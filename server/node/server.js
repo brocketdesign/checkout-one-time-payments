@@ -127,7 +127,7 @@ const handleFileUpload = async (file) => {
 };
 
 app.get('/', (req, res) => {
-  const path = resolve(process.env.STATIC_DIR + '/index.html');
+  const path = resolve(`${process.env.STATIC_DIR}/index.html`);
   res.sendFile(path);
 });
 
@@ -151,7 +151,10 @@ app.get('/api/checkout-session', async (req, res) => {
 
 app.post('/api/create-checkout-session', async (req, res) => {
   try {
-    const domainURL = process.env.DOMAIN;
+    // on localhost, use http://localhost:4242 but on production use the domain
+    const currentURL = req.protocol + '://' + req.get('host');
+    console.log('Current URL:', currentURL);
+    const domainURL = process.env.MODE === 'local' ? 'http://localhost:4242' : currentURL;
     const { tempId, roundedSellingPrice, fileName, duration, resolution, fileSize, frameCount } = req.body;
     
     if (!tempId || !tempFiles.has(tempId)) {
