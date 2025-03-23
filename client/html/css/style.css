@@ -93,7 +93,7 @@ h1 {
   display: block !important;
   margin-top: 20px !important;
   font-size: 21px !important;
-  min-width: 400px !important;
+  min-width: 200px !important;
 }
 
 .proceed-btn:hover {
