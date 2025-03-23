@@ -45,6 +45,15 @@ const upload = multer({
   limits: { fileSize: 50 * 1024 * 1024 } // 50MB limit
 });
 
+// Redirect to https if not local and not already https
+app.use((req, res, next) => {
+  if (process.env.MODE !== 'local' && req.headers['x-forwarded-proto'] !== 'https') {
+    res.redirect(`https://${req.headers['host']}${req.url}`);
+  } else {
+    next();
+  }
+});
+
 app.use(express.static(process.env.STATIC_DIR));
 app.use(express.urlencoded({ extended: true }));
 app.use(
