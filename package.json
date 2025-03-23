@@ -20,7 +20,8 @@
     "ws": "^8.8.0",
     "@aws-sdk/client-s3": "^3.529.1",
     "uuid": "^9.0.1",
-    "express-handlebars": "^7.0.0"
+    "express-handlebars": "^7.0.0",
+    "cookie-parser": "^1.4.6"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"

@@ -1,4 +1,8 @@
 document.addEventListener('DOMContentLoaded', async () => {
+  console.log('Translations loaded:', translations);
+  // Parse the translations JSON string into an object
+  const translationsObj = JSON.parse(translations);
+  
   // Get elements
   const statusMessage = document.getElementById('status-message');
   const videoResult = document.getElementById('video-result');
@@ -53,17 +57,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       if (!tempId) {
-        throw new Error('No tempId found. Cannot retrieve your files.');
+        throw new Error(translationsObj.no_temp_id_error);
       }
 
       // Ensure progress bar is visible
       progressContainer.classList.remove('hidden');
       progressContainer.style.display = 'block';
-      updateProgress(0, 'Initializing video processing...');
+      updateProgress(0, translationsObj.initializing_processing);
 
       // Submit for processing
       log('Submitting for processing', { tempId });
-      statusMessage.textContent = 'Submitting files for processing...';
+      statusMessage.textContent = translationsObj.submitting_files;
       
       const response = await fetch('/api/process-video', {
         method: 'POST',
@@ -74,14 +78,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
 
       if (!response.ok) {
-        throw new Error(`Server responded with ${response.status}: ${await response.text()}`);
+        throw new Error(`${translationsObj.server_error} ${response.status}: ${await response.text()}`);
       }
 
       const data = await response.json();
       const taskId = data.task_id;
       log('Process initiated', { taskId });
       
-      updateProgress(0, 'Process started. Connecting to status updates...');
+      updateProgress(0, translationsObj.process_started);
 
       // Set up WebSocket connection with reconnection logic
       function setupWebSocket(taskId) {
@@ -116,7 +120,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (message.progress && !isProcessingComplete) {
               // Use the exact progress value from the server, don't modify it
-              updateProgress(message.progress, message.status || 'Processing...');
+              updateProgress(message.progress, message.status || translationsObj.processing);
             }
 
             if (message.status === 'success') {
@@ -124,8 +128,8 @@ document.addEventListener('DOMContentLoaded', async () => {
               // Hide progress bar when complete
               progressContainer.classList.add('hidden');
               // Update status messages
-              document.querySelector('h1').textContent = 'Success!';
-              statusMessage.textContent = 'Your video is ready! Download it below.';
+              document.querySelector('h1').textContent = translationsObj.success;
+              statusMessage.textContent = translationsObj.video_ready;
               
               // Show completion section with video and buttons
               completionSection.classList.remove('hidden');
@@ -139,19 +143,18 @@ document.addEventListener('DOMContentLoaded', async () => {
               // Save video URL to local storage
               saveVideoUrl(message.video_url);
               
-              // Make sure to close the WebSocket connection
               ws.close();
             } else if (message.status === 'failed') {
               isProcessingComplete = true;
               // Hide progress bar on failure too
               progressContainer.classList.add('hidden');
-              showError(`Video processing failed: ${message.error}`);
+              showError(translationsObj.processing_failed.replace('{error}', message.error));
               ws.close();
             } else if (message.status === 'timeout') {
               isProcessingComplete = true;
               // Hide progress bar on timeout
               progressContainer.classList.add('hidden');
-              showError(`Video processing timed out: ${message.error}`);
+              showError(translationsObj.processing_timeout.replace('{error}', message.error));
               ws.close();
             }
           } catch (error) {
@@ -175,13 +178,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             reconnectAttempts++;
             const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 10000);
             log(`Attempting to reconnect in ${delay}ms (attempt ${reconnectAttempts}/${maxReconnectAttempts})...`);
-            updateProgress(0, `Connection lost. Reconnecting (${reconnectAttempts}/${maxReconnectAttempts})...`);
+            updateProgress(0, translationsObj.connection_lost.replace('{attempts}', reconnectAttempts).replace('{maxAttempts}', maxReconnectAttempts));
             
             reconnectTimeout = setTimeout(() => {
               setupWebSocket(taskId);
             }, delay);
           } else if (event.code !== 1000) {
-            showError('Connection closed unexpectedly. Please refresh to try again.');
+            showError(translationsObj.connection_closed);
           }
         };
 
@@ -204,7 +207,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (error) {
       log('Error in processVideo', { error: error.message });
-      showError(`Error: ${error.message}`);
+      showError(`${translationsObj.error}: ${error.message}`);
     }
   }
 
@@ -222,7 +225,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     statusMessage.classList.add('hidden');
     errorMessage.textContent = message;
     errorMessage.classList.remove('hidden');
-    updateProgress(100, 'Error');
+    updateProgress(100, translationsObj.error);
     progressFill.style.backgroundColor = '#e74c3c';
   }
 
@@ -234,14 +237,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   const changeFaceButton = document.getElementById('change-face-button');
 
   anotherVideoButton.addEventListener('click', () => {
-    window.location.href = '/';
+    // Get the current language
+    const currentLanguage = document.documentElement.lang;
+    // Redirect to the home page with the language prefix
+    window.location.href = currentLanguage === 'en' ? '/' : `/${currentLanguage}/`;
   });
 
   changeFaceButton.addEventListener('click', () => {
     // Get the video URL from the video source
     const videoUrl = videoSource.src;
-    // Redirect to the index page with the video URL as a query parameter
-    window.location.href = `/?videoUrl=${encodeURIComponent(videoUrl)}`;
+    // Get the current language
+    const currentLanguage = document.documentElement.lang;
+    // Redirect to the index page with the video URL and language prefix
+    const baseUrl = currentLanguage === 'en' ? '/' : `/${currentLanguage}/`;
+    window.location.href = `${baseUrl}?videoUrl=${encodeURIComponent(videoUrl)}`;
   });
 });
 

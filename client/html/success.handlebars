@@ -1,16 +1,17 @@
 <!DOCTYPE html>
-<html>
+<html lang="{{language}}">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Processing Video</title>
+    <title>{{ translations.processing_video }}</title>
 
     <link rel="icon" href="favicon.ico" type="image/x-icon" />
-    <link rel="stylesheet" href="css/normalize.css" />
-    <link rel="stylesheet" href="css/global.css" />
-    <link rel="stylesheet" href="style.css" />
-    <script src="./success.js" defer></script>
+    <link rel="stylesheet" href="/css/normalize.css" />
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <script>const translations = `{{{json translations}}}`;</script> 
+    <script src="/success.js" defer></script>
     <style>
       .progress-bar {
         background-color: #e0e0e0;
@@ -42,15 +43,15 @@
     <div class="sr-root">
       <div class="sr-main">
         <section class="container">
-          <h1>Processing Your Video...</h1>
-          <div id="status-message" class="processing">Retrieving your upload...</div>
+          <h1>{{ translations.processing_your_video }}</h1>
+          <div id="status-message" class="processing">{{ translations.retrieving_upload }}</div>
           
           <div id="progress-container" class="progress-container">
             <div class="progress-bar" style="position: relative;">
               <div id="progress-fill" class="progress-fill" style="width: 0%;"></div>
               <span id="progress-text" style="position: absolute; top: 0; left: 50%;">0%</span>
             </div>
-            <div id="progress-status" class="progress-status">Initializing...</div>
+            <div id="progress-status" class="progress-status">{{ translations.initializing }}</div>
           </div>
           
           <div id="completion-section" class="hidden">            
@@ -60,13 +61,13 @@
                 Your browser does not support the video tag.
               </video>
               <p>
-                <a id="download-link" href="#" download="video.mp4">Download video</a>
+                <a id="download-link" href="#" download="video.mp4">{{ translations.download_video }}</a>
               </p>
             </div>
 
             <div id="action-buttons">
-              <button id="another-video-button">Generate another video</button>
-              <button id="change-face-button">Change the face</button>
+              <button id="another-video-button">{{ translations.generate_another_video }}</button>
+              <button id="change-face-button">{{ translations.change_the_face }}</button>
             </div>
           </div>
 

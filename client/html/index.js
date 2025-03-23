@@ -2,6 +2,9 @@ const stripe = Stripe(
   'pk_test_51PjtRbE5sP7DA1XvD68v7X7Qj7pG6ZJpQmvuNodJjxc7MbH1ss2Te2gahFAS9nms4pbmEdMYdfCPxFDWHBbu9CxR003ikTnRES'
 ); // Replace with your actual publishable key
 
+// Parse the translations JSON string into an object
+const translationsObj = JSON.parse(translations);
+
 // Add a variable to store the rounded selling price
 let roundedSellingPrice = 0;
 
@@ -103,7 +106,7 @@ function handleImageSelection(imageFile) {
 // Proceed Button Logic
 payButton.addEventListener('click', async () => {
   if (!videoInput.files.length || !imageInput.files.length) {
-    status.textContent = 'Please upload both video and image';
+    status.textContent = translationsObj.please_upload_both;
     console.log('Missing files');
     return;
   }
@@ -113,7 +116,7 @@ payButton.addEventListener('click', async () => {
   formData.append('face_image_file', imageInput.files[0]);
 
   try {
-    status.textContent = 'Uploading files...';
+    status.textContent = translationsObj.uploading_files;
     const response = await fetch('/api/temp-upload', {
       method: 'POST',
       body: formData,
@@ -128,12 +131,21 @@ payButton.addEventListener('click', async () => {
     const tempId = data.tempId;
 
     const skipPayment = document.getElementById('skipPayment').checked;
-
+    
+    // Get the current language from cookie preferredLanguage
+    const currentLanguage = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('preferredLanguage='))
+      ?.split('=')[1];
+    console.log('Current language:', currentLanguage);
+    const baseUrl = currentLanguage === 'en' || !currentLanguage ? '/' : `/${currentLanguage}/`;
+    const redirectionUrl = `${baseUrl}success?tempId=${tempId}`;
+    console.log('Redirection URL:', redirectionUrl);
     if (skipPayment) {
-      window.location.href = '/success.html?tempId=' + tempId;
+      window.location.href = `${baseUrl}success?tempId=${tempId}`;
       console.log('Skipping payment, redirecting with tempId:', tempId);
     } else {
-      status.textContent = 'Creating checkout session...';
+      status.textContent = translationsObj.creating_checkout;
 
       // Extract video details
       const sessionResponse = await fetch('/api/create-checkout-session', {
@@ -170,7 +182,7 @@ payButton.addEventListener('click', async () => {
     }
   } catch (error) {
     console.error('Error:', error);
-    status.textContent = `An error occurred: ${error.message}`;
+    status.textContent = `${translationsObj.an_error_occurred}: ${error.message}`;
   }
 });
 
@@ -200,20 +212,20 @@ async function getVideoDetails(videoFile) {
     roundedSellingPrice = Math.ceil(sellingPrice);
 
     videoDetails.innerHTML = `
-      <h3>Video Details</h3>
+      <h3>${translationsObj.video_details}</h3>
       <ul style="text-align: left;">
-      <li><strong>Name:</strong> ${fileName}</li>
-      <li><strong>Duration:</strong> ${duration.toFixed(2)} seconds</li>
-      <li><strong>Resolution:</strong> ${width}x${height}</li>
-      <li><strong>Size:</strong> ${(fileSize / (1024 * 1024)).toFixed(2)} MB</li>
-      <li><strong>Estimated Frame Count:</strong> ${frameCount}</li>
-      <li><strong>Processing Fee:</strong> $${roundedSellingPrice.toFixed(2)}</li>
+      <li><strong>${translationsObj.name}:</strong> ${fileName}</li>
+      <li><strong>${translationsObj.duration}:</strong> ${duration.toFixed(2)} ${translationsObj.seconds}</li>
+      <li><strong>${translationsObj.resolution}:</strong> ${width}x${height}</li>
+      <li><strong>${translationsObj.size}:</strong> ${(fileSize / (1024 * 1024)).toFixed(2)} MB</li>
+      <li><strong>${translationsObj.estimated_frame_count}:</strong> ${frameCount}</li>
+      <li><strong>${translationsObj.processing_fee}:</strong> $${roundedSellingPrice.toFixed(2)}</li>
       </ul>
     `;
   }
 
   video.onerror = function() {
-    status.textContent = 'Error loading video metadata.';
+    status.textContent = translationsObj.error_loading_metadata;
   }
 
   video.src = URL.createObjectURL(videoFile);
@@ -258,7 +270,7 @@ async function loadVideoFromUrl(videoUrl) {
     videoInput.dispatchEvent(event);
   } catch (error) {
     console.error('Error loading video from URL:', error);
-    status.textContent = 'Error loading video from URL.';
+    status.textContent = translationsObj.error_loading_url;
   }
 }
 

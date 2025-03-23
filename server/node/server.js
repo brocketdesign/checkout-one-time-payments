@@ -10,6 +10,7 @@ const { S3Client, PutObjectCommand, ListObjectsV2Command } = require('@aws-sdk/c
 const { createHash } = require('crypto');
 const { v4: uuidv4 } = require('uuid');
 const handlebars = require('express-handlebars'); // Require Handlebars
+const cookieParser = require('cookie-parser'); // Add cookie-parser
 
 // Copy the .env.example in the root into a .env file in this folder
 require('dotenv').config({ path: './.env' });
@@ -57,6 +58,9 @@ app.use(
     },
   })
 );
+
+// Add cookie-parser middleware
+app.use(cookieParser());
 
 // S3 Upload Helper Functions
 const uploadToS3 = async (buffer, hash, filename) => {
@@ -155,7 +159,9 @@ const hbs = handlebars.create({
   },
   defaultLayout: false // Disable default layout
 });
-
+hbs.handlebars.registerHelper('json', function(context) {
+  return JSON.stringify(context);
+});
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 app.set('views', process.env.STATIC_DIR);
@@ -173,6 +179,58 @@ app.get(['/', '/:lang/'], (req, res) => {
   res.cookie('preferredLanguage', language, { maxAge: 365 * 24 * 60 * 60 * 1000, httpOnly: false }); // Expires in 1 year
 
   // Load translation file
+  const translationPath = resolve(`${process.env.STATIC_DIR}/lang/${language}.json`);
+  let translations = {};
+  try {
+    const translationFile = fs.readFileSync(translationPath, 'utf-8');
+    translations = JSON.parse(translationFile);
+  } catch (error) {
+    console.error('Error loading translations:', error);
+  }
+
+  // Send the translation data to the client
+  res.render(path, { translations, language });
+});
+
+app.get(['/success', '/:lang/success'], (req, res) => {
+  const path = 'success';
+
+  // Determine language from cookie, URL parameter, or headers, default to 'en'
+  let language = req.cookies?.preferredLanguage || req.params.lang || (req.headers['accept-language']?.startsWith('ja') ? 'ja' : 'en');
+  if (language !== 'ja' && language !== 'en') {
+    language = 'en'; // Default to English if the language is not supported
+  }
+
+  // Correct the translation path - looking for translations in the lang directory
+  const translationPath = resolve(`${process.env.STATIC_DIR}/lang/${language}.json`);
+  let translations = {};
+  try {
+    const translationFile = fs.readFileSync(translationPath, 'utf-8');
+    translations = JSON.parse(translationFile);
+    console.log(`Loaded translations from ${translationPath}`);
+  } catch (error) {
+    console.error(`Error loading translations from ${translationPath}:`, error);
+  }
+
+  console.log(`Rendering success template with language: ${language}, tempId: ${req.query.tempId}`);
+  // Send the translation data to the client
+  res.render(path, { 
+    translations, 
+    language,
+    tempId: req.query.tempId  // Pass the tempId to the template
+  });
+});
+
+app.get(['/canceled', '/:lang/canceled'], (req, res) => {
+  const path = 'canceled';
+
+  // Determine language from cookie, URL parameter, or headers, default to 'en'
+  let language = req.cookies?.preferredLanguage || req.params.lang || (req.headers['accept-language']?.startsWith('ja') ? 'ja' : 'en');
+  if (language !== 'ja' && language !== 'en') {
+    language = 'en'; // Default to English if the language is not supported
+  }
+
+  // Correct the translation path - looking for translations in the lang directory
   const translationPath = resolve(`${process.env.STATIC_DIR}/lang/${language}.json`);
   let translations = {};
   try {
@@ -215,7 +273,7 @@ app.post('/api/create-checkout-session', async (req, res) => {
     if (!tempId || !tempFiles.has(tempId)) {
       return res.status(400).json({ error: 'Invalid tempId or files have expired' });
     }
-    
+
     // Construct line_items array using roundedSellingPrice
     const line_items = [
       {
@@ -230,14 +288,19 @@ app.post('/api/create-checkout-session', async (req, res) => {
         quantity: 1
       }
     ];
-
+    
+    // Determine language from cookie, URL parameter, or headers, default to 'en'
+    let language = req.cookies?.preferredLanguage || req.params.lang || (req.headers['accept-language']?.startsWith('ja') ? 'ja' : 'en');
+    if (language !== 'ja' && language !== 'en') {
+      language = 'en'; // Default to English if the language is not supported
+    }
     // Create new Checkout Session for the order
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       line_items: line_items,
       // Add tempId to success URL to retrieve files after payment
-      success_url: `${domainURL}/success.html?session_id={CHECKOUT_SESSION_ID}&tempId=${tempId}`,
-      cancel_url: `${domainURL}/canceled.html`,
+      success_url: `${domainURL}/${language}/success?session_id={CHECKOUT_SESSION_ID}&tempId=${tempId}`,
+      cancel_url: `${domainURL}/${language}/canceled`,
       // automatic_tax: {enabled: true},
     });
 
