@@ -9,6 +9,7 @@ const { WebSocket, WebSocketServer } = require('ws');
 const { S3Client, PutObjectCommand, ListObjectsV2Command } = require('@aws-sdk/client-s3');
 const { createHash } = require('crypto');
 const { v4: uuidv4 } = require('uuid');
+const handlebars = require('express-handlebars'); // Require Handlebars
 
 // Copy the .env.example in the root into a .env file in this folder
 require('dotenv').config({ path: './.env' });
@@ -126,9 +127,63 @@ const handleFileUpload = async (file) => {
     }
 };
 
-app.get('/', (req, res) => {
-  const path = resolve(`${process.env.STATIC_DIR}/index.html`);
-  res.sendFile(path);
+// Configure Express to use Handlebars template engine
+const hbs = handlebars.create({
+  helpers: {
+    ifCond: function (v1, operator, v2, options) {
+      switch (operator) {
+        case '==':
+          return (v1 == v2) ? options.fn(this) : options.inverse(this);
+        case '===':
+          return (v1 === v2) ? options.fn(this) : options.inverse(this);
+        case '!=':
+          return (v1 != v2) ? options.fn(this) : options.inverse(this);
+        case '!==':
+          return (v1 !== v2) ? options.fn(this) : options.inverse(this);
+        case '<':
+          return (v1 < v2) ? options.fn(this) : options.inverse(this);
+        case '<=':
+          return (v1 <= v2) ? options.fn(this) : options.inverse(this);
+        case '>':
+          return (v1 > v2) ? options.fn(this) : options.inverse(this);
+        case '>=':
+          return (v1 >= v2) ? options.fn(this) : options.inverse(this);
+        default:
+          return options.inverse(this);
+      }
+    }
+  },
+  defaultLayout: false // Disable default layout
+});
+
+app.engine('handlebars', hbs.engine);
+app.set('view engine', 'handlebars');
+app.set('views', process.env.STATIC_DIR);
+
+app.get(['/', '/:lang/'], (req, res) => {
+  const path = 'index';
+
+  // Determine language from URL parameter or headers, default to 'en'
+  let language = req.params.lang || (req.headers['accept-language']?.startsWith('ja') ? 'ja' : 'en');
+  if (language !== 'ja' && language !== 'en') {
+    language = 'en'; // Default to English if the language is not supported
+  }
+
+  // Set the preferred language cookie
+  res.cookie('preferredLanguage', language, { maxAge: 365 * 24 * 60 * 60 * 1000, httpOnly: false }); // Expires in 1 year
+
+  // Load translation file
+  const translationPath = resolve(`${process.env.STATIC_DIR}/lang/${language}.json`);
+  let translations = {};
+  try {
+    const translationFile = fs.readFileSync(translationPath, 'utf-8');
+    translations = JSON.parse(translationFile);
+  } catch (error) {
+    console.error('Error loading translations:', error);
+  }
+
+  // Send the translation data to the client
+  res.render(path, { translations, language });
 });
 
 // Prefix API routes with /api for consistency
