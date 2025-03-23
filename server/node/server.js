@@ -166,31 +166,6 @@ app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 app.set('views', process.env.STATIC_DIR);
 
-app.get(['/', '/:lang/'], (req, res) => {
-  const path = 'index';
-
-  // Determine language from URL parameter or headers, default to 'en'
-  let language = req.params.lang || (req.headers['accept-language']?.startsWith('ja') ? 'ja' : 'en');
-  if (language !== 'ja' && language !== 'en') {
-    language = 'en'; // Default to English if the language is not supported
-  }
-
-  // Set the preferred language cookie
-  res.cookie('preferredLanguage', language, { maxAge: 365 * 24 * 60 * 60 * 1000, httpOnly: false }); // Expires in 1 year
-
-  // Load translation file
-  const translationPath = resolve(`${process.env.STATIC_DIR}/lang/${language}.json`);
-  let translations = {};
-  try {
-    const translationFile = fs.readFileSync(translationPath, 'utf-8');
-    translations = JSON.parse(translationFile);
-  } catch (error) {
-    console.error('Error loading translations:', error);
-  }
-
-  // Send the translation data to the client
-  res.render(path, { translations, language });
-});
 
 app.get(['/success', '/:lang/success'], (req, res) => {
   const path = 'success';
@@ -231,6 +206,32 @@ app.get(['/canceled', '/:lang/canceled'], (req, res) => {
   }
 
   // Correct the translation path - looking for translations in the lang directory
+  const translationPath = resolve(`${process.env.STATIC_DIR}/lang/${language}.json`);
+  let translations = {};
+  try {
+    const translationFile = fs.readFileSync(translationPath, 'utf-8');
+    translations = JSON.parse(translationFile);
+  } catch (error) {
+    console.error('Error loading translations:', error);
+  }
+
+  // Send the translation data to the client
+  res.render(path, { translations, language });
+});
+
+app.get(['/', '/:lang/'], (req, res) => {
+  const path = 'index';
+
+  // Determine language from URL parameter or headers, default to 'en'
+  let language = req.params.lang || (req.headers['accept-language']?.startsWith('ja') ? 'ja' : 'en');
+  if (language !== 'ja' && language !== 'en') {
+    language = 'en'; // Default to English if the language is not supported
+  }
+
+  // Set the preferred language cookie
+  res.cookie('preferredLanguage', language, { maxAge: 365 * 24 * 60 * 60 * 1000, httpOnly: false }); // Expires in 1 year
+
+  // Load translation file
   const translationPath = resolve(`${process.env.STATIC_DIR}/lang/${language}.json`);
   let translations = {};
   try {
