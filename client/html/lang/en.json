@@ -86,9 +86,103 @@
   "privacy_policy": "Privacy Policy",
   "service_complaint_policy": "Service Complaint Policy",
   "contact": "Contact",
-  "home": "Home",
-  "demo": "Demo",
-  "benefits": "Benefits",
-  "pricing": "Pricing",
-  "faq": "FAQ"
+  "home": {
+    "title": "Home"
+  },
+  "demo": {
+    "title": "Demo",
+    "heading": "See AI Face Swap in Action",
+    "description": "Watch your video transform as our AI swaps faces with stunning realism. Our cutting-edge technology meticulously analyzes each frame to swap faces seamlessly, providing an experience that's not only efficient but also entertaining. Whether you're looking to create fun pranks, movie-like effects, or unique social media content, our platform offers a safe, high-quality solution that brings your creative visions to life. The process preserves facial expressions and movements, ensuring that emotions and personality shine through in every frame. This is AI-powered magic at its best, combining advanced algorithms with a user-friendly interface to deliver professional results on demand.",
+    "funNote": "Great for pranks, movie magic, or simply creating unforgettable moments with friends and family!",
+    "imageAlt": "Before and after face swap comparison",
+    "videoAlt": "Demo video showing face swap in action"
+  },
+  "benefits": {
+    "title": "Benefits",
+    "heading": "Why Choose Our AI Face Swap",
+    "seamless": {
+      "title": "Seamless Face Swapping",
+      "description": "Our sophisticated AI ensures perfectly natural-looking face swaps that maintain expressions, movements, and emotions throughout your video. Using cutting-edge deep learning algorithms trained on millions of facial data points, our technology creates seamless transitions and realistic blending that's nearly indistinguishable from the original. The system adapts to different lighting conditions, angles, and facial expressions to maintain consistency across every frame of your video, even during complex movements or rapid scene changes."
+    },
+    "secure": {
+      "title": "Complete Security & Privacy",
+      "description": "Your privacy matters to us. All uploads are encrypted and automatically deleted after processing, ensuring your content remains yours alone. We implement bank-level SSL encryption for all data transfers and use secure cloud storage with strict access controls. Our privacy-first approach means we never use your content for training our AI or sharing it with third parties. You retain complete ownership of all processed videos, and our transparent privacy policy clearly outlines how we handle your data. Rest assured your personal information and creative content are always protected."
+    },
+    "fast": {
+      "title": "Lightning-Fast Processing",
+      "description": "No more waiting hours for results. Our optimized AI completes most face swaps in just minutes, not hours. Thanks to our distributed processing infrastructure and GPU acceleration, even longer videos are processed efficiently. Our intelligent queue management system prioritizes tasks optimally, while our proprietary compression algorithms reduce transfer times without sacrificing quality. We continuously fine-tune our processing pipeline to improve speed without compromising the exceptional quality you expect, ensuring you get professional-grade results in a fraction of the time compared to other solutions."
+    },
+    "quality": {
+      "title": "Professional-Quality Results",
+      "description": "Enjoy studio-grade face swaps with attention to detail that sets us apart from basic apps and filters. Our advanced AI produces results that maintain consistent skin tones, accurate lighting adaptation, and precise facial feature alignment. The technology preserves natural shadows, reflections, and texture variations that make the swap believable even under scrutiny. Unlike simpler solutions, our system handles challenging scenarios like profile views, partial face visibility, and rapid movements with remarkable accuracy, ensuring professional quality throughout your entire video regardless of complexity."
+    }
+  },
+  "hero": {
+    "headline": "Unlock the Magic of AI Face Swapping",
+    "tagline": "Transform your videos with realistic and seamless face swaps. Experience the future of video editing today!",
+    "cta": "Try it Now",
+    "imageAlt": "AI face swap hero image"
+  },
+  "dynamicPricing": {
+    "title": "Pricing",
+    "heading": "Dynamic Pricing",
+    "description": "We use dynamic pricing to give you the best possible value. Simply upload your video and photo, and we'll provide an accurate estimate based on video length, resolution, and other factors.",
+    "reassurance": "Rest assured, we only charge you for successful face swaps. Try it now to see how affordable and easy it is!",
+    "ctaButton": "Try it Now",
+    "estimatedPriceLabel": "Estimated Price:",
+    "adultContentNote": "Note: Adult content may incur additional charges."
+  },
+  "faq": {
+    "title": "FAQ",
+    "heading": "Frequently Asked Questions",
+    "q1": {
+      "question": "What video formats do you support?",
+      "answer": "We support all major video formats including MP4, AVI, MOV, WMV, and more. If you have a particular format need, please contact our support team. Our system is designed to be compatible with virtually any standard video format you might encounter, making it easy to use without worrying about technical details or conversions. For optimal processing speed, we recommend using MP4 files encoded with H.264, but this is not a requirement."
+    },
+    "q2": {
+      "question": "How quickly will my video be processed?",
+      "answer": "Processing time depends on video length and complexity, but most videos under 5 minutes are completed within 10-15 minutes. Our system uses parallel processing techniques to maximize efficiency for all users. Longer videos or those with multiple faces may take additional time to ensure quality results. Pro and Enterprise users receive priority in our processing queue, which can significantly reduce waiting times during peak periods. You'll receive a notification as soon as your video is ready for download."
+    },
+    "q3": {
+      "question": "Is my data secure and private?",
+      "answer": "Absolutely. We use bank-level encryption for all uploads and automatically delete your files after processing is complete and a brief retention period (typically 24 hours). Our privacy policy strictly prohibits using customer content for AI training or sharing with third parties. We maintain SOC 2 compliance and regular security audits to ensure your data remains protected. All processing happens on secure isolated servers, and access to processing systems is strictly limited to essential personnel only."
+    },
+    "q4": {
+      "question": "Can I swap multiple faces in one video?",
+      "answer": "Currently, we process one face swap per video for optimal quality and accuracy. This allows our AI to focus entirely on creating the most realistic and seamless integration possible. If you need multiple faces swapped, we recommend processing the video multiple times in sequence, swapping one face at a time. For Enterprise clients with specific multi-face swap requirements, we can develop custom solutions to handle more complex scenarios. Contact our sales team to discuss your specific needs."
+    },
+    "q5": {
+      "question": "What if I'm not satisfied with the results?",
+      "answer": "Customer satisfaction is our priority. If you're not happy with your face swap, please contact our support team within 7 days of processing, and we'll work with you to improve the results or provide a refund. We might ask for specific feedback to help us understand what aspects didn't meet your expectations, which helps us continuously improve our technology. In many cases, simply providing a different photo or adjusting certain parameters can dramatically improve results on a second attempt."
+    }
+  },
+  "footer": {
+    "ctaHeading": "Ready to Create Amazing Videos?",
+    "ctaMessage": "Join thousands of satisfied users who have transformed their videos with our AI face swap technology. Whether for fun, creative projects, or professional content, we make the impossible possible with just a few clicks.",
+    "ctaButton": "Start Face Swapping Now",
+    "imageAlt": "Happy user enjoying their face-swapped video"
+  },
+  "howItWorks": {
+    "heading": "How It Works - Simple as 1-2-3-4",
+    "step1": {
+      "title": "Upload Your Video",
+      "description": "Start by uploading any video clip where you want to swap a face. Our system accepts all common formats including MP4, AVI, MOV, and more with file sizes up to 500MB. The upload process is quick and secure, with a simple drag-and-drop interface that makes getting started a breeze. For best results, choose videos with clear, well-lit faces and minimal rapid movements. Your video remains private and is processed on our secure servers with encryption to protect your content.",
+      "imageAlt": "Illustration of video upload process"
+    },
+    "step2": {
+      "title": "Upload a Photo",
+      "description": "Next, upload a clear photo of the face you want to insert into your video. Front-facing portraits with good lighting work best. Our AI is remarkably adaptable, but clearer images produce more convincing results. The photo should show the entire face without obstructions like sunglasses or heavy shadows. Our system will analyze the facial features, expressions, and unique characteristics to create a seamless integration. Don't worry about perfect alignment – our advanced algorithms handle the positioning and scaling automatically.",
+      "imageAlt": "Illustration of photo upload process"
+    },
+    "step3": {
+      "title": "Proceed to Payment",
+      "description": "After uploading your files, proceed to our secure payment process. We offer various affordable options based on your specific needs, from one-time swaps to subscription plans for regular users. All transactions are processed through industry-standard secure payment gateways, ensuring your financial information remains completely protected. We use 256-bit encryption and never store your complete payment details. Once payment is confirmed, your face swap process begins immediately, with no unnecessary waiting periods.",
+      "imageAlt": "Secure payment process illustration"
+    },
+    "step4": {
+      "title": "Download Your Video",
+      "description": "Within minutes, your face-swapped video will be ready to download and share! The processing time depends on the video length and complexity, but our advanced AI works quickly to deliver high-quality results. Once complete, you'll receive a notification and can download your video in full resolution. The finished product maintains the original video quality while perfectly integrating the new face throughout every frame. You own the result completely and can use it however you like – share on social media, send to friends, or keep for your personal collection.",
+      "imageAlt": "Illustration of downloading completed video"
+    }
+  }
 }

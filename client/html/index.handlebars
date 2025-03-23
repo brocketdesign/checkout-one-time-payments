@@ -17,16 +17,16 @@
 
   <body>
     {{> header translations=translations}}
-    <div class="sr-root">
+    <div class="container mx-auto mt-5 bg-white text-dark">
       <div class="main" style="width: 100%;">
-        <section class="main-container" style="background-color: white; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+        <section id="top" class="main-container">
           <div>
             <h1 id="title" style="padding-top: 50px;">{{ translations.title }}</h1>
             <h4 id="subtitle" class="subtitle">{{ translations.subtitle }}</h4>
           </div>
 
           <div class="upload-container">
-            <div class="upload-section">
+            <div class="upload-section bg-light border shadow-sm">
               <h4 id="instruction_video" class="instruction">{{ translations.instruction_video }}</h4>
               <div id="videoDropZone" class="drop-zone">
                 <input
@@ -45,7 +45,7 @@
               <div id="videoDetails" class="video-details"></div>
             </div>
 
-            <div class="upload-section">
+            <div class="upload-section bg-light border shadow-sm">
               <h4 id="instruction_image" class="instruction">{{ translations.instruction_image }}</h4>
               <div id="imageDropZone" class="drop-zone">
                 <input
@@ -68,7 +68,7 @@
           <div class="payment-section"style="max-width: 80%; padding-bottom: 50px; margin: 50px auto 0 auto;">
             <input type="checkbox" id="skipPayment" name="skipPayment" checked />
             <label for="skipPayment"><span>{{ translations.skip_payment }}</span></label>
-            <button id="payButton" class="proceed-btn"><span>{{ translations.proceed }}</span></button>
+            <button id="payButton" class="btn btn-danger d-block proceed-btn shadow border border-white "><span>{{ translations.proceed }}</span></button>
           </div>
 
           <script>
@@ -80,88 +80,180 @@
 
           <div id="status" class="status"></div>
         </section>
-
-        <section style=" margin: 40px auto; padding: 20px; text-align: center;">
-          <h1 id="ai_video_face_swap" style="font-size: 2em; font-weight: bold; color: #333;">{{ translations.ai_video_face_swap }}</h1>
-          <p id="video_face_swap_description" style="font-size: 1.1em; color: #666; margin-bottom: 40px;">{{ translations.video_face_swap_description }}</p>
-
-          <div class="columns" style="display: flex; justify-content: space-between;">
-            <div style="width: 45%; padding: 10px;">
-              <h2 id="how_to_use" style="font-size: 1.5em; color: #333;">{{ translations.how_to_use }}</h2>
-              <ol style="list-style: decimal inside; color: #666; text-align: left;">
-                <li id="step1">{{ translations.step1 }}</li>
-                <li id="step2">{{ translations.step2 }}</li>
-                <li id="step3">{{ translations.step3 }}</li>
-                <li id="step4">{{ translations.step4 }}</li>
-              </ol>
-            </div>
-
-            <div style="width: 45%; padding: 10px;">
-              <h2 id="why_choose" style="font-size: 1.5em; color: #333;">{{ translations.why_choose }}</h2>
-              <ol style="list-style: decimal inside; color: #666; text-align: left;">
-                <li id="reason1">{{ translations.reason1 }}</li>
-                <li id="reason2">{{ translations.reason2 }}</li>
-                <li id="reason3">{{ translations.reason3 }}</li>
-                <li id="reason4">{{ translations.reason4 }}</li>
-              </ol>
-            </div>
-          </div>
-
-          <div class="features" style="display: flex; justify-content: space-around; margin-top: 40px;">
-            <div style="width: 30%; text-align: center;">
-              <span style="font-size: 2em; margin-bottom: 10px;">🎥</span>
-              <p id="seamless_face_swapping" style="font-size: 1em; color: #666;">{{ translations.seamless_face_swapping }}</p>
-            </div>
-
-            <div style="width: 30%; text-align: center;">
-              <span style="font-size: 2em; margin-bottom: 10px;">🔒</span>
-              <p id="secure_payments" style="font-size: 1em; color: #666;">{{ translations.secure_payments }}</p>
-            </div>
-
-            <div style="width: 30%; text-align: center;">
-              <span style="font-size: 2em; margin-bottom: 10px;">⚡</span>
-              <p id="fast_processing" style="font-size: 1em; color: #666;">{{ translations.fast_processing }}</p>
+        <!-- Add your edit here -->
+     </div>
+    </div>
+    <div class="features">
+        <!-- Hero Section -->
+        <section id="hero" class="section py-5">
+          <div class="container mx-auto">
+            <div class="row align-items-center">
+              <div class="col-md-6">
+            <img src="/img/demo-swap1.webp" alt="{{ translations.hero.imageAlt }}" class="img-fluid">
+              </div>
+              <div class="col-md-6">
+                <h2>{{ translations.hero.headline }}</h2>
+                <p>{{ translations.hero.tagline }}</p>
+                {{#if translations.hero.cta}}
+                  <a href="#top" class="btn btn-primary btn-lg cta" style="padding: 12px 30px; font-size: 1.2em; border-radius: 30px;">{{ translations.hero.cta }}</a>
+                {{/if}}
+              </div>
             </div>
           </div>
         </section>
 
-        <section id="demo" style="margin: 40px auto; padding: 20px; text-align: center;">
-          <h1 style="font-size: 2em; font-weight: bold; color: #333;">{{ translations.demo_heading }}</h1>
-          <p style="font-size: 1.1em; color: #666; margin-bottom: 40px;">{{ translations.demo_description }}</p>
-          <!-- Placeholder for demo content -->
-          <p style="color: #666;">{{ translations.demo_placeholder }}</p>
-        </section>
-
-        <section id="benefits" style="margin: 40px auto; padding: 20px; text-align: center;">
-          <h1 style="font-size: 2em; font-weight: bold; color: #333;">{{ translations.benefits_heading }}</h1>
-          <div style="display: flex; justify-content: space-around; margin-top: 20px;">
-            <div style="width: 30%; text-align: center;">
-              <p style="font-size: 1em; color: #666;">{{ translations.benefit1 }}</p>
-            </div>
-            <div style="width: 30%; text-align: center;">
-              <p style="font-size: 1em; color: #666;">{{ translations.benefit2 }}</p>
-            </div>
-            <div style="width: 30%; text-align: center;">
-              <p style="font-size: 1em; color: #666;">{{ translations.benefit3 }}</p>
+        <!-- Demo Section -->
+        <section id="demo" class="section py-5 bg-light">
+          <div class="container mx-auto">
+            <div class="row align-items-center">
+              <div class="col-md-6 order-md-2">
+            <img src="/img/demo-swap2.webp" alt="{{ translations.demo.imageAlt }}" class="img-fluid">
+              </div>
+              <div class="col-md-6 order-md-1">
+            <h2>{{ translations.demo.heading }}</h2>
+            <p>{{ translations.demo.description }}</p>
+              </div>
             </div>
           </div>
         </section>
 
-        <section id="pricing" style="margin: 40px auto; padding: 20px; text-align: center;">
-          <h1 style="font-size: 2em; font-weight: bold; color: #333;">{{ translations.pricing_heading }}</h1>
-          <p style="font-size: 1.1em; color: #666; margin-bottom: 40px;">{{ translations.pricing_description }}</p>
-          <div style="font-size: 1em; color: #666;">{{ translations.pricing_details }}</div>
+        <!-- How It Works Section -->
+        <section id="how-it-works" class="section py-5">
+          <div class="container mx-auto">
+            <div class="row align-items-center">
+              <div class="col-md-6">
+            <img src="/img/demo-swap3.gif" alt="{{ translations.howItWorks.heading }}" class="img-fluid">
+              </div>
+              <div class="col-md-6">
+            <h2>{{ translations.howItWorks.heading }}</h2>
+            <p>{{ translations.howItWorks.step1.description }}</p>
+              </div>
+            </div>
+          </div>
         </section>
 
-        <section id="faq" style="margin: 40px auto; padding: 20px; text-align: center;">
-          <h1 style="font-size: 2em; font-weight: bold; color: #333;">{{ translations.faq_heading }}</h1>
-          <div style="text-align: left; max-width: 600px; margin: 0 auto;">
-            <h3 style="color: #333;">{{ translations.faq_question1 }}</h3>
-            <p style="color: #666;">{{ translations.faq_answer1 }}</p>
-            <h3 style="color: #333;">{{ translations.faq_question2 }}</h3>
-            <p style="color: #666;">{{ translations.faq_answer2 }}</p>
-            <h3 style="color: #333;">{{ translations.faq_question3 }}</h3>
-            <p style="color: #666;">{{ translations.faq_answer3 }}</p>
+        <!-- Benefits Section -->
+        <section id="benefits" class="section" style="padding: 80px 20px; max-width: 1200px; margin: 0 auto 60px auto;">
+          <h2 style="text-align: center; margin-bottom: 50px; font-size: 2.5em; color: #333;">{{ translations.benefits.heading }}</h2>
+          <div class="row row-cols-2" >
+            <div class="col mx-0" data-animate="animate__bounceIn" style="min-width: 250px; margin: 0 15px 40px 15px; text-align: center;">
+              <div style="font-size: 3em; margin-bottom: 20px; color: #007bff;">🎥</div>
+              <h3 style="font-size: 1.5em; margin-bottom: 15px; color: #333;">{{ translations.benefits.seamless.title }}</h3>
+              <p style="text-align: justify;font-size: 1.1em; line-height: 1.6; color: #555;">{{ translations.benefits.seamless.description }}</p>
+            </div>
+            
+            <div  class="col mx-0" data-animate="animate__bounceIn" data-delay="delay-100ms" style="min-width: 250px; margin: 0 15px 40px 15px; text-align: center;">
+              <div style="font-size: 3em; margin-bottom: 20px; color: #007bff;">🔒</div>
+              <h3 style="font-size: 1.5em; margin-bottom: 15px; color: #333;">{{ translations.benefits.secure.title }}</h3>
+              <p style="text-align: justify;font-size: 1.1em; line-height: 1.6; color: #555;">{{ translations.benefits.secure.description }}</p>
+            </div>
+            
+            <div  class="col mx-0" data-animate="animate__bounceIn" data-delay="delay-200ms" style="min-width: 250px; margin: 0 15px 40px 15px; text-align: center;">
+              <div style="font-size: 3em; margin-bottom: 20px; color: #007bff;">⚡</div>
+              <h3 style="font-size: 1.5em; margin-bottom: 15px; color: #333;">{{ translations.benefits.fast.title }}</h3>
+              <p style="text-align: justify;font-size: 1.1em; line-height: 1.6; color: #555;">{{ translations.benefits.fast.description }}</p>
+            </div>
+            
+            <div  class="col mx-0" data-animate="animate__bounceIn" data-delay="delay-300ms" style="min-width: 250px; margin: 0 15px 40px 15px; text-align: center;">
+              <div style="font-size: 3em; margin-bottom: 20px; color: #007bff;">✨</div>
+              <h3 style="font-size: 1.5em; margin-bottom: 15px; color: #333;">{{ translations.benefits.quality.title }}</h3>
+              <p style="text-align: justify;font-size: 1.1em; line-height: 1.6; color: #555;">{{ translations.benefits.quality.description }}</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Dynamic Pricing Section -->
+        <section id="pricing" class="section" style="padding: 80px 20px; max-width: 1200px; margin: 0 auto 60px auto;">
+          <h2 style="text-align: center; margin-bottom: 50px; font-size: 2.5em; color: #333;">{{ translations.dynamicPricing.heading }}</h2>
+          <p style="text-align: center; margin-bottom: 50px; font-size: 1.2em; color: #666; max-width: 700px; margin-left: auto; margin-right: auto;">{{ translations.dynamicPricing.description }}</p>
+          <p style="text-align: center; margin-bottom: 50px; font-size: 1.2em; color: #666; max-width: 700px; margin-left: auto; margin-right: auto;">{{ translations.dynamicPricing.reassurance }}</p>
+          
+            <!-- CTA Button -->
+            <div style="text-align: center;">
+              <a href="#top" class="btn btn-success btn-lg cta" style="padding: 12px 30px; font-size: 1.2em; border-radius: 30px;">{{ translations.dynamicPricing.ctaButton }}</a>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section id="faq" class="section" style="padding: 80px 20px; max-width: 1200px; margin: 0 auto 60px auto;">
+          <h2 style="text-align: center; margin-bottom: 50px; font-size: 2.5em; color: #333;">{{ translations.faq.heading }}</h2>
+          
+          <div class="accordion" id="faqAccordion" style="max-width: 800px; margin: 0 auto;">
+            <div class="accordion-item" data-animate="animate__fadeIn" style="margin-bottom: 15px; border: 1px solid #dee2e6; border-radius: 10px; overflow: hidden;">
+              <h3 class="accordion-header" id="headingOne">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                  {{ translations.faq.q1.question }}
+                </button>
+              </h3>
+              <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                <div class="accordion-body" style="padding: 20px; font-size: 1.1em; line-height: 1.6; color: #555;">
+                  {{ translations.faq.q1.answer }}
+                </div>
+              </div>
+            </div>
+            
+            <div class="accordion-item" data-animate="animate__fadeIn" data-delay="delay-100ms" style="margin-bottom: 15px; border: 1px solid #dee2e6; border-radius: 10px; overflow: hidden;">
+              <h3 class="accordion-header" id="headingTwo">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                  {{ translations.faq.q2.question }}
+                </button>
+              </h3>
+              <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                <div class="accordion-body" style="padding: 20px; font-size: 1.1em; line-height: 1.6; color: #555;">
+                  {{ translations.faq.q2.answer }}
+                </div>
+              </div>
+            </div>
+            
+            <div class="accordion-item" data-animate="animate__fadeIn" data-delay="delay-200ms" style="margin-bottom: 15px; border: 1px solid #dee2e6; border-radius: 10px; overflow: hidden;">
+              <h3 class="accordion-header" id="headingThree">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                  {{ translations.faq.q3.question }}
+                </button>
+              </h3>
+              <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                <div class="accordion-body" style="padding: 20px; font-size: 1.1em; line-height: 1.6; color: #555;">
+                  {{ translations.faq.q3.answer }}
+                </div>
+              </div>
+            </div>
+            
+            <div class="accordion-item" data-animate="animate__fadeIn" data-delay="delay-300ms" style="margin-bottom: 15px; border: 1px solid #dee2e6; border-radius: 10px; overflow: hidden;">
+              <h3 class="accordion-header" id="headingFour">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                  {{ translations.faq.q4.question }}
+                </button>
+              </h3>
+              <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                <div class="accordion-body" style="padding: 20px; font-size: 1.1em; line-height: 1.6; color: #555;">
+                  {{ translations.faq.q4.answer }}
+                </div>
+              </div>
+            </div>
+            
+            <div class="accordion-item" data-animate="animate__fadeIn" data-delay="delay-400ms" style="margin-bottom: 15px; border: 1px solid #dee2e6; border-radius: 10px; overflow: hidden;">
+              <h3 class="accordion-header" id="headingFive">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                  {{ translations.faq.q5.question }}
+                </button>
+              </h3>
+              <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#faqAccordion">
+                <div class="accordion-body" style="padding: 20px; font-size: 1.1em; line-height: 1.6; color: #555;">
+                  {{ translations.faq.q5.answer }}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          
+        </section>
+        
+        <!-- CTA Footer Section -->
+        <section id="footer-cta" class="section" style="position: relative; padding: 100px 20px; text-align: center; margin-bottom: 60px;background-color: rgb(90 111 236/var(--tw-bg-opacity,1));">
+          <div style="background: rgba(255,255,255,0.9); padding: 50px 20px; max-width: 800px; margin: 0 auto; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <h2 data-animate="animate__fadeInDown" style="font-size: 2.5em; margin-bottom: 20px; color: #333;">{{ translations.footer.ctaHeading }}</h2>
+            <p data-animate="animate__fadeInDown" data-delay="delay-100ms" style="font-size: 1.2em; margin-bottom: 30px; color: #666; max-width: 600px; margin-left: auto; margin-right: auto;">{{ translations.footer.ctaMessage }}</p>
+            <a href="#top" class="btn btn-primary btn-lg cta" data-animate="animate__zoomIn" data-delay="delay-200ms" style="padding: 12px 30px; font-size: 1.2em; border-radius: 30px;">{{ translations.footer.ctaButton }}</a>
           </div>
         </section>
       </div>

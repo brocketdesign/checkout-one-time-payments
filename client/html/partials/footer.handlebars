@@ -34,4 +34,25 @@
     const currentYear = new Date().getFullYear();
     document.querySelector('footer .container .row:last-child .col-md-12 p').innerHTML = `&copy; ${currentYear} {{translations.footer_company_name}}. {{translations.footer_rights_reserved}}`;
   });
+  document.addEventListener('DOMContentLoaded', function() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.remove('hidden');
+                entry.target.classList.add('animate__animated');
+                const sanitizedAnimate = entry.target.dataset.animate.replace(/[^a-zA-Z0-9-_]/g, '');
+                entry.target.classList.add(sanitizedAnimate);
+                if (entry.target.dataset.delay && entry.target.dataset.delay !== '') {
+                    const sanitizedDelay = entry.target.dataset.delay.replace(/[^a-zA-Z0-9-_]/g, '');
+                    entry.target.classList.add(sanitizedDelay);
+                }
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('[data-animate]').forEach(element => {
+        //element.classList.add('hidden');
+        observer.observe(element);
+    });
+  });
 </script>
