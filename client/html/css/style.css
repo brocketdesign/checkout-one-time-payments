@@ -197,11 +197,6 @@ a:hover {
   display: none;
 }
 
-video {
-  margin-top: 20px;
-  border: 1px solid #ccc;
-}
-
 #download-link {
   display: block;
   margin-top: 10px;
@@ -373,20 +368,21 @@ video {
 /* Preview Styles */
 #videoPreview {
   margin-top: 10px;
-  border: 1px solid #ccc;
   width: 100%;
+  object-fit: cover;
+  border-radius: 15px;
   max-height: 400px;
 }
 
 #imagePreview {
   margin-top: 10px;
-  border: 1px solid #ccc;
   width: 100%;
-  object-fit: contain;
+  object-fit: cover;
+  border-radius: 15px;
   max-height: 400px;
 }
 
-.video-details {
+.video-details, .image-details {
   margin-top: 10px;
   padding: 10px;
   border: 1px solid #ccc;

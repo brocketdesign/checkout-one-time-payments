@@ -73,6 +73,7 @@ imageDropZone.addEventListener('drop', (event) => {
   imageInput.files = files;
   console.log('Image dropped:', files);
   handleImageSelection(files[0]);
+  getImageDetails(files[0]);
 });
 
 imageUploadBtn.addEventListener('click', () => {
@@ -82,6 +83,7 @@ imageUploadBtn.addEventListener('click', () => {
 imageInput.addEventListener('change', (event) => {
   console.log('Image selected:', imageInput.files);
   handleImageSelection(imageInput.files[0]);
+  getImageDetails(imageInput.files[0]);
 });
 
 // Function to handle video selection and display preview
@@ -100,6 +102,9 @@ function handleImageSelection(imageFile) {
   if (imageFile) {
     imagePreview.style.display = 'block';
     imagePreview.src = URL.createObjectURL(imageFile);
+    imageDetails.style.display = 'block'; // Show image details
+  } else {
+    imageDetails.style.display = 'none'; // Hide image details if no image
   }
 }
 
@@ -107,6 +112,7 @@ function handleImageSelection(imageFile) {
 payButton.addEventListener('click', async () => {
   if (!videoInput.files.length || !imageInput.files.length) {
     status.textContent = translationsObj.please_upload_both;
+    status.className = 'alert alert-danger'; // Use Bootstrap alert-danger class
     console.log('Missing files');
     return;
   }
@@ -117,6 +123,7 @@ payButton.addEventListener('click', async () => {
 
   try {
     status.textContent = translationsObj.uploading_files;
+    status.className = 'alert alert-info'; // Use Bootstrap alert-info class
     const response = await fetch('/api/temp-upload', {
       method: 'POST',
       body: formData,
@@ -146,6 +153,7 @@ payButton.addEventListener('click', async () => {
       console.log('Skipping payment, redirecting with tempId:', tempId);
     } else {
       status.textContent = translationsObj.creating_checkout;
+      status.className = 'alert alert-info'; // Use Bootstrap alert-info class
 
       // Extract video details
       const sessionResponse = await fetch('/api/create-checkout-session', {
@@ -178,11 +186,13 @@ payButton.addEventListener('click', async () => {
 
       if (result.error) {
         status.textContent = result.error.message;
+        status.className = 'alert alert-danger'; // Use Bootstrap alert-danger class
       }
     }
   } catch (error) {
     console.error('Error:', error);
     status.textContent = `${translationsObj.an_error_occurred}: ${error.message}`;
+    status.className = 'alert alert-danger'; // Use Bootstrap alert-danger class
   }
 });
 
@@ -212,7 +222,7 @@ async function getVideoDetails(videoFile) {
     roundedSellingPrice = Math.ceil(sellingPrice);
 
     videoDetails.innerHTML = `
-      <h3>${translationsObj.video_details}</h3>
+      <h5>${translationsObj.video_details}</h5>
       <ul style="text-align: left;">
       <li><strong>${translationsObj.name}:</strong> ${fileName}</li>
       <li><strong>${translationsObj.duration}:</strong> ${duration.toFixed(2)} ${translationsObj.seconds}</li>
@@ -226,9 +236,40 @@ async function getVideoDetails(videoFile) {
 
   video.onerror = function() {
     status.textContent = translationsObj.error_loading_metadata;
+    status.className = 'alert alert-danger'; // Use Bootstrap alert-danger class
   }
 
   video.src = URL.createObjectURL(videoFile);
+}
+
+// Function to get image details
+async function getImageDetails(imageFile) {
+  const image = new Image();
+
+  image.onload = function() {
+    const width = image.width;
+    const height = image.height;
+    const fileSize = imageFile.size;
+    const fileName = imageFile.name;
+
+    imageDetails.innerHTML = `
+      <h5>${translationsObj.image_details}</h5>
+      <ul style="text-align: left;">
+        <li><strong>${translationsObj.name}:</strong> ${fileName}</li>
+        <li><strong>${translationsObj.resolution}:</strong> ${width}x${height}</li>
+        <li><strong>${translationsObj.size}:</strong> ${(fileSize / (1024 * 1024)).toFixed(2)} MB</li>
+      </ul>
+    `;
+  }
+
+  image.onerror = function() {
+    status.textContent = translationsObj.error_loading_metadata;
+    imageDetails.innerHTML = `<p>${translationsObj.error_loading_metadata}</p>`;
+    imageDetails.style.display = 'block';
+    status.className = 'alert alert-danger'; // Use Bootstrap alert-danger class
+  }
+
+  image.src = URL.createObjectURL(imageFile);
 }
 
 // Function to reset the form
@@ -271,6 +312,7 @@ async function loadVideoFromUrl(videoUrl) {
   } catch (error) {
     console.error('Error loading video from URL:', error);
     status.textContent = translationsObj.error_loading_url;
+    status.className = 'alert alert-danger'; // Use Bootstrap alert-danger class
   }
 }
 

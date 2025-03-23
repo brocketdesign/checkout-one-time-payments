@@ -1,0 +1,37 @@
+<footer class="bg-light text-dark py-4">
+  <div class="container bg-transparent border-0 shadow-none w-100 mx-auto">
+    <div class="row">
+      <div class="col-md-6">
+        <h5>{{ translations.footer_links }}</h5>
+        <ul class="list-unstyled">
+          <li><a href="/{{language}}/signup" class="text-dark">{{ translations.signup_login }}</a></li>
+          <li><a href="/{{language}}/#demo" class="text-dark">{{ translations.demo_heading }}</a></li>
+          <li><a href="/{{language}}/#pricing" class="text-dark">{{ translations.pricing_heading }}</a></li>
+          <li><a href="/{{language}}/#faq" class="text-dark">{{ translations.faq_heading }}</a></li>
+        </ul>
+      </div>
+      <div class="col-md-6">
+        <h5>{{ translations.footer_legal }}</h5>
+        <ul class="list-unstyled">
+          <li><a href="/{{language}}/terms" class="text-dark">{{ translations.terms_of_service }}</a></li>
+          <li><a href="/{{language}}/privacy" class="text-dark">{{ translations.privacy_policy }}</a></li>
+          <li><a href="/{{language}}/service-complaint" class="text-dark">{{ translations.service_complaint_policy }}</a></li>
+          <li><a href="/{{language}}/contact" class="text-dark">{{ translations.contact }}</a></li>
+        </ul>
+      </div>
+    </div>
+    <hr class="bg-secondary">
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <p>&copy; {{ currentYear }} {{translations.footer_company_name}}. {{translations.footer_rights_reserved}}</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const currentYear = new Date().getFullYear();
+    document.querySelector('footer .container .row:last-child .col-md-12 p').innerHTML = `&copy; ${currentYear} {{translations.footer_company_name}}. {{translations.footer_rights_reserved}}`;
+  });
+</script>
