@@ -565,7 +565,7 @@ async function pollTaskResult(task_id) {
 const port = process.env.PORT || 4242;
 
 // Create a WebSocket server
-const wss = new WebSocketServer({ port: port + 1 }); // WebSocket server on port 4243
+const wss = new WebSocketServer({ port: parseInt(port) + 1 }); // WebSocket server on port 4243
 
 wss.on('connection', ws => {
   console.log('Client connected');
