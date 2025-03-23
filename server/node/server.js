@@ -695,22 +695,84 @@ async function pollTaskResult(task_id) {
 
 const port = process.env.PORT || 4242;
 
-// Create a WebSocket server
-const wss = new WebSocketServer({ port: parseInt(port) + 1 }); // WebSocket server on port 4243
+// Create HTTP server for both Express and WebSocket
+const server = require('http').createServer(app);
 
-wss.on('connection', ws => {
-  console.log('Client connected');
+// Create WebSocket server attached to the HTTP server
+const wss = new WebSocketServer({ 
+  server,
+  // Add options to handle connections from any domain
+  verifyClient: (info) => {
+    // Accept connections from any origin when deployed
+    return true;
+  }
+});
+
+// Track active connections with unique IDs
+const connections = new Map();
+let connectionCounter = 0;
+
+// Setup a heartbeat interval to keep connections alive on Heroku (which has a 55s timeout)
+const HEARTBEAT_INTERVAL = 30000; // 30 seconds
+const heartbeatInterval = setInterval(() => {
+  wss.clients.forEach(ws => {
+    if (ws.isAlive === false) {
+      console.log(`Terminating inactive connection: ${ws.connectionId}`);
+      return ws.terminate();
+    }
+    
+    ws.isAlive = false;
+    ws.ping('', false, true);
+    
+    // Also send a custom ping message that clients can respond to
+    try {
+      ws.send(JSON.stringify({ type: 'ping', timestamp: Date.now() }));
+    } catch (e) {
+      console.error('Error sending ping:', e);
+    }
+  });
+}, HEARTBEAT_INTERVAL);
+
+wss.on('connection', (ws, req) => {
+  // Assign unique ID to connection
+  ws.connectionId = ++connectionCounter;
+  ws.isAlive = true;
+  
+  console.log(`Client connected - ID: ${ws.connectionId}, IP: ${req.socket.remoteAddress}`);
+
+  // Handle pong response
+  ws.on('pong', () => {
+    ws.isAlive = true;
+  });
 
   ws.on('message', message => {
     try {
       const data = JSON.parse(message.toString());
+      
+      // Handle client pong responses
+      if (data.type === 'pong') {
+        ws.isAlive = true;
+        return;
+      }
+      
+      // Handle task_id registration
       if (data.task_id) {
+        // If this task_id already has a connection, close the old one
+        clients.forEach((existingWs, taskId) => {
+          if (taskId === data.task_id && existingWs !== ws) {
+            console.log(`Replacing existing connection for task_id: ${data.task_id}`);
+            existingWs.close();
+            clients.delete(taskId);
+          }
+        });
+        
         // Store the tempId along with the WebSocket client if provided
         if (data.tempId) {
           ws.tempId = data.tempId;
         }
+        
         clients.set(data.task_id, ws);
-        console.log(`Client connected with task_id: ${data.task_id}`);
+        console.log(`Client connected with task_id: ${data.task_id}, connection ID: ${ws.connectionId}`);
       }
     } catch (error) {
       console.error('Error parsing message:', error);
@@ -718,7 +780,7 @@ wss.on('connection', ws => {
   });
 
   ws.on('close', () => {
-    console.log('Client disconnected');
+    console.log(`Client disconnected - ID: ${ws.connectionId}`);
     // Clean up clients and taskPolls when a client disconnects
     clients.forEach((clientWs, taskId) => {
       if (clientWs === ws) {
@@ -730,14 +792,26 @@ wss.on('connection', ws => {
         }
       }
     });
+    
+    // Remove from connections map
+    connections.delete(ws.connectionId);
   });
 
   ws.on('error', error => {
-    console.error('WebSocket error:', error);
+    console.error(`WebSocket error on connection ${ws.connectionId}:`, error);
   });
+  
+  // Store in our connections map
+  connections.set(ws.connectionId, ws);
 });
 
-app.listen(port, '0.0.0.0', () => console.log(`Node server listening on port ${port}!`));
+// Clean up interval on server close
+wss.on('close', () => {
+  clearInterval(heartbeatInterval);
+});
+
+// Start server listening on the specified port
+server.listen(port, '0.0.0.0', () => console.log(`Server listening on port ${port}!`));
 
 function checkEnv() {
   const price = process.env.PRICE;
