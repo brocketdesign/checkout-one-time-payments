@@ -85,6 +85,8 @@
   "privacy_policy": "プライバシーポリシー",
   "service_complaint_policy": "サービス苦情ポリシー",
   "contact": "お問い合わせ",
+  "video_too_large": "動画ファイルが大きすぎます。 最大サイズは10MBです。 動画を圧縮するか、小さいファイルを選択してください。",
+  "current_size": "現在のサイズ",
   "home": {
     "title": "ホーム"
   },

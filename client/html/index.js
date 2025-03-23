@@ -8,6 +8,9 @@ const translationsObj = JSON.parse(translations);
 // Add a variable to store the rounded selling price
 let roundedSellingPrice = 0;
 
+// Define max video size (10MB)
+const MAX_VIDEO_SIZE = 10 * 1024 * 1024; // 10MB in bytes
+
 // Drag and Drop Functionality
 const videoDropZone = document.getElementById('videoDropZone');
 const videoInput = document.getElementById('videoInput');
@@ -89,6 +92,25 @@ imageInput.addEventListener('change', (event) => {
 // Function to handle video selection and display preview
 function handleVideoSelection(videoFile) {
   if (videoFile) {
+    // Check if file size exceeds the maximum allowed
+    if (videoFile.size > MAX_VIDEO_SIZE) {
+      status.textContent = translationsObj.video_too_large || `Video file is too large. Maximum size is 10MB. Please compress your video or select a smaller file.`;
+      status.className = 'alert alert-danger';
+      videoPreview.style.display = 'none';
+      videoDetails.style.display = 'none';
+      
+      // Disable pay button when file is too large
+      payButton.disabled = true;
+      return;
+    }
+    
+    // Reset status if previously showed an error
+    if (status.className.includes('alert-danger')) {
+      status.textContent = '';
+      status.className = '';
+      payButton.disabled = false;
+    }
+    
     videoPreview.style.display = 'block';
     videoPreview.src = URL.createObjectURL(videoFile);
     videoDetails.style.display = 'block'; // Show video details
@@ -114,6 +136,13 @@ payButton.addEventListener('click', async () => {
     status.textContent = translationsObj.please_upload_both;
     status.className = 'alert alert-danger'; // Use Bootstrap alert-danger class
     console.log('Missing files');
+    return;
+  }
+  
+  // Double-check file size before proceeding
+  if (videoInput.files[0].size > MAX_VIDEO_SIZE) {
+    status.textContent = translationsObj.video_too_large || `Video file is too large. Maximum size is 10MB. Please compress your video or select a smaller file.`;
+    status.className = 'alert alert-danger';
     return;
   }
 
@@ -198,6 +227,19 @@ payButton.addEventListener('click', async () => {
 
 // Function to get video details
 async function getVideoDetails(videoFile) {
+  // Check file size first
+  if (videoFile.size > MAX_VIDEO_SIZE) {
+    videoDetails.innerHTML = `
+      <h5>${translationsObj.video_details || 'Video Details'}</h5>
+      <div class="alert alert-danger">
+        ${translationsObj.video_too_large || 'Video file is too large (Maximum: 10MB). Please compress your video or select a smaller file.'}
+        <p><strong>${translationsObj.current_size || 'Current size'}:</strong> ${(videoFile.size / (1024 * 1024)).toFixed(2)} MB</p>
+      </div>
+    `;
+    videoDetails.style.display = 'block';
+    return;
+  }
+
   const video = document.createElement('video');
   video.preload = 'metadata';
 
@@ -278,7 +320,9 @@ function resetForm() {
   document.getElementById('imageInput').value = '';
   document.getElementById('skipPayment').checked = false;
   document.getElementById('status').textContent = '';
+  document.getElementById('status').className = '';
   roundedSellingPrice = 0;
+  payButton.disabled = false; // Re-enable the pay button when form is reset
 }
 
 // Check for videoUrl in query parameters on page load

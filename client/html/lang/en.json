@@ -184,5 +184,7 @@
       "description": "Within minutes, your face-swapped video will be ready to download and share! The processing time depends on the video length and complexity, but our advanced AI works quickly to deliver high-quality results. Once complete, you'll receive a notification and can download your video in full resolution. The finished product maintains the original video quality while perfectly integrating the new face throughout every frame. You own the result completely and can use it however you like – share on social media, send to friends, or keep for your personal collection.",
       "imageAlt": "Illustration of downloading completed video"
     }
-  }
+  },
+  "video_too_large": "Video file is too large. Maximum size is 10MB. Please compress your video or select a smaller file.",
+  "current_size": "Current size"
 }

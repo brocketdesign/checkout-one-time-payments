@@ -374,7 +374,7 @@ a:hover {
 #videoPreview {
   margin-top: 10px;
   width: 100%;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 15px;
   max-height: 400px;
 }
@@ -382,7 +382,7 @@ a:hover {
 #imagePreview {
   margin-top: 10px;
   width: 100%;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 15px;
   max-height: 400px;
 }
