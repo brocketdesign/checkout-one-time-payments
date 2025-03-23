@@ -606,7 +606,7 @@ wss.on('connection', ws => {
   });
 });
 
-app.listen(port, () => console.log(`Node server listening on port ${port}!`));
+app.listen(port, '0.0.0.0', () => console.log(`Node server listening on port ${port}!`));
 
 function checkEnv() {
   const price = process.env.PRICE;
