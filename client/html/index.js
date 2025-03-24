@@ -5,8 +5,18 @@ const stripe = Stripe(
 // Parse the translations JSON string into an object
 const translationsObj = JSON.parse(translations);
 
-// Add a variable to store the rounded selling price
+// Get the current language from cookie preferredLanguage
+const currentLanguage = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('preferredLanguage='))
+  ?.split('=')[1] || 'en';
+
+// Set currency based on language
+const currency = currentLanguage === 'ja' ? 'jpy' : 'usd';
+
+// Add variables to store the selling price
 let roundedSellingPrice = 0;
+let formattedPrice = '';
 
 // Define max video size (10MB)
 const MAX_VIDEO_SIZE = 10 * 1024 * 1024; // 10MB in bytes
@@ -207,7 +217,7 @@ payButton.addEventListener('click', async () => {
       status.classList.remove('hidden');
       status.className = 'alert alert-info'; // Use Bootstrap alert-info class
 
-      // Extract video details
+      // Extract video details and include currency
       const sessionResponse = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: {
@@ -216,6 +226,7 @@ payButton.addEventListener('click', async () => {
         body: JSON.stringify({ 
           tempId: tempId, 
           roundedSellingPrice,
+          currency: currency,
           fileName: videoInput.files[0].name,
           duration: videoPreview.duration,
           resolution: `${videoPreview.videoWidth}x${videoPreview.videoHeight}`,
@@ -282,10 +293,19 @@ async function getVideoDetails(videoFile) {
     // Price estimation
     const pricePerFrame = 0.0005;
     const estimatedPrice = frameCount * pricePerFrame;
-    // Selling price is 4x the estimated price with a minimum of $1
-    const sellingPrice = Math.max(estimatedPrice * 4, 1);
-    // Round to whole number and store in the global variable
-    roundedSellingPrice = Math.ceil(sellingPrice);
+    // Selling price is 4x the estimated price with a minimum of $1/¥100
+    let sellingPrice = Math.max(estimatedPrice * 4, currency === 'jpy' ? 100 : 1);
+    
+    // Round to whole number for JPY, round up to nearest dollar or 100 yen
+    if (currency === 'jpy') {
+      // Round up to nearest 100 yen
+      roundedSellingPrice = Math.ceil(sellingPrice / 100) * 150;
+      formattedPrice = `¥${roundedSellingPrice.toLocaleString()}`;
+    } else {
+      // Round up to nearest dollar
+      roundedSellingPrice = Math.ceil(sellingPrice);
+      formattedPrice = `$${roundedSellingPrice.toFixed(2)}`;
+    }
 
     videoDetails.innerHTML = `
       <h5>${translationsObj.video_details}</h5>
@@ -295,7 +315,7 @@ async function getVideoDetails(videoFile) {
       <li><strong>${translationsObj.resolution}:</strong> ${width}x${height}</li>
       <li><strong>${translationsObj.size}:</strong> ${(fileSize / (1024 * 1024)).toFixed(2)} MB</li>
       <li><strong>${translationsObj.estimated_frame_count}:</strong> ${frameCount}</li>
-      <li><strong>${translationsObj.processing_fee}:</strong> $${roundedSellingPrice.toFixed(2)}</li>
+      <li><strong>${translationsObj.processing_fee}:</strong> ${formattedPrice}</li>
       </ul>
     `;
   }

@@ -385,24 +385,37 @@ app.post('/api/create-checkout-session', async (req, res) => {
     // on localhost, use http://localhost:4242 but on production use the domain
     const currentURL = req.protocol + '://' + req.get('host');
     const domainURL = process.env.MODE === 'local' ? 'http://localhost:4242' : currentURL;
-    const { tempId, roundedSellingPrice, fileName, duration, resolution, fileSize, frameCount } = req.body;
+    const { tempId, roundedSellingPrice, currency, fileName, duration, resolution, fileSize, frameCount } = req.body;
     
     if (!tempId || !tempFiles.has(tempId)) {
       return res.status(400).json({ error: 'Invalid tempId or files have expired' });
     }
 
+    // Determine currency based on the language
+    // Default to USD if currency not specified
+    const checkoutCurrency = currency || 'usd';
+    
+    // Adjust unit_amount calculation based on currency
+    // For JPY: amount is in whole yen (no decimal)
+    // For USD: amount is in cents (100 cents = $1)
+    const unitAmount = checkoutCurrency === 'jpy' 
+      ? Math.round(roundedSellingPrice) // JPY doesn't use cents
+      : Math.round(roundedSellingPrice * 100); // Convert dollars to cents
+    
     // Construct line_items array using roundedSellingPrice
     const line_items = [
       {
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: 'Video Processing Service',
-            description: `Face replacement processing for your video: ${fileName}, Duration: ${duration.toFixed(2)}s, Resolution: ${resolution}, Size: ${(fileSize / (1024 * 1024)).toFixed(2)} MB, Frame Count: ${frameCount}`
-          },
-          unit_amount: roundedSellingPrice * 100, // Convert to cents for Stripe
+      price_data: {
+        currency: checkoutCurrency,
+        product_data: {
+        name: checkoutCurrency === 'jpy' ? 'ビデオ処理サービス' : 'Video Processing Service',
+        description: checkoutCurrency === 'jpy' 
+          ? `ビデオの顔置換処理: ${fileName}, 長さ: ${duration.toFixed(2)}秒, 解像度: ${resolution}, サイズ: ${(fileSize / (1024 * 1024)).toFixed(2)} MB, フレーム数: ${frameCount}`
+          : `Face replacement processing for your video: ${fileName}, Duration: ${duration.toFixed(2)}s, Resolution: ${resolution}, Size: ${(fileSize / (1024 * 1024)).toFixed(2)} MB, Frame Count: ${frameCount}`
         },
-        quantity: 1
+        unit_amount: unitAmount,
+      },
+      quantity: 1
       }
     ];
     
@@ -411,6 +424,7 @@ app.post('/api/create-checkout-session', async (req, res) => {
     if (language !== 'ja' && language !== 'en') {
       language = 'en'; // Default to English if the language is not supported
     }
+    
     // Create new Checkout Session for the order
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',

@@ -222,5 +222,8 @@
   "contact_address": "123 AI Innovation Street, San Francisco, CA 94105, USA",
   "contact_phone": "+1 (555) 123-4567",
   "contact_email_address": "support@aivideoswap.example.com",
-  "contact_hours": "Monday - Friday: 9:00 AM - 6:00 PM (PST)"
+  "contact_hours": "Monday - Friday: 9:00 AM - 6:00 PM (PST)",
+  "payment_canceled": "Payment Canceled",
+  "payment_canceled_message": "Your payment has been canceled. If you have any questions, please contact our support team.",
+  "return_to_upload": "Return to Upload"
 }

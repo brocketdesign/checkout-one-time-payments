@@ -231,5 +231,8 @@
   "unknown_date": "不明な日付",
   "video_not_supported": "お使いのブラウザはビデオタグをサポートしていません。",
   "back_to_home": "ホームに戻る",
-  "processing_video": "ビデオを処理中..."
+  "processing_video": "ビデオを処理中...",
+  "payment_canceled": "支払いがキャンセルされました",
+  "payment_canceled_message": "支払いがキャンセルされました。ご質問がある場合は、サポートチームにお問い合わせください。",
+  "return_to_upload": "アップロードに戻る"
 }
