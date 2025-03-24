@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="/css/normalize.css" />
     <link rel="stylesheet" href="/css/global.css" />
     <link rel="stylesheet" href="/css/style.css" />
-    <script src="/websocket.js"></script>
     <script src="https://js.stripe.com/v3/"></script>
     <script>const translations = `{{{json translations}}}`;</script> 
     <script src="/index.js" defer></script>
@@ -66,7 +65,7 @@
             </div>
           </div>
 
-          <div class="payment-section"style="max-width: 80%; padding-bottom: 50px; margin: 50px auto 0 auto;">
+          <div class="payment-section"style="max-width: 80%; margin: 50px auto 0 auto;">
             <input type="checkbox" id="skipPayment" name="skipPayment" checked />
             <label for="skipPayment"><span>{{ translations.skip_payment }}</span></label>
             <button id="payButton" class="btn btn-danger d-block proceed-btn shadow border border-white "><span>{{ translations.proceed }}</span></button>
@@ -79,7 +78,7 @@
             }
           </script>
 
-          <div id="status" class="status"></div>
+          <div id="status" class="status hidden"></div>
         </section>
         <!-- Add your edit here -->
      </div>

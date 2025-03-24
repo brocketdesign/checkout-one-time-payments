@@ -106,7 +106,9 @@ h1 {
   font-size: 1.2em;
   color: #333;
 }
-
+#status{
+  margin-top: 25px;
+}
 #change-face-button{
   display: none;
 }

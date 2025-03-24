@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', async () => {
-  console.log('Translations loaded:', translations);
   // Parse the translations JSON string into an object
   const translationsObj = JSON.parse(translations);
   
@@ -13,7 +12,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const debugOutput = document.getElementById('debug-output');
   const progressContainer = document.getElementById('progress-container');
   const progressFill = document.getElementById('progress-fill');
-  const progressText = document.getElementById('progress-text');
   const progressStatus = document.getElementById('progress-status');
   const completionSection = document.getElementById('completion-section');
 
@@ -44,6 +42,38 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Process video function
   async function processVideo() {
     try {
+      // First, check if this tempId is already being processed or completed
+      const processingState = checkProcessingState(tempId, sessionId);
+      if (processingState) {
+        log('Found existing processing data', processingState);
+        
+        // If already completed successfully, show the result directly
+        if (processingState.status === 'success' && processingState.videoUrl) {
+          log('Video already processed successfully, showing result', { videoUrl: processingState.videoUrl });
+          
+          // Update UI to show completed state
+          progressContainer.classList.add('hidden');
+          document.querySelector('h1').textContent = translationsObj.success;
+          statusMessage.textContent = translationsObj.video_ready;
+          
+          // Show completion section with video
+          completionSection.classList.remove('hidden');
+          videoSource.src = processingState.videoUrl;
+          videoSource.muted = true;
+          videoSource.autoplay = true;
+          downloadLink.href = processingState.videoUrl;
+          
+          return; // Exit function since video is already processed
+        }
+        
+        // If currently being processed, show status message
+        if (processingState.status === 'processing') {
+          log('Video is currently being processed', { tempId });
+          statusMessage.textContent = translationsObj.already_processing;
+          // We'll continue to start monitoring via WebSocket, but won't restart the processing
+        }
+      }
+
       // If we have a session ID from Stripe, log it
       if (sessionId) {
         log('Retrieving Stripe session', { sessionId });
@@ -141,7 +171,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               downloadLink.href = message.video_url;
               
               // Save video URL to local storage
-              saveVideoUrl(message.video_url);
+              saveProcessingData(message.video_url, 'success');
               
               ws.close();
             } else if (message.status === 'failed') {
@@ -149,12 +179,16 @@ document.addEventListener('DOMContentLoaded', async () => {
               // Hide progress bar on failure too
               progressContainer.classList.add('hidden');
               showError(translationsObj.processing_failed.replace('{error}', message.error));
+              // Mark as failed in local storage
+              saveProcessingData(null, 'failed');
               ws.close();
             } else if (message.status === 'timeout') {
               isProcessingComplete = true;
               // Hide progress bar on timeout
               progressContainer.classList.add('hidden');
               showError(translationsObj.processing_timeout.replace('{error}', message.error));
+              // Mark as timeout in local storage
+              saveProcessingData(null, 'timeout');
               ws.close();
             }
           } catch (error) {
@@ -216,9 +250,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     progressContainer.classList.remove('hidden');
     progressContainer.style.display = 'block';
     
-    progressFill.style.width = `${percent}%`;
-    progressText.textContent = `${Math.round(percent)}%`;
+    const roundedPercent = Math.round(percent);
+    
+    // Update the progress bar
+    progressFill.style.width = `${roundedPercent}%`;
+    progressFill.textContent = `${roundedPercent}%`;
+    progressFill.setAttribute('aria-valuenow', roundedPercent);
+    
+    // Update status message
     progressStatus.textContent = message;
+    
+    // Change color based on progress percentage
+    progressFill.classList.remove('bg-danger', 'bg-warning', 'bg-info', 'bg-success');
+    
+    if (roundedPercent < 25) {
+      progressFill.classList.add('bg-info');
+    } else if (roundedPercent < 50) {
+      progressFill.classList.add('bg-info');
+    } else if (roundedPercent < 75) {
+      progressFill.classList.add('bg-success');
+    } else {
+      progressFill.classList.add('bg-success');
+    }
+    
+    // Add striped animated effect for in-progress bars
+    if (roundedPercent > 0 && roundedPercent < 100) {
+      progressFill.classList.add('progress-bar-striped', 'progress-bar-animated');
+    } else {
+      progressFill.classList.remove('progress-bar-striped', 'progress-bar-animated');
+    }
   }
 
   function showError(message) {
@@ -226,10 +286,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     errorMessage.textContent = message;
     errorMessage.classList.remove('hidden');
     updateProgress(100, translationsObj.error);
-    progressFill.style.backgroundColor = '#e74c3c';
+    
+    // Use Bootstrap classes instead of inline styles
+    progressFill.classList.remove('bg-success', 'bg-info', 'bg-warning', 'progress-bar-striped', 'progress-bar-animated');
+    progressFill.classList.add('bg-danger');
   }
 
   // Start processing
+  saveProcessingData(null, 'processing');
   processVideo();
 
   // Add event listeners for the buttons
@@ -274,14 +338,98 @@ if (sessionId) {
     });
 }
 
-function saveVideoUrl(videoUrl) {
-  let videoUrls = JSON.parse(localStorage.getItem('videoUrls') || '[]');
-  const now = new Date();
-  const videoData = {
-    url: videoUrl,
-    date: now.toISOString()
-  };
-  videoUrls.push(videoData);
-  localStorage.setItem('videoUrls', JSON.stringify(videoUrls));
-  console.log('Video URL saved to local storage', videoData);
+// Function to check if a tempId is already being processed or completed
+function checkProcessingState(tempId, sessionId) {
+  if (!tempId && !sessionId) return null;
+  
+  const processingData = JSON.parse(localStorage.getItem('processingData') || '[]');
+  
+  // Try to find an existing entry for this tempId or sessionId
+  let existingItem = null;
+  
+  if (tempId && sessionId) {
+    existingItem = processingData.find(item => 
+      item.tempId === tempId && item.sessionId === sessionId
+    );
+  }
+  
+  if (!existingItem && tempId) {
+    existingItem = processingData.find(item => item.tempId === tempId);
+  }
+  
+  if (!existingItem && sessionId) {
+    existingItem = processingData.find(item => item.sessionId === sessionId);
+  }
+  
+  return existingItem;
+}
+
+function saveProcessingData(videoUrl, status = 'processing') {
+  // Get parameters from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const tempId = urlParams.get('tempId');
+  const sessionId = urlParams.get('session_id');
+
+  let processingData = JSON.parse(localStorage.getItem('processingData') || '[]');
+  
+  // Check if there's an existing entry for this tempId/sessionId
+  let existingIndex = -1;
+  
+  // First try to find by tempId (most reliable identifier)
+  if (tempId) {
+    existingIndex = processingData.findIndex(item => item.tempId === tempId);
+  }
+  
+  // If not found by tempId, try by sessionId
+  if (existingIndex === -1 && sessionId) {
+    existingIndex = processingData.findIndex(item => item.sessionId === sessionId);
+  }
+  
+  // If still not found, try by videoUrl (if provided)
+  if (existingIndex === -1 && videoUrl) {
+    existingIndex = processingData.findIndex(item => item.videoUrl === videoUrl);
+  }
+
+  // If status indicates a failure (failed/timeout), remove the entry if it exists
+  if (status === 'failed' || status === 'timeout') {
+    if (existingIndex !== -1) {
+      processingData.splice(existingIndex, 1);
+      console.log(`Removed failed processing data (status: ${status}) from local storage`);
+    }
+  } else if (existingIndex !== -1) {
+    // Update existing entry
+    processingData[existingIndex] = {
+      ...processingData[existingIndex],
+      videoUrl: videoUrl || processingData[existingIndex].videoUrl,
+      processed: status === 'success',
+      status: status,
+      date: new Date().toISOString(),
+      // Preserve identifiers from the existing record
+      tempId: tempId || processingData[existingIndex].tempId,
+      sessionId: sessionId || processingData[existingIndex].sessionId
+    };
+    console.log('Updated processing data in local storage', processingData[existingIndex]);
+  } else if (tempId || sessionId || videoUrl) {
+    // Only create a new entry if we have at least one identifier
+    const newData = {
+      sessionId: sessionId || null,
+      tempId: tempId || null,
+      videoUrl: videoUrl || null,
+      date: new Date().toISOString(),
+      processed: status === 'success',
+      status: status
+    };
+    processingData.push(newData);
+    console.log('Saved processing data to local storage', newData);
+  }
+
+  // Clean up old entries (keep only the last 10)
+  if (processingData.length > 10) {
+    processingData = processingData
+      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .slice(0, 10);
+    console.log('Cleaned up processing data, keeping only the 10 most recent entries');
+  }
+
+  localStorage.setItem('processingData', JSON.stringify(processingData));
 }

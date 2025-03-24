@@ -26,6 +26,9 @@
           <a class="nav-link" href="#faq">{{translations.faq.title}}</a>
         </li>
         <li class="nav-item">
+          <a class="nav-link" href="/{{#ifCond language '==' 'en'}}{{else}}{{language}}/{{/ifCond}}history">{{translations.history_title}}</a>
+        </li>
+        <li class="nav-item">
           <select id="language-switch" class="form-select bg-light text-dark">
             <option value="en" {{#ifCond language '==' 'en'}}selected{{/ifCond}}>
               <span class="language-option"><i class="bi bi-globe"></i> English</span>

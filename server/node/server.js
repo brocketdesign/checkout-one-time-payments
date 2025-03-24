@@ -228,6 +228,133 @@ app.get(['/canceled', '/:lang/canceled'], (req, res) => {
   res.render(path, { translations, language });
 });
 
+app.get(['/history', '/:lang/history'], (req, res) => {
+  const path = 'history';
+
+  // Determine language from cookie, URL parameter, or headers, default to 'en'
+  let language = req.cookies?.preferredLanguage || req.params.lang || (req.headers['accept-language']?.startsWith('ja') ? 'ja' : 'en');
+  if (language !== 'ja' && language !== 'en') {
+    language = 'en'; // Default to English if the language is not supported
+  }
+
+  // Load translation file
+  const translationPath = resolve(`${process.env.STATIC_DIR}/lang/${language}.json`);
+  let translations = {};
+  try {
+    const translationFile = fs.readFileSync(translationPath, 'utf-8');
+    translations = JSON.parse(translationFile);
+  } catch (error) {
+    console.error('Error loading translations:', error);
+  }
+  
+  // Render the history page with translations
+  res.render(path, { translations, language });
+});
+
+app.get(['/terms', '/:lang/terms'], (req, res) => {
+  const path = 'legal/terms';
+
+  // Determine language from cookie, URL parameter, or headers, default to 'en'
+  let language = req.cookies?.preferredLanguage || req.params.lang || (req.headers['accept-language']?.startsWith('ja') ? 'ja' : 'en');
+  if (language !== 'ja' && language !== 'en') {
+    language = 'en'; // Default to English if the language is not supported
+  }
+
+  // Load translation file
+  const translationPath = resolve(`${process.env.STATIC_DIR}/lang/${language}.json`);
+  let translations = {};
+  try {
+    const translationFile = fs.readFileSync(translationPath, 'utf-8');
+    translations = JSON.parse(translationFile);
+  } catch (error) {
+    console.error('Error loading translations:', error);
+  }
+  
+  // Get current year for footer
+  const currentYear = new Date().getFullYear();
+  
+  // Render the terms page with translations
+  res.render(path, { translations, language, currentYear });
+});
+
+app.get(['/privacy', '/:lang/privacy'], (req, res) => {
+  const path = 'legal/privacy';
+
+  // Determine language from cookie, URL parameter, or headers, default to 'en'
+  let language = req.cookies?.preferredLanguage || req.params.lang || (req.headers['accept-language']?.startsWith('ja') ? 'ja' : 'en');
+  if (language !== 'ja' && language !== 'en') {
+    language = 'en'; // Default to English if the language is not supported
+  }
+
+  // Load translation file
+  const translationPath = resolve(`${process.env.STATIC_DIR}/lang/${language}.json`);
+  let translations = {};
+  try {
+    const translationFile = fs.readFileSync(translationPath, 'utf-8');
+    translations = JSON.parse(translationFile);
+  } catch (error) {
+    console.error('Error loading translations:', error);
+  }
+  
+  // Get current year for footer
+  const currentYear = new Date().getFullYear();
+  
+  // Render the privacy page with translations
+  res.render(path, { translations, language, currentYear });
+});
+
+app.get(['/service-complaint', '/:lang/service-complaint'], (req, res) => {
+  const path = 'legal/service-complaint';
+
+  // Determine language from cookie, URL parameter, or headers, default to 'en'
+  let language = req.cookies?.preferredLanguage || req.params.lang || (req.headers['accept-language']?.startsWith('ja') ? 'ja' : 'en');
+  if (language !== 'ja' && language !== 'en') {
+    language = 'en'; // Default to English if the language is not supported
+  }
+
+  // Load translation file
+  const translationPath = resolve(`${process.env.STATIC_DIR}/lang/${language}.json`);
+  let translations = {};
+  try {
+    const translationFile = fs.readFileSync(translationPath, 'utf-8');
+    translations = JSON.parse(translationFile);
+  } catch (error) {
+    console.error('Error loading translations:', error);
+  }
+  
+  // Get current year for footer
+  const currentYear = new Date().getFullYear();
+  
+  // Render the service complaint page with translations
+  res.render(path, { translations, language, currentYear });
+});
+
+app.get(['/contact', '/:lang/contact'], (req, res) => {
+  const path = 'legal/contact';
+
+  // Determine language from cookie, URL parameter, or headers, default to 'en'
+  let language = req.cookies?.preferredLanguage || req.params.lang || (req.headers['accept-language']?.startsWith('ja') ? 'ja' : 'en');
+  if (language !== 'ja' && language !== 'en') {
+    language = 'en'; // Default to English if the language is not supported
+  }
+
+  // Load translation file
+  const translationPath = resolve(`${process.env.STATIC_DIR}/lang/${language}.json`);
+  let translations = {};
+  try {
+    const translationFile = fs.readFileSync(translationPath, 'utf-8');
+    translations = JSON.parse(translationFile);
+  } catch (error) {
+    console.error('Error loading translations:', error);
+  }
+  
+  // Get current year for footer
+  const currentYear = new Date().getFullYear();
+  
+  // Render the contact page with translations
+  res.render(path, { translations, language, currentYear });
+});
+
 app.get(['/', '/:lang/'], (req, res) => {
   const path = 'index';
 
@@ -254,23 +381,6 @@ app.get(['/', '/:lang/'], (req, res) => {
   res.render(path, { translations, language });
 });
 
-// Prefix API routes with /api for consistency
-app.get('/api/config', async (req, res) => {
-  const price = await stripe.prices.retrieve(process.env.PRICE);
-
-  res.send({
-    publicKey: process.env.STRIPE_PUBLISHABLE_KEY,
-    unitAmount: price.unit_amount,
-    currency: price.currency,
-  });
-});
-
-// Fetch the Checkout Session to display the JSON result on the success page
-app.get('/api/checkout-session', async (req, res) => {
-  const { sessionId } = req.query;
-  const session = await stripe.checkout.sessions.retrieve(sessionId);
-  res.send(session);
-});
 
 app.post('/api/create-checkout-session', async (req, res) => {
   try {
@@ -561,7 +671,6 @@ async function pollTaskResult(task_id) {
       });
 
       const result = response.data;
-      console.log('Task Result:', result);
 
       // Send progress updates to the client
       const ws = clients.get(task_id);
@@ -688,7 +797,7 @@ async function pollTaskResult(task_id) {
         }
       }
     }
-  }, 1000);
+  }, 5000);
 
   taskPolls.set(task_id, pollInterval);
 }
@@ -704,9 +813,6 @@ const wss = new WebSocketServer({
   // Add options to handle connections from any domain
   verifyClient: (info) => {
     // Accept connections from any origin when deployed
-    console.log('Origin:', info.origin);
-    console.log('Secure:', info.secure);
-    console.log('Headers:', info.req.headers);
     return true;
   }
 });
@@ -741,10 +847,6 @@ wss.on('connection', (ws, req) => {
   ws.connectionId = ++connectionCounter;
   ws.isAlive = true;
   
-  console.log(`Client connected - ID: ${ws.connectionId}, IP: ${req.socket.remoteAddress}`);
-
-  // Log headers for debugging
-  console.log('Headers:', req.headers);
 
   // Handle pong response
   ws.on('pong', () => {
@@ -754,7 +856,6 @@ wss.on('connection', (ws, req) => {
 
   ws.on('message', message => {
     try {
-      console.log(`Received message from client ${ws.connectionId}:`, message.toString());
       const data = JSON.parse(message.toString());
       
       // Handle client pong responses

@@ -10,6 +10,8 @@ let roundedSellingPrice = 0;
 
 // Define max video size (10MB)
 const MAX_VIDEO_SIZE = 10 * 1024 * 1024; // 10MB in bytes
+// Define max image size (1MB)
+const MAX_IMAGE_SIZE = 1 * 1024 * 1024; // 1MB in bytes
 
 // Drag and Drop Functionality
 const videoDropZone = document.getElementById('videoDropZone');
@@ -94,8 +96,6 @@ function handleVideoSelection(videoFile) {
   if (videoFile) {
     // Check if file size exceeds the maximum allowed
     if (videoFile.size > MAX_VIDEO_SIZE) {
-      status.textContent = translationsObj.video_too_large || `Video file is too large. Maximum size is 10MB. Please compress your video or select a smaller file.`;
-      status.className = 'alert alert-danger';
       videoPreview.style.display = 'none';
       videoDetails.style.display = 'none';
       
@@ -122,6 +122,23 @@ function handleVideoSelection(videoFile) {
 // Function to handle image selection and display preview
 function handleImageSelection(imageFile) {
   if (imageFile) {
+    // Check if file size exceeds the maximum allowed
+    if (imageFile.size > MAX_IMAGE_SIZE) {
+      imagePreview.style.display = 'none';
+      imageDetails.style.display = 'none';
+      
+      // Disable pay button when file is too large
+      payButton.disabled = true;
+      return;
+    }
+    
+    // Reset status if previously showed an error
+    if (status.className.includes('alert-danger')) {
+      status.textContent = '';
+      status.className = '';
+      payButton.disabled = false;
+    }
+    
     imagePreview.style.display = 'block';
     imagePreview.src = URL.createObjectURL(imageFile);
     imageDetails.style.display = 'block'; // Show image details
@@ -134,6 +151,7 @@ function handleImageSelection(imageFile) {
 payButton.addEventListener('click', async () => {
   if (!videoInput.files.length || !imageInput.files.length) {
     status.textContent = translationsObj.please_upload_both;
+    status.classList.remove('hidden');
     status.className = 'alert alert-danger'; // Use Bootstrap alert-danger class
     console.log('Missing files');
     return;
@@ -142,6 +160,15 @@ payButton.addEventListener('click', async () => {
   // Double-check file size before proceeding
   if (videoInput.files[0].size > MAX_VIDEO_SIZE) {
     status.textContent = translationsObj.video_too_large || `Video file is too large. Maximum size is 10MB. Please compress your video or select a smaller file.`;
+    status.classList.remove('hidden');
+    status.className = 'alert alert-danger';
+    return;
+  }
+  
+  // Double-check image file size before proceeding
+  if (imageInput.files[0].size > MAX_IMAGE_SIZE) {
+    status.textContent = translationsObj.image_too_large || `Image file is too large. Maximum size is 1MB. Please compress your image or select a smaller file.`;
+    status.classList.remove('hidden');
     status.className = 'alert alert-danger';
     return;
   }
@@ -152,6 +179,7 @@ payButton.addEventListener('click', async () => {
 
   try {
     status.textContent = translationsObj.uploading_files;
+    status.classList.remove('hidden');
     status.className = 'alert alert-info'; // Use Bootstrap alert-info class
     const response = await fetch('/api/temp-upload', {
       method: 'POST',
@@ -182,6 +210,7 @@ payButton.addEventListener('click', async () => {
       console.log('Skipping payment, redirecting with tempId:', tempId);
     } else {
       status.textContent = translationsObj.creating_checkout;
+      status.classList.remove('hidden');
       status.className = 'alert alert-info'; // Use Bootstrap alert-info class
 
       // Extract video details
@@ -215,12 +244,14 @@ payButton.addEventListener('click', async () => {
 
       if (result.error) {
         status.textContent = result.error.message;
+        status.classList.remove('hidden');
         status.className = 'alert alert-danger'; // Use Bootstrap alert-danger class
       }
     }
   } catch (error) {
     console.error('Error:', error);
     status.textContent = `${translationsObj.an_error_occurred}: ${error.message}`;
+    status.classList.remove('hidden');
     status.className = 'alert alert-danger'; // Use Bootstrap alert-danger class
   }
 });
@@ -278,6 +309,7 @@ async function getVideoDetails(videoFile) {
 
   video.onerror = function() {
     status.textContent = translationsObj.error_loading_metadata;
+    status.classList.remove('hidden');
     status.className = 'alert alert-danger'; // Use Bootstrap alert-danger class
   }
 
@@ -286,6 +318,19 @@ async function getVideoDetails(videoFile) {
 
 // Function to get image details
 async function getImageDetails(imageFile) {
+  // Check file size first
+  if (imageFile.size > MAX_IMAGE_SIZE) {
+    imageDetails.innerHTML = `
+      <h5>${translationsObj.image_details || 'Image Details'}</h5>
+      <div class="alert alert-danger">
+        ${translationsObj.image_too_large || 'Image file is too large (Maximum: 1MB). Please compress your image or select a smaller file.'}
+        <p><strong>${translationsObj.current_size || 'Current size'}:</strong> ${(imageFile.size / (1024 * 1024)).toFixed(2)} MB</p>
+      </div>
+    `;
+    imageDetails.style.display = 'block';
+    return;
+  }
+
   const image = new Image();
 
   image.onload = function() {
@@ -308,6 +353,7 @@ async function getImageDetails(imageFile) {
     status.textContent = translationsObj.error_loading_metadata;
     imageDetails.innerHTML = `<p>${translationsObj.error_loading_metadata}</p>`;
     imageDetails.style.display = 'block';
+    status.classList.remove('hidden');
     status.className = 'alert alert-danger'; // Use Bootstrap alert-danger class
   }
 
@@ -356,6 +402,7 @@ async function loadVideoFromUrl(videoUrl) {
   } catch (error) {
     console.error('Error loading video from URL:', error);
     status.textContent = translationsObj.error_loading_url;
+    status.classList.remove('hidden');
     status.className = 'alert alert-danger'; // Use Bootstrap alert-danger class
   }
 }

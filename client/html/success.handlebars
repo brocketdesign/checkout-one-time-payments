@@ -13,24 +13,6 @@
     <script>const translations = `{{{json translations}}}`;</script> 
     <script src="/success.js" defer></script>
     <style>
-      .progress-bar {
-        background-color: #e0e0e0;
-        border-radius: 4px;
-        height: 30px;
-        width: 100%;
-        position: relative;
-        overflow: hidden;
-      }
-      .progress-fill {
-        background-color: #4CAF50;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: width 0.3s ease;
-        color: white;
-        font-weight: bold;
-      }
       .progress-status {
         margin-top: 8px;
         text-align: center;
@@ -43,21 +25,21 @@
     {{> header translations=translations}}
     <div class="sr-root">
       <div class="sr-main">
-        <section class="container">
+        <section class="container mx-auto">
           <h1>{{ translations.processing_your_video }}</h1>
           <div id="status-message" class="processing">{{ translations.retrieving_upload }}</div>
           
           <div id="progress-container" class="progress-container">
-            <div class="progress-bar" style="position: relative;">
-              <div id="progress-fill" class="progress-fill" style="width: 0%;"></div>
-              <span id="progress-text" style="position: absolute; top: 0; left: 50%;">0%</span>
+            <div class="progress" style="height: 30px;">
+              <div id="progress-fill" class="progress-bar bg-success" role="progressbar" 
+                   style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
             </div>
             <div id="progress-status" class="progress-status">{{ translations.initializing }}</div>
           </div>
           
           <div id="completion-section" class="hidden">            
             <div id="video-result">
-              <video id="video-result-element" width="640" height="360" controls>
+              <video id="video-result-element" width="640" height="360" controls muted autoplay>
                 <source id="video-source" src="" type="video/mp4">
                 Your browser does not support the video tag.
               </video>
@@ -69,6 +51,9 @@
             <div id="action-buttons">
               <button id="another-video-button">{{ translations.generate_another_video }}</button>
               <button id="change-face-button">{{ translations.change_the_face }}</button>
+              <a id="history-button" href="{{#ifCond language '==' 'en'}}/history{{else}}/{{language}}/history{{/ifCond}}" class="btn btn-light rounded-0 mt-2 border">
+                {{ translations.history_title }}
+              </a>
             </div>
           </div>
 

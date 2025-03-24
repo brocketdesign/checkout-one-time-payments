@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="{{language}}">
+<head>
+  <title>{{translations.history_title}} - {{translations.ai_video_face_swap}}</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>const translations = `{{{json translations}}}`;</script> 
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .page-header {
+      background-color: #4a6bdf;
+      color: white;
+      padding: 2rem 0;
+      margin-bottom: 2rem;
+      margin-top: -40px;
+      border-radius: 0 0 4rem 4rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .section-container {
+      background-color: white;
+      border-radius: 1rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    .section-header {
+      border-bottom: 1px solid #e9ecef;
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+    }
+    .section-header i {
+      margin-right: 0.75rem;
+      font-size: 1.5rem;
+      color: #4a6bdf;
+    }
+    .card {
+      border: none;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+      transition: transform 0.3s, box-shadow 0.3s;
+      height: 100%;
+      border-radius: 0.75rem;
+      overflow: hidden;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+    .card-header {
+      font-weight: 600;
+      padding: 1rem;
+    }
+    .pending-card .card-header {
+      background-color: #f8d7da;
+      color: #842029;
+    }
+    .completed-card .card-header {
+      background-color: #d1e7dd;
+      color: #0f5132;
+    }
+    .video-container {
+      position: relative;
+      padding-top: 56.25%; /* 16:9 aspect ratio */
+      background-color: #000;
+    }
+    .video-container video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .card-footer {
+      background-color: white;
+      border-top: 1px solid #e9ecef;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #6c757d;
+    }
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+    .navbar {
+      margin-bottom: 2rem;
+    }
+    .nav-link {
+      color: #495057;
+      font-weight: 500;
+    }
+    .nav-link.active {
+      color: #4a6bdf;
+      border-bottom: 2px solid #4a6bdf;
+    }
+    .btn-action {
+      background-color: #4a6bdf;
+      color: white;
+      border: none;
+      font-weight: 500;
+    }
+    .btn-action:hover {
+      background-color: #3a59c7;
+      color: white;
+    }
+    .home-btn {
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+    {{> header translations=translations}}
+  <div class="page-header">
+    <div class="container">
+      <h1 class="text-center">{{translations.history_title}}</h1>
+      <p class="text-center mb-0">{{translations.history_subtitle}}</p>
+    </div>
+  </div>
+  
+  <div class="container mb-4">
+    <a href="{{#ifCond language '==' 'en'}}/{{else}}/{{language}}/{{/ifCond}}" class="btn btn-outline-secondary home-btn">
+      <i class="fas fa-arrow-left me-2"></i>{{translations.back_to_home}}
+    </a>
+  </div>
+
+  <div class="container">
+    <!-- Pending/Failed Processes Section -->
+    <section class="section-container" id="pending-processes">
+      <div class="section-header">
+        <i class="fas fa-hourglass-half"></i>
+        <h2 class="mb-0">{{translations.pending_processes}}</h2>
+      </div>
+      <div id="pending-container" class="row g-4">
+        <!-- Pending items will be populated here by JavaScript -->
+      </div>
+    </section>
+    
+    <!-- Completed Processes Section -->
+    <section class="section-container" id="completed-processes">
+      <div class="section-header">
+        <i class="fas fa-check-circle"></i>
+        <h2 class="mb-0">{{translations.completed_processes}}</h2>
+      </div>
+      <div id="completed-container" class="row g-4">
+        <!-- Completed items will be populated here by JavaScript -->
+      </div>
+    </section>
+  </div>
+    {{> footer translations=translations}}
+  <script src="/history.js"></script>
+</body>
+</html>
