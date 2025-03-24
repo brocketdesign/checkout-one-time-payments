@@ -191,12 +191,10 @@ app.get(['/success', '/:lang/success'], (req, res) => {
   try {
     const translationFile = fs.readFileSync(translationPath, 'utf-8');
     translations = JSON.parse(translationFile);
-    console.log(`Loaded translations from ${translationPath}`);
   } catch (error) {
     console.error(`Error loading translations from ${translationPath}:`, error);
   }
 
-  console.log(`Rendering success template with language: ${language}, tempId: ${req.query.tempId}`);
   // Send the translation data to the client
   res.render(path, { 
     translations, 
@@ -386,7 +384,6 @@ app.post('/api/create-checkout-session', async (req, res) => {
   try {
     // on localhost, use http://localhost:4242 but on production use the domain
     const currentURL = req.protocol + '://' + req.get('host');
-    console.log('Current URL:', currentURL);
     const domainURL = process.env.MODE === 'local' ? 'http://localhost:4242' : currentURL;
     const { tempId, roundedSellingPrice, fileName, duration, resolution, fileSize, frameCount } = req.body;
     
@@ -882,7 +879,6 @@ wss.on('connection', (ws, req) => {
         }
         
         clients.set(data.task_id, ws);
-        console.log(`Client connected with task_id: ${data.task_id}, connection ID: ${ws.connectionId}`);
       }
     } catch (error) {
       console.error('Error parsing message:', error);

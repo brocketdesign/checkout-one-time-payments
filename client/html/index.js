@@ -46,7 +46,6 @@ videoDropZone.addEventListener('drop', (event) => {
   videoDropZone.classList.remove('hover');
   const files = event.dataTransfer.files;
   videoInput.files = files;
-  console.log('Video dropped:', files);
   handleVideoSelection(files[0]);
   getVideoDetails(files[0]);
 });
@@ -56,7 +55,6 @@ videoUploadBtn.addEventListener('click', () => {
 });
 
 videoInput.addEventListener('change', (event) => {
-  console.log('Video selected:', videoInput.files);
   handleVideoSelection(videoInput.files[0]);
   getVideoDetails(videoInput.files[0]);
 });
@@ -76,7 +74,6 @@ imageDropZone.addEventListener('drop', (event) => {
   imageDropZone.classList.remove('hover');
   const files = event.dataTransfer.files;
   imageInput.files = files;
-  console.log('Image dropped:', files);
   handleImageSelection(files[0]);
   getImageDetails(files[0]);
 });
@@ -86,7 +83,6 @@ imageUploadBtn.addEventListener('click', () => {
 });
 
 imageInput.addEventListener('change', (event) => {
-  console.log('Image selected:', imageInput.files);
   handleImageSelection(imageInput.files[0]);
   getImageDetails(imageInput.files[0]);
 });
@@ -201,10 +197,8 @@ payButton.addEventListener('click', async () => {
       .split('; ')
       .find(row => row.startsWith('preferredLanguage='))
       ?.split('=')[1];
-    console.log('Current language:', currentLanguage);
     const baseUrl = currentLanguage === 'en' || !currentLanguage ? '/' : `/${currentLanguage}/`;
     const redirectionUrl = `${baseUrl}success?tempId=${tempId}`;
-    console.log('Redirection URL:', redirectionUrl);
     if (skipPayment) {
       window.location.href = `${baseUrl}success?tempId=${tempId}`;
       console.log('Skipping payment, redirecting with tempId:', tempId);
@@ -236,7 +230,6 @@ payButton.addEventListener('click', async () => {
 
       const sessionData = await sessionResponse.json();
       const sessionId = sessionData.id;
-      console.log('Stripe session created:', sessionId);
 
       const result = await stripe.redirectToCheckout({
         sessionId: sessionId,
