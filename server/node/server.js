@@ -725,7 +725,7 @@ const heartbeatInterval = setInterval(() => {
     }
     
     ws.isAlive = false;
-    ws.ping('', false, true);
+    ws.ping(); // Modified: removed incorrect parameters
     
     // Also send a custom ping message that clients can respond to
     try {
