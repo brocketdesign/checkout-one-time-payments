@@ -704,6 +704,9 @@ const wss = new WebSocketServer({
   // Add options to handle connections from any domain
   verifyClient: (info) => {
     // Accept connections from any origin when deployed
+    console.log('Origin:', info.origin);
+    console.log('Secure:', info.secure);
+    console.log('Headers:', info.req.headers);
     return true;
   }
 });
@@ -740,18 +743,24 @@ wss.on('connection', (ws, req) => {
   
   console.log(`Client connected - ID: ${ws.connectionId}, IP: ${req.socket.remoteAddress}`);
 
+  // Log headers for debugging
+  console.log('Headers:', req.headers);
+
   // Handle pong response
   ws.on('pong', () => {
     ws.isAlive = true;
+    console.log(`Received pong from client ${ws.connectionId}`);
   });
 
   ws.on('message', message => {
     try {
+      console.log(`Received message from client ${ws.connectionId}:`, message.toString());
       const data = JSON.parse(message.toString());
       
       // Handle client pong responses
       if (data.type === 'pong') {
         ws.isAlive = true;
+        console.log(`Received pong response from client ${ws.connectionId}`);
         return;
       }
       

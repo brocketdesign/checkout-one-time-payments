@@ -90,8 +90,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Set up WebSocket connection with reconnection logic
       function setupWebSocket(taskId) {
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsPort = (window.location.port ? parseInt(window.location.port) : 80) + 1;
-        const wsUrl = `${protocol}//${window.location.hostname}:${wsPort}`;
+        // For Heroku and other platforms, use the same host (hostname:port)
+        const wsUrl = `${protocol}//${window.location.host}`;
         log('Connecting to WebSocket', { url: wsUrl });
         
         let reconnectAttempts = 0;
