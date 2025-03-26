@@ -745,6 +745,7 @@ function useFrameForFaceSwap(frameDataUrl, timeStamp) {
     videoModeBtn.classList.add('btn-outline-primary');
     videoModeBtn.classList.remove('btn-primary');
     
+    imageFreeBadge.style.display = 'block';
     videoSourceSection.style.display = 'none';
     imageSourceSection.style.display = 'block';
     
