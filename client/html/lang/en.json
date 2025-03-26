@@ -239,5 +239,7 @@
   "processing_image": "Processing image...",
   "processed_image": "Processed Image",
   "download": "Download",
-  "close": "Close"
+  "close": "Close",
+  "extracted_frames": "Extracted Frames",
+  "click_frame_to_use": "Click on a frame to use it"
 }

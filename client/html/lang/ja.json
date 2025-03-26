@@ -248,5 +248,7 @@
   "processing_image": "画像を処理中...",
   "processed_image": "処理済み画像",
   "download": "ダウンロード",
-  "close": "閉じる"
+  "close": "閉じる",
+  "extracted_frames": "抽出されたフレーム",
+  "click_frame_to_use": "使用するフレームをクリックしてください"
 }

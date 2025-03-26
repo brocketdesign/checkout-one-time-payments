@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+    <link rel="icon" href="/img/logo.ico" type="image/x-icon">
     <title>{{ translations.title }}</title>
 
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
@@ -24,10 +24,13 @@
     <div class="container mx-auto mt-5 bg-white text-dark">
       <div class="main" style="width: 100%;">
         <section id="top" class="main-container">
-          <div>
-            <h1 id="title" style="padding-top: 50px;">{{ translations.title }}</h1>
-            <h4 id="subtitle" class="subtitle">{{ translations.subtitle }}</h4>
-          </div>
+            <div style="display: flex; flex-direction: column;align-items: center;justify-content: center;">
+              <img src="/img/logo.png" alt="Logo" style="height: 50px; margin-right: 10px;">
+              <div>
+                <h1 id="title" >{{ translations.title }}</h1>
+                <h4 id="subtitle" class="subtitle mb-0">{{ translations.subtitle }}</h4>
+              </div>
+            </div>
 
           <!-- Mode Selection Toggle -->
             <div class="mode-toggle-container" style="margin: 20px auto; text-align: center;">
@@ -61,7 +64,7 @@
               </div>
               <p id="drop_video" class="drop-text">{{ translations.drop_video }}</p>
               <video id="videoPreview" width="100%" controls style="display: none;"></video>
-              <div id="videoDetails" class="video-details"></div>
+              <div id="videoDetails" class="video-details bg-white"></div>
               
               <!-- Video Frames Gallery -->
               <div class="video-frames-section" style="display: none;">
@@ -127,7 +130,7 @@
               </div>
               <p id="drop_source_image" class="drop-text">{{#if translations.drop_source_image}}{{ translations.drop_source_image }}{{else}}...or drop image here{{/if}}</p>
               <img id="sourceImagePreview" src="#" alt="Source image preview" style="max-width: 100%; height: auto; display: none;">
-              <div id="sourceImageDetails" class="image-details"></div>
+              <div id="sourceImageDetails" class="image-details bg-white"></div>
             </div>
 
             <div class="upload-section bg-light border shadow-sm col-12 col-sm-5 mx-0">
@@ -146,7 +149,7 @@
               </div>
               <p id="drop_photo" class="drop-text">{{ translations.drop_photo }}</p>
               <img id="imagePreview" src="#" alt="Image preview" style="max-width: 100%; height: auto; display: none;">
-              <div id="imageDetails" class="image-details"></div>
+              <div id="imageDetails" class="image-details bg-white"></div>
               
               <!-- Sample Images Gallery -->
               <div class="sample-images-section">
