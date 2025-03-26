@@ -207,6 +207,9 @@ async function getSourceImageDetails(imageFile) {
         <li><strong>${translationsObj.size}:</strong> ${(fileSize / (1024 * 1024)).toFixed(2)} MB</li>
       </ul>
     `;
+    
+    // Store the source image URL to use in the comparison slider
+    sourceImagePreview.dataset.originalUrl = URL.createObjectURL(imageFile);
   }
 
   image.onerror = function() {
@@ -394,12 +397,13 @@ payButton.addEventListener('click', async () => {
       const result = await response.json();
       
       if (result.image_url) {
-        // Set the image source in the modal
-        document.getElementById('processedImage').src = result.image_url;
+        // Update modal to show comparison slider
+        const originalImageUrl = sourceImagePreview.dataset.originalUrl;
+        setupComparisonSlider(originalImageUrl, result.image_url);
         
         // Set the download link
         document.getElementById('downloadLink').href = result.image_url;
-        document.getElementById('downloadLink').download = 'processed_image.jpg'; // You can set a default filename
+        document.getElementById('downloadLink').download = 'processed_image.jpg';
         
         // Show the modal
         const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
@@ -908,3 +912,154 @@ document.addEventListener('DOMContentLoaded', () => {
     loadVideoFromUrl(videoUrl);
   }
 });
+
+// Function to set up the image comparison slider
+function setupComparisonSlider(originalImageUrl, processedImageUrl) {
+  const comparisonContainer = document.getElementById('imageComparisonContainer');
+  
+  // Clear previous content
+  comparisonContainer.innerHTML = '';
+  
+  // Create the structure for the comparison slider
+  comparisonContainer.innerHTML = `
+    <div class="img-comp-container">
+      <div class="img-comp-after">
+        <img src="${processedImageUrl}" alt="Processed Image">
+      </div>
+      <div class="img-comp-before">
+        <img src="${originalImageUrl}" alt="Original Image">
+      </div>
+      <div class="img-comp-slider">
+        <div class="img-comp-handle">
+          <span class="img-comp-arrow-left">❮</span>
+          <span class="img-comp-arrow-right">❯</span>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Wait for images to load before initializing comparison
+  const images = comparisonContainer.querySelectorAll('img');
+  let loadedCount = 0;
+  
+  images.forEach(img => {
+    img.onload = () => {
+      loadedCount++;
+      if (loadedCount === images.length) {
+        initComparison();
+      }
+    };
+    // Handle already cached images
+    if (img.complete) {
+      img.onload();
+    }
+  });
+  
+  // Also update the processedImage element for backward compatibility
+  document.getElementById('processedImage').src = processedImageUrl;
+}
+
+// Function to initialize the comparison slider
+function initComparison() {
+  const container = document.querySelector('.img-comp-container');
+  const slider = document.querySelector('.img-comp-slider');
+  const before = document.querySelector('.img-comp-before');
+  const after = document.querySelector('.img-comp-after');
+  const afterImg = document.querySelector('.img-comp-after img');
+  const beforeImg = document.querySelector('.img-comp-before img');
+  
+  // First, make sure both images have the same dimensions
+  const afterNaturalWidth = afterImg.naturalWidth;
+  const afterNaturalHeight = afterImg.naturalHeight;
+  
+  // Calculate aspect ratio
+  const aspectRatio = afterNaturalWidth / afterNaturalHeight;
+  
+  // Set container height based on the container width and aspect ratio
+  // while respecting max-height
+  let containerHeight = container.offsetWidth / aspectRatio;
+  if (containerHeight > 400) {
+    containerHeight = 400;
+  }
+  container.style.height = containerHeight + 'px';
+  
+  // Calculate the actual displayed width of the image (accounting for object-fit: contain)
+  let displayedWidth, displayedHeight;
+  
+  if (aspectRatio > container.offsetWidth / containerHeight) {
+    // Width constrained
+    displayedWidth = container.offsetWidth;
+    displayedHeight = displayedWidth / aspectRatio;
+  } else {
+    // Height constrained
+    displayedHeight = containerHeight;
+    displayedWidth = displayedHeight * aspectRatio;
+  }
+  
+  // Calculate the offset to center the image horizontally
+  const horizontalOffset = (container.offsetWidth - displayedWidth) / 2;
+  
+  // Set initial position (show half of each image)
+  const initialPosition = horizontalOffset + (displayedWidth / 2);
+  slider.style.left = initialPosition + 'px';
+  before.style.width = initialPosition + 'px';
+  
+  // Position both images identically
+  const imgStyle = `
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: ${containerHeight}px;
+    left: ${horizontalOffset}px;
+  `;
+  beforeImg.style.cssText = imgStyle;
+  afterImg.style.cssText = imgStyle;
+  
+  // Add event listeners for slider interaction
+  slider.addEventListener('mousedown', startSliding);
+  slider.addEventListener('touchstart', startSliding, { passive: true });
+  
+  function startSliding(e) {
+    e.preventDefault();
+    
+    // Add event listeners for moving and stopping
+    document.addEventListener('mousemove', slide);
+    document.addEventListener('touchmove', slide, { passive: false });
+    document.addEventListener('mouseup', stopSliding);
+    document.addEventListener('touchend', stopSliding);
+  }
+  
+  function slide(e) {
+    let pos = getPosition(e);
+    
+    // Constrain position within the displayed image bounds
+    if (pos < horizontalOffset) pos = horizontalOffset;
+    if (pos > horizontalOffset + displayedWidth) pos = horizontalOffset + displayedWidth;
+    
+    // Update slider and before image width
+    slider.style.left = pos + 'px';
+    before.style.width = pos + 'px';
+  }
+  
+  function getPosition(e) {
+    const containerRect = container.getBoundingClientRect();
+    let clientX;
+    
+    // Handle both mouse and touch events
+    if (e.type.includes('touch')) {
+      clientX = e.touches[0].clientX;
+    } else {
+      clientX = e.clientX;
+    }
+    
+    return clientX - containerRect.left;
+  }
+  
+  function stopSliding() {
+    // Remove event listeners
+    document.removeEventListener('mousemove', slide);
+    document.removeEventListener('touchmove', slide);
+    document.removeEventListener('mouseup', stopSliding);
+    document.removeEventListener('touchend', stopSliding);
+  }
+}

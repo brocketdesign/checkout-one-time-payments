@@ -67,6 +67,77 @@ h1 {
   cursor: pointer;
   margin: 1em 0;
 }
+/* Image comparison slider styles */
+.img-comp-container {
+  position: relative;
+  width: 100%;
+  max-height: 400px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.img-comp-before, .img-comp-after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.img-comp-before {
+  z-index: 2;
+  border-right: 2px solid #fff;
+  width: 50%; /* Initial width, will be controlled by JS */
+}
+
+.img-comp-after {
+  z-index: 1;
+}
+
+.img-comp-before img, .img-comp-after img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+.img-comp-slider {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  margin-left: -20px;
+  cursor: ew-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.img-comp-handle {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.img-comp-arrow-left, .img-comp-arrow-right {
+  font-size: 12px;
+  color: #555;
+  margin: 0 2px;
+}
 
 .bg-animation {
   background: linear-gradient(-45deg,#ee7752,#e73c7e,#23a6d5,#23d5ab);
