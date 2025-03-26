@@ -349,6 +349,10 @@ function handleImageSelection(imageFile) {
 
 // Proceed Button Logic
 payButton.addEventListener('click', async () => {
+  // Disable the button and add a spinner
+  payButton.disabled = true;
+  payButton.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> ${translationsObj.processing || 'Processing...'}`;
+
   // Check based on current mode
   if (isImageMode) {
     // Image-to-image mode validation
@@ -356,6 +360,7 @@ payButton.addEventListener('click', async () => {
       status.textContent = translationsObj.please_upload_both_images || 'Please upload both the source image and the face image.';
       status.classList.remove('hidden');
       status.className = 'alert alert-danger';
+      resetPayButton();
       return;
     }
     
@@ -364,6 +369,7 @@ payButton.addEventListener('click', async () => {
       status.textContent = translationsObj.image_too_large || `Source image file is too large. Maximum size is 1MB. Please compress your image or select a smaller file.`;
       status.classList.remove('hidden');
       status.className = 'alert alert-danger';
+      resetPayButton();
       return;
     }
     
@@ -372,6 +378,7 @@ payButton.addEventListener('click', async () => {
       status.textContent = translationsObj.image_too_large || `Face image file is too large. Maximum size is 1MB. Please compress your image or select a smaller file.`;
       status.classList.remove('hidden');
       status.className = 'alert alert-danger';
+      resetPayButton();
       return;
     }
     
@@ -381,10 +388,6 @@ payButton.addEventListener('click', async () => {
     formData.append('face_image_file', imageInput.files[0]);
 
     try {
-      status.textContent = translationsObj.processing_image || 'Processing image...';
-      status.classList.remove('hidden');
-      status.className = 'alert alert-info';
-      
       const response = await fetch('/api/process-image-swap', {
         method: 'POST',
         body: formData,
@@ -416,6 +419,8 @@ payButton.addEventListener('click', async () => {
       status.textContent = `${translationsObj.an_error_occurred}: ${error.message}`;
       status.classList.remove('hidden');
       status.className = 'alert alert-danger';
+    } finally {
+      resetPayButton();
     }
   } else {
     // Original video mode validation and processing
@@ -424,6 +429,7 @@ payButton.addEventListener('click', async () => {
       status.classList.remove('hidden');
       status.className = 'alert alert-danger';
       console.log('Missing files');
+      resetPayButton();
       return;
     }
     
@@ -432,6 +438,7 @@ payButton.addEventListener('click', async () => {
       status.textContent = translationsObj.video_too_large || 'Video file is too large (Maximum: 10MB). Please compress your video or select a smaller file.';
       status.classList.remove('hidden');
       status.className = 'alert alert-danger';
+      resetPayButton();
       return;
     }
     // Original video mode processing logic
@@ -470,10 +477,6 @@ payButton.addEventListener('click', async () => {
         window.location.href = `${baseUrl}success?tempId=${tempId}`;
         console.log('Skipping payment, redirecting with tempId:', tempId);
       } else {
-        status.textContent = translationsObj.creating_checkout;
-        status.classList.remove('hidden');
-        status.className = 'alert alert-info';
-
         // Extract video details and include currency
         const sessionResponse = await fetch('/api/create-checkout-session', {
           method: 'POST',
@@ -514,9 +517,18 @@ payButton.addEventListener('click', async () => {
       status.textContent = `${translationsObj.an_error_occurred}: ${error.message}`;
       status.classList.remove('hidden');
       status.className = 'alert alert-danger';
+    } finally {
+      resetPayButton();
+      status.textContent = "";
+      status.classList.add('hidden');
     }
   }
 });
+
+function resetPayButton() {
+  payButton.disabled = false;
+  payButton.innerHTML = `<span>${translationsObj.proceed || 'Proceed'}</span>`;
+}
 
 // Function to get video details
 async function getVideoDetails(videoFile) {
@@ -917,10 +929,10 @@ document.addEventListener('DOMContentLoaded', () => {
 // Function to set up the image comparison slider
 function setupComparisonSlider(originalImageUrl, processedImageUrl) {
   const comparisonContainer = document.getElementById('imageComparisonContainer');
-  
+
   // Clear previous content
   comparisonContainer.innerHTML = '';
-  
+
   // Create the structure for the comparison slider
   comparisonContainer.innerHTML = `
     <div class="img-comp-container">
@@ -939,24 +951,49 @@ function setupComparisonSlider(originalImageUrl, processedImageUrl) {
       </div>
     </div>
   `;
-  
+
   // Wait for images to load before initializing comparison
   const images = comparisonContainer.querySelectorAll('img');
   let loadedCount = 0;
-  
-  images.forEach(img => {
-    img.onload = () => {
-      loadedCount++;
-      if (loadedCount === images.length) {
-        initComparison();
+  let errorOccurred = false; // Flag to track if any image fails to load
+
+  const imagePromises = Array.from(images).map(img => {
+    return new Promise((resolve, reject) => {
+      img.onload = () => {
+        // Check for natural dimensions after load
+        if (!img.naturalWidth || !img.naturalHeight) {
+          console.warn('Image dimensions not available yet, delaying initComparison');
+          setTimeout(() => {
+            img.onload(); // Re-trigger onload after a delay
+          }, 200);
+          reject('Image dimensions not available');
+          return;
+        }
+        resolve();
+      };
+      img.onerror = () => {
+        errorOccurred = true;
+        status.textContent = translationsObj.error_loading_images || 'Error loading images for comparison.';
+        status.classList.remove('hidden');
+        status.className = 'alert alert-danger';
+        reject('Error loading image');
+      };
+      // Handle already cached images
+      if (img.complete) {
+        img.onload();
       }
-    };
-    // Handle already cached images
-    if (img.complete) {
-      img.onload();
-    }
+    });
   });
-  
+
+  Promise.all(imagePromises)
+    .then(() => {
+      // Delay initComparison to ensure images are rendered
+      setTimeout(initComparison, 100);
+    })
+    .catch(error => {
+      console.error('Image loading failed:', error);
+    });
+
   // Also update the processedImage element for backward compatibility
   document.getElementById('processedImage').src = processedImageUrl;
 }
@@ -969,28 +1006,34 @@ function initComparison() {
   const after = document.querySelector('.img-comp-after');
   const afterImg = document.querySelector('.img-comp-after img');
   const beforeImg = document.querySelector('.img-comp-before img');
-  
+
+  // Check if images have valid dimensions
+  if (!afterImg.naturalWidth || !afterImg.naturalHeight || !beforeImg.naturalWidth || !beforeImg.naturalHeight) {
+    console.error('Images have no dimensions!');
+    return;
+  }
+
   // Calculate natural aspect ratio of images
   const imgWidth = afterImg.naturalWidth;
   const imgHeight = afterImg.naturalHeight;
   const aspectRatio = imgWidth / imgHeight;
-  
+
   // Calculate container dimensions based on aspect ratio
   let containerWidth = container.offsetWidth;
   let containerHeight = containerWidth / aspectRatio;
-  
+
   // If the calculated height exceeds max-height, adjust width accordingly
   if (containerHeight > 400) {
     containerHeight = 400;
     containerWidth = containerHeight * aspectRatio;
   }
-  
+
   // Set container height
   container.style.height = containerHeight + 'px';
-  
+
   // Calculate the actual displayed dimensions of the images
   let displayedWidth, displayedHeight, scale;
-  
+
   if (aspectRatio > container.offsetWidth / containerHeight) {
     // Width constrained - image will be full width
     displayedWidth = container.offsetWidth;
@@ -1002,80 +1045,80 @@ function initComparison() {
     displayedWidth = displayedHeight * aspectRatio;
     scale = displayedHeight / imgHeight;
   }
-  
+
   // Calculate horizontal offset to center images
   const horizontalOffset = (container.offsetWidth - displayedWidth) / 2;
-  
+
   // Style both images identically
   afterImg.style.width = 'auto';
   afterImg.style.height = 'auto';
   afterImg.style.maxWidth = `${displayedWidth}px`;
   afterImg.style.maxHeight = `${containerHeight}px`;
   afterImg.style.left = `${horizontalOffset}px`;
-  
+
   beforeImg.style.width = 'auto';
   beforeImg.style.height = 'auto';
   beforeImg.style.maxWidth = `${displayedWidth}px`;
   beforeImg.style.maxHeight = `${containerHeight}px`;
   beforeImg.style.left = `${horizontalOffset}px`;
-  
+
   // Set initial slider position (center)
   const initialPosition = container.offsetWidth / 2;
   slider.style.left = initialPosition + 'px';
-  
+
   // Set initial clip for before image (show left half)
   updateClipPath(initialPosition);
-  
+
   // Add event listeners for slider interaction
   slider.addEventListener('mousedown', startSliding);
   slider.addEventListener('touchstart', startSliding, { passive: true });
-  
+
   function startSliding(e) {
     e.preventDefault();
-    
+
     // Add event listeners for moving and stopping
     document.addEventListener('mousemove', slide);
     document.addEventListener('touchmove', slide, { passive: false });
     document.addEventListener('mouseup', stopSliding);
     document.addEventListener('touchend', stopSliding);
   }
-  
+
   function slide(e) {
     let pos = getPosition(e);
-    
+
     // Constrain position within the valid image bounds
     if (pos < horizontalOffset) pos = horizontalOffset;
     if (pos > horizontalOffset + displayedWidth) pos = horizontalOffset + displayedWidth;
-    
+
     // Update slider position
     slider.style.left = pos + 'px';
-    
+
     // Update clip path instead of width
     updateClipPath(pos);
   }
-  
+
   function updateClipPath(position) {
     // Calculate how much of the right side to clip (as a percentage)
     const rightClip = 100 - ((position / container.offsetWidth) * 100);
-    
+
     // Apply clip-path to show only the portion left of the slider
     before.style.clipPath = `inset(0 ${rightClip}% 0 0)`;
   }
-  
+
   function getPosition(e) {
     const containerRect = container.getBoundingClientRect();
     let clientX;
-    
+
     // Handle both mouse and touch events
     if (e.type.includes('touch')) {
       clientX = e.touches[0].clientX;
     } else {
       clientX = e.clientX;
     }
-    
+
     return clientX - containerRect.left;
   }
-  
+
   function stopSliding() {
     // Remove event listeners
     document.removeEventListener('mousemove', slide);
