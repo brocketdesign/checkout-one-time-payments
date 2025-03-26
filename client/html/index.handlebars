@@ -17,6 +17,10 @@
 
   <body>
     {{> header translations=translations}}
+    <!-- Free badge for image mode -->
+    <div id="freeModeBadgeTop" class="alert alert-success w-100 rounded-0" style="text-align: center;">
+      <strong>{{#if translations.free_mode}}{{ translations.free_mode }}{{else}}Free!{{/if}}</strong> {{#if translations.free_mode_description}}{{ translations.free_mode_description }}{{else}}Image to image face swap is 100% free{{/if}}
+    </div>
     <div class="container mx-auto mt-5 bg-white text-dark">
       <div class="main" style="width: 100%;">
         <section id="top" class="main-container">
@@ -25,8 +29,23 @@
             <h4 id="subtitle" class="subtitle">{{ translations.subtitle }}</h4>
           </div>
 
-          <div class="upload-container row mx-0">
-            <div class="upload-section bg-light border shadow-sm col-12 col-sm-6 mx-0">
+          <!-- Mode Selection Toggle -->
+            <div class="mode-toggle-container" style="margin: 20px auto; text-align: center;">
+            <div class="btn-group mode-toggle" role="group" aria-label="Choose mode">
+              <button type="button" class="btn btn-primary active" id="videoModeBtn">{{#if translations.video_mode}}{{ translations.video_mode }}{{else}}Video Mode{{/if}}</button>
+              <button type="button" class="btn btn-outline-primary position-relative" id="imageModeBtn">
+              {{#if translations.image_mode}}{{ translations.image_mode }}{{else}}Image Mode{{/if}}
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+                {{#if translations.free_mode}}{{ translations.free_mode }}{{else}}Free!{{/if}}
+                <span class="visually-hidden">Free!</span>
+              </span>
+              </button>
+            </div>
+            <p class="mt-2 text-muted">{{#if translations.mode_description}}{{ translations.mode_description }}{{else}}Choose between video or image face swap{{/if}}</p>
+            </div>
+
+          <div class="upload-container row mx-auto">
+            <div id="videoSourceSection" class="upload-section bg-light border shadow-sm col-12 col-sm-5 mx-0">
               <h4 id="instruction_video" class="instruction">{{ translations.instruction_video }}</h4>
               <div id="videoDropZone" class="drop-zone">
                 <input
@@ -43,9 +62,75 @@
               <p id="drop_video" class="drop-text">{{ translations.drop_video }}</p>
               <video id="videoPreview" width="100%" controls style="display: none;"></video>
               <div id="videoDetails" class="video-details"></div>
+              
+              <!-- Video Frames Gallery -->
+              <div class="video-frames-section" style="display: none;">
+                <h5 class="mt-3">{{#if translations.extracted_frames}}{{translations.extracted_frames}}{{else}}Extracted Frames:{{/if}}</h5>
+                <p class="text-muted small">{{#if translations.click_frame_to_use}}{{translations.click_frame_to_use}}{{else}}Click on a frame to use for face swap{{/if}}</p>
+                <div id="videoFramesGallery" class="video-frames-carousel"></div>
+              </div>
+              
+              <style>
+                .video-frames-section {
+                  margin-top: 15px;
+                  width: 100%;
+                }
+                
+                .video-frames-carousel {
+                  display: flex;
+                  overflow-x: auto;
+                  gap: 10px;
+                  padding: 10px 0;
+                  -webkit-overflow-scrolling: touch;
+                  scrollbar-width: thin;
+                }
+                
+                .video-frame {
+                  flex: 0 0 auto;
+                  cursor: pointer;
+                  border: 2px solid transparent;
+                  border-radius: 5px;
+                  transition: border-color 0.3s;
+                }
+                
+                .video-frame:hover {
+                  border-color: #007bff;
+                }
+                
+                .video-frame.selected {
+                  border-color: #007bff;
+                }
+                
+                .video-frame img {
+                  width: 80px;
+                  height: 80px;
+                  object-fit: cover;
+                  border-radius: 3px;
+                }
+              </style>
             </div>
 
-            <div class="upload-section bg-light border shadow-sm col-12 col-sm-6 mx-0">
+            <!-- Image Source Section (Hidden by default) -->
+            <div id="imageSourceSection" class="upload-section bg-light border shadow-sm col-12 col-sm-5 mx-0" style="display: none;">
+              <h4 id="instruction_source_image" class="instruction">{{#if translations.instruction_source_image}}{{ translations.instruction_source_image }}{{else}}Upload source image{{/if}}</h4>
+              <div id="sourceImageDropZone" class="drop-zone">
+                <input
+                  type="file"
+                  id="sourceImageInput"
+                  name="image_file"
+                  accept="image/*"
+                  style="display: none"
+                />
+                <button id="sourceImageUploadBtn" class="upload-btn">
+                  <span>{{#if translations.upload_source_image}}{{ translations.upload_source_image }}{{else}}Upload Source Image{{/if}}</span>
+                </button>
+              </div>
+              <p id="drop_source_image" class="drop-text">{{#if translations.drop_source_image}}{{ translations.drop_source_image }}{{else}}...or drop image here{{/if}}</p>
+              <img id="sourceImagePreview" src="#" alt="Source image preview" style="max-width: 100%; height: auto; display: none;">
+              <div id="sourceImageDetails" class="image-details"></div>
+            </div>
+
+            <div class="upload-section bg-light border shadow-sm col-12 col-sm-5 mx-0">
               <h4 id="instruction_image" class="instruction">{{ translations.instruction_image }}</h4>
               <div id="imageDropZone" class="drop-zone">
                 <input
@@ -61,14 +146,82 @@
               </div>
               <p id="drop_photo" class="drop-text">{{ translations.drop_photo }}</p>
               <img id="imagePreview" src="#" alt="Image preview" style="max-width: 100%; height: auto; display: none;">
-                <div id="imageDetails" class="image-details"></div>
+              <div id="imageDetails" class="image-details"></div>
+              
+              <!-- Sample Images Gallery -->
+              <div class="sample-images-section">
+                <h5 class="mt-3">{{#if translations.or_choose_sample}}{{translations.or_choose_sample}}{{else}}Or choose from samples:{{/if}}</h5>
+                <div class="sample-images-carousel">
+                    <div class="sample-image" data-img-src="/img/face-sample-1.png"><img src="/img/face-sample-1.png" alt="Sample 1"></div>
+                    <div class="sample-image" data-img-src="/img/face-sample-2.png"><img src="/img/face-sample-2.png" alt="Sample 2"></div>
+                    <div class="sample-image" data-img-src="/img/face-sample-3.png"><img src="/img/face-sample-3.png" alt="Sample 3"></div>
+                    <div class="sample-image" data-img-src="/img/face-sample-4.png"><img src="/img/face-sample-4.png" alt="Sample 4"></div>
+                    <div class="sample-image" data-img-src="/img/face-sample-5.png"><img src="/img/face-sample-5.png" alt="Sample 5"></div>
+                    <div class="sample-image" data-img-src="/img/face-sample-6.png"><img src="/img/face-sample-6.png" alt="Sample 6"></div></div>
+              </div>
+              
+              <style>
+                .sample-images-section {
+                  margin-top: 15px;
+                  width: 100%;
+                }
+                
+                .sample-images-carousel {
+                  display: flex;
+                  overflow-x: auto;
+                  gap: 10px;
+                  padding: 10px 0;
+                  -webkit-overflow-scrolling: touch;
+                  scrollbar-width: thin;
+                }
+                
+                .sample-image {
+                  flex: 0 0 auto;
+                  cursor: pointer;
+                  border: 2px solid transparent;
+                  border-radius: 5px;
+                  transition: border-color 0.3s;
+                }
+                
+                .sample-image:hover {
+                  border-color: #007bff;
+                }
+                
+                .sample-image.selected {
+                  border-color: #007bff;
+                }
+                
+                .sample-image img {
+                  width: 80px;
+                  height: 80px;
+                  object-fit: cover;
+                  border-radius: 3px;
+                }
+                
+                /* Mode toggle styling */
+                .mode-toggle-container {
+                  max-width: 400px;
+                  margin: 20px auto 30px;
+                }
+                
+                .mode-toggle .btn {
+                  min-width: 120px;
+                  font-weight: 500;
+                }
+              </style>
             </div>
           </div>
 
           <div class="payment-section"style="max-width: 80%; margin: 50px auto 0 auto;">
             <input type="checkbox" id="skipPayment" name="skipPayment" checked />
             <label for="skipPayment"><span>{{ translations.skip_payment }}</span></label>
-            <button id="payButton" class="btn btn-danger d-block proceed-btn shadow border border-white "><span>{{ translations.proceed }}</span></button>
+            <button id="payButton" class="btn btn-primary rounded d-block proceed-btn shadow border border-white position-relative">
+              <span>{{ translations.proceed }}</span>
+              <span class="image-free-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success border border-white" style="display: none;">
+                {{#if translations.free_mode}}{{ translations.free_mode }}{{else}}Free!{{/if}}
+                <span class="visually-hidden">Free!</span>
+              </span>
+            </button>
           </div>
 
           <script>
@@ -80,8 +233,24 @@
 
           <div id="status" class="status hidden"></div>
         </section>
-        <!-- Add your edit here -->
      </div>
+    </div>
+    <!-- Image Modal -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="imageModalLabel">{{ translations.processed_image }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+        <img id="processedImage" src="" alt="Processed Image" style="width: 100%; max-height: 400px; object-fit: contain;">
+        </div>
+        <div class="modal-footer">
+        <a id="downloadLink" href="#" class="btn btn-primary" download="processed_image.jpg">{{ translations.download }}</a>
+        </div>
+      </div>
+      </div>
     </div>
     <div class="features">
         <!-- Hero Section -->

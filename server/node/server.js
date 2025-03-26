@@ -656,6 +656,79 @@ app.post('/api/process-video', async (req, res) => {
   }
 });
 
+// New endpoint for image-to-image face swap
+app.post('/api/process-image-swap', upload.fields([
+  { name: 'image_file', maxCount: 1 }, 
+  { name: 'face_image_file', maxCount: 1 }
+]), async (req, res) => {
+  try {
+    if (!req.files || !req.files['image_file'] || !req.files['face_image_file']) {
+      return res.status(400).json({ error: 'Missing required files' });
+    }
+
+    const sourceImageFile = req.files['image_file'][0];
+    const faceImageFile = req.files['face_image_file'][0];
+
+    // Convert both images to base64
+    const sourceImageBase64 = imageToBase64(sourceImageFile.buffer);
+    const faceImageBase64 = imageToBase64(faceImageFile.buffer);
+    
+    // Prepare request body for Novita image-to-image API
+    const requestBody = {
+      extra: {
+        response_image_type: "jpeg",
+        enterprise_plan: {
+          enabled: false
+        }
+      },
+      face_image_file: faceImageBase64,
+      image_file: sourceImageBase64
+    };
+
+    // Make API request to Novita
+    const response = await axios.post('https://api.novita.ai/v3/merge-face', 
+      requestBody, 
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.NOVITA_API_KEY}`
+        },
+        timeout: 30000,
+      }
+    );
+
+    // Parse the response
+    const result = response.data;
+
+    if (result.image_file) {
+      // The image is returned directly in the response as base64
+      // We need to save it to S3 and return the URL
+      const buffer = Buffer.from(result.image_file, 'base64');
+      const hash = createHash('sha256').update(buffer).digest('hex');
+      const filename = `swap-${Date.now()}.jpeg`;
+      
+      const imageUrl = await uploadToS3(buffer, hash, filename);
+      
+      // Return the swapped image URL
+      return res.json({ image_url: imageUrl });
+    } else {
+      throw new Error('No image in response');
+    }
+  } catch (error) {
+    console.error('API Error:', error);
+
+    if (error.response) {
+      // API returned an error
+      return res.status(error.response.status || 500).json({ 
+        error: error.response.data?.detail || 'Failed to process image' 
+      });
+    } else {
+      // Network error or timeout
+      return res.status(500).json({ error: 'Failed to process image' });
+    }
+  }
+});
+
 // Map to store WebSocket clients by task_id
 const clients = new Map();
 
