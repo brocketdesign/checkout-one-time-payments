@@ -1,5 +1,5 @@
 const stripe = Stripe(
-  window.location.hostname !== 'localhost' && !window.location.hostname.includes('192') ? 'pk_live_51PjtRbE5sP7DA1XvCkdmezori9qPGoO21y7yKSVvgkQVyrhWZfHAUkNsjPMnbwpPlp4zzoYsRjn79Ad7XN7HTHcc00UjBA9adF' : 'pk_test_51PjtRbE5sP7DA1XvD68v7X7Qj7pG6ZJpQmvuNodJjxc7MbH1ss2Te2gahFAS9nms4pbmEdMYdfCPxFDWHBbu9CxR003ikTnRES'
+  window.location.hostname !== 'localhost' && !window.location.hostname.includes('192.168.') ? 'pk_live_51PjtRbE5sP7DA1XvCkdmezori9qPGoO21y7yKSVvgkQVyrhWZfHAUkNsjPMnbwpPlp4zzoYsRjn79Ad7XN7HTHcc00UjBA9adF' : 'pk_test_51PjtRbE5sP7DA1XvD68v7X7Qj7pG6ZJpQmvuNodJjxc7MbH1ss2Te2gahFAS9nms4pbmEdMYdfCPxFDWHBbu9CxR003ikTnRES'
 ); // Replace with your actual publishable key
 
 // Parse the translations JSON string into an object
@@ -890,7 +890,7 @@ async function loadVideoFromUrl(videoUrl) {
 
 // Function to hide the skip payment option if not on localhost
 function checkAndHideSkipPayment() {
-  if (window.location.hostname !== 'localhost') {
+  if (window.location.hostname !== 'localhost' && !window.location.hostname.includes('192.168.') ) {
     const skipPaymentCheckbox = document.getElementById('skipPayment');
     if (skipPaymentCheckbox) {
       skipPaymentCheckbox.checked = false; // Uncheck the checkbox
@@ -931,6 +931,7 @@ function setupComparisonSlider(originalImageUrl, processedImageUrl) {
         <img src="${originalImageUrl}" alt="Original Image">
       </div>
       <div class="img-comp-slider">
+        <div class="img-comp-vertical-line"></div>
         <div class="img-comp-handle">
           <span class="img-comp-arrow-left">❮</span>
           <span class="img-comp-arrow-right">❯</span>
@@ -969,52 +970,61 @@ function initComparison() {
   const afterImg = document.querySelector('.img-comp-after img');
   const beforeImg = document.querySelector('.img-comp-before img');
   
-  // First, make sure both images have the same dimensions
-  const afterNaturalWidth = afterImg.naturalWidth;
-  const afterNaturalHeight = afterImg.naturalHeight;
+  // Calculate natural aspect ratio of images
+  const imgWidth = afterImg.naturalWidth;
+  const imgHeight = afterImg.naturalHeight;
+  const aspectRatio = imgWidth / imgHeight;
   
-  // Calculate aspect ratio
-  const aspectRatio = afterNaturalWidth / afterNaturalHeight;
+  // Calculate container dimensions based on aspect ratio
+  let containerWidth = container.offsetWidth;
+  let containerHeight = containerWidth / aspectRatio;
   
-  // Set container height based on the container width and aspect ratio
-  // while respecting max-height
-  let containerHeight = container.offsetWidth / aspectRatio;
+  // If the calculated height exceeds max-height, adjust width accordingly
   if (containerHeight > 400) {
     containerHeight = 400;
+    containerWidth = containerHeight * aspectRatio;
   }
+  
+  // Set container height
   container.style.height = containerHeight + 'px';
   
-  // Calculate the actual displayed width of the image (accounting for object-fit: contain)
-  let displayedWidth, displayedHeight;
+  // Calculate the actual displayed dimensions of the images
+  let displayedWidth, displayedHeight, scale;
   
   if (aspectRatio > container.offsetWidth / containerHeight) {
-    // Width constrained
+    // Width constrained - image will be full width
     displayedWidth = container.offsetWidth;
     displayedHeight = displayedWidth / aspectRatio;
+    scale = displayedWidth / imgWidth;
   } else {
-    // Height constrained
+    // Height constrained - image will be full height
     displayedHeight = containerHeight;
     displayedWidth = displayedHeight * aspectRatio;
+    scale = displayedHeight / imgHeight;
   }
   
-  // Calculate the offset to center the image horizontally
+  // Calculate horizontal offset to center images
   const horizontalOffset = (container.offsetWidth - displayedWidth) / 2;
   
-  // Set initial position (show half of each image)
-  const initialPosition = horizontalOffset + (displayedWidth / 2);
-  slider.style.left = initialPosition + 'px';
-  before.style.width = initialPosition + 'px';
+  // Style both images identically
+  afterImg.style.width = 'auto';
+  afterImg.style.height = 'auto';
+  afterImg.style.maxWidth = `${displayedWidth}px`;
+  afterImg.style.maxHeight = `${containerHeight}px`;
+  afterImg.style.left = `${horizontalOffset}px`;
   
-  // Position both images identically
-  const imgStyle = `
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    max-height: ${containerHeight}px;
-    left: ${horizontalOffset}px;
-  `;
-  beforeImg.style.cssText = imgStyle;
-  afterImg.style.cssText = imgStyle;
+  beforeImg.style.width = 'auto';
+  beforeImg.style.height = 'auto';
+  beforeImg.style.maxWidth = `${displayedWidth}px`;
+  beforeImg.style.maxHeight = `${containerHeight}px`;
+  beforeImg.style.left = `${horizontalOffset}px`;
+  
+  // Set initial slider position (center)
+  const initialPosition = container.offsetWidth / 2;
+  slider.style.left = initialPosition + 'px';
+  
+  // Set initial clip for before image (show left half)
+  updateClipPath(initialPosition);
   
   // Add event listeners for slider interaction
   slider.addEventListener('mousedown', startSliding);
@@ -1033,13 +1043,23 @@ function initComparison() {
   function slide(e) {
     let pos = getPosition(e);
     
-    // Constrain position within the displayed image bounds
+    // Constrain position within the valid image bounds
     if (pos < horizontalOffset) pos = horizontalOffset;
     if (pos > horizontalOffset + displayedWidth) pos = horizontalOffset + displayedWidth;
     
-    // Update slider and before image width
+    // Update slider position
     slider.style.left = pos + 'px';
-    before.style.width = pos + 'px';
+    
+    // Update clip path instead of width
+    updateClipPath(pos);
+  }
+  
+  function updateClipPath(position) {
+    // Calculate how much of the right side to clip (as a percentage)
+    const rightClip = 100 - ((position / container.offsetWidth) * 100);
+    
+    // Apply clip-path to show only the portion left of the slider
+    before.style.clipPath = `inset(0 ${rightClip}% 0 0)`;
   }
   
   function getPosition(e) {

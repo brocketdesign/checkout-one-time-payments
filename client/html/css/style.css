@@ -91,7 +91,8 @@ h1 {
 .img-comp-before {
   z-index: 2;
   border-right: 2px solid #fff;
-  width: 50%; /* Initial width, will be controlled by JS */
+  /* Don't set initial width here - the clip path will handle visibility */
+  clip-path: inset(0 0 0 0); /* Initial clip - will be adjusted by JS */
 }
 
 .img-comp-after {
@@ -101,12 +102,12 @@ h1 {
 .img-comp-before img, .img-comp-after img {
   position: absolute;
   top: 0;
-  left: 0;
-  max-width: 100%;
-  max-height: 400px;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   display: block;
-  margin: 0 auto;
+  transform-origin: center;
+  /* No margin or left positioning here - managed in JS */
 }
 
 .img-comp-slider {
@@ -138,7 +139,16 @@ h1 {
   color: #555;
   margin: 0 2px;
 }
-
+.img-comp-vertical-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%; /* Center the line */
+  width: 2px; /* Width of the line */
+  background-color: white; /* Line color */
+  transform: translateX(-50%); /* Adjust to truly center */
+  z-index: 4; /* Ensure it's above other elements */
+}
 .bg-animation {
   background: linear-gradient(-45deg,#ee7752,#e73c7e,#23a6d5,#23d5ab);
   background-size: 400% 400%;
