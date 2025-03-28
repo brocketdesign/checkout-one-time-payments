@@ -241,5 +241,6 @@
   "download": "Download",
   "close": "Close",
   "extracted_frames": "Extracted Frames",
-  "click_frame_to_use": "Click on a frame to use it"
+  "click_frame_to_use": "Click on a frame to use it",
+  "your_saved_faces": "Your Saved Faces"
 }

@@ -5,7 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="/img/logo.ico" type="image/x-icon">
     <title>{{ translations.title }}</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VYS6LYR9KZ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
+      gtag('config', 'G-VYS6LYR9KZ');
+    </script>
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="/css/normalize.css" />
     <link rel="stylesheet" href="/css/global.css" />
@@ -163,8 +171,14 @@
                     <div class="sample-image" data-img-src="/img/face-sample-6.png"><img src="/img/face-sample-6.png" alt="Sample 6"></div></div>
               </div>
               
+              <!-- Saved Faces Gallery -->
+              <div class="saved-faces-section" style="display: none;">
+                <h5 class="mt-3">{{#if translations.your_saved_faces}}{{translations.your_saved_faces}}{{else}}Your saved faces:{{/if}}</h5>
+                <div id="savedFacesGallery" class="sample-images-carousel"></div>
+              </div>
+              
               <style>
-                .sample-images-section {
+                .sample-images-section, .saved-faces-section {
                   margin-top: 15px;
                   width: 100%;
                 }
@@ -184,6 +198,7 @@
                   border: 2px solid transparent;
                   border-radius: 5px;
                   transition: border-color 0.3s;
+                  position: relative;
                 }
                 
                 .sample-image:hover {
@@ -199,6 +214,31 @@
                   height: 80px;
                   object-fit: cover;
                   border-radius: 3px;
+                }
+                
+                .delete-saved-face {
+                  position: absolute;
+                  top: -8px;
+                  right: -8px;
+                  width: 20px;
+                  height: 20px;
+                  background: #cacaca;
+                  color: black;
+                  border: none;
+                  border-radius: 50%;
+                  font-size: 12px;
+                  line-height: 1;
+                  padding: 0;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  cursor: pointer;
+                  opacity: 0.8;
+                  z-index: 1;
+                }
+                
+                .delete-saved-face:hover {
+                  opacity: 1;
                 }
                 
                 /* Mode toggle styling */

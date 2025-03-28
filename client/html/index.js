@@ -29,6 +29,9 @@ const MAX_IMAGE_SIZE = 1 * 1024 * 1024; // 1MB in bytes
 // Number of frames to extract from video
 const NUM_FRAMES_TO_EXTRACT = 10;
 
+// Maximum number of saved faces to store
+const MAX_SAVED_FACES = 5;
+
 // Drag and Drop Functionality
 const videoDropZone = document.getElementById('videoDropZone');
 const videoInput = document.getElementById('videoInput');
@@ -340,8 +343,12 @@ function handleImageSelection(imageFile) {
     }
     
     imagePreview.style.display = 'block';
-    imagePreview.src = URL.createObjectURL(imageFile);
+    const imageUrl = URL.createObjectURL(imageFile);
+    imagePreview.src = imageUrl;
     imageDetails.style.display = 'block'; // Show image details
+    
+    // Save face image to localStorage
+    saveFaceToLocalStorage(imageFile);
   } else {
     imageDetails.style.display = 'none'; // Hide image details if no image
   }
@@ -853,6 +860,12 @@ function setupSampleImageSelection() {
         // Trigger the change event to update image preview and details
         const event = new Event('change', { bubbles: true });
         imageInput.dispatchEvent(event);
+        
+        // If this is a user-saved face (has data-saved attribute), no need to save it again
+        if (!imgContainer.hasAttribute('data-saved')) {
+          // Save sample face to localStorage
+          saveFaceToLocalStorage(imageFile);
+        }
       } catch (error) {
         console.error('Error selecting sample image:', error);
         status.textContent = translationsObj.error_loading_sample_image || 'Error loading sample image';
@@ -862,6 +875,175 @@ function setupSampleImageSelection() {
     });
   });
 }
+
+// Function to save face image to localStorage
+function saveFaceToLocalStorage(imageFile) {
+  // Create a FileReader to convert the image to a data URL
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    const imageDataUrl = event.target.result;
+    
+    // Get existing saved faces or initialize empty array
+    let savedFaces = JSON.parse(localStorage.getItem('savedFaces') || '[]');
+    
+    // Add timestamp and filename to identify the face
+    const faceData = {
+      id: Date.now().toString(),
+      name: imageFile.name,
+      dataUrl: imageDataUrl,
+      timestamp: new Date().toISOString()
+    };
+    
+    // Add new face to the beginning of the array
+    savedFaces.unshift(faceData);
+    
+    // Limit the number of saved faces to MAX_SAVED_FACES
+    if (savedFaces.length > MAX_SAVED_FACES) {
+      savedFaces = savedFaces.slice(0, MAX_SAVED_FACES);
+    }
+    
+    // Save back to localStorage
+    try {
+      localStorage.setItem('savedFaces', JSON.stringify(savedFaces));
+      
+      // Update the saved faces gallery
+      displaySavedFaces();
+    } catch (e) {
+      // Handle localStorage quota exceeded
+      console.error('localStorage quota exceeded:', e);
+      
+      // Try removing the oldest face and retrying
+      if (savedFaces.length > 1) {
+        savedFaces.pop();
+        localStorage.setItem('savedFaces', JSON.stringify(savedFaces));
+        displaySavedFaces();
+      }
+    }
+  };
+  
+  // Read the image file as data URL
+  reader.readAsDataURL(imageFile);
+}
+
+// Function to load and display saved faces from localStorage
+function displaySavedFaces() {
+  // Get the saved faces gallery container
+  const savedFacesContainer = document.getElementById('savedFacesGallery');
+  if (!savedFacesContainer) return;
+  
+  // Clear current saved faces
+  savedFacesContainer.innerHTML = '';
+  
+  // Get saved faces from localStorage
+  const savedFaces = JSON.parse(localStorage.getItem('savedFaces') || '[]');
+  
+  if (savedFaces.length === 0) {
+    // Hide the saved faces section if no faces are saved
+    const savedFacesSection = document.querySelector('.saved-faces-section');
+    if (savedFacesSection) {
+      savedFacesSection.style.display = 'none';
+    }
+    return;
+  }
+  
+  // Show the saved faces section
+  const savedFacesSection = document.querySelector('.saved-faces-section');
+  if (savedFacesSection) {
+    savedFacesSection.style.display = 'block';
+  }
+  
+  // Add each saved face to the gallery
+  savedFaces.forEach(face => {
+    const faceElement = document.createElement('div');
+    faceElement.classList.add('sample-image');
+    faceElement.setAttribute('data-img-src', face.dataUrl);
+    faceElement.setAttribute('data-saved', 'true');
+    faceElement.setAttribute('data-face-id', face.id);
+    
+    const faceImage = document.createElement('img');
+    faceImage.src = face.dataUrl;
+    faceImage.alt = `Saved face ${face.name}`;
+    
+    // Add delete button
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'delete-saved-face';
+    deleteButton.classList.add('hidden');
+    deleteButton.innerHTML = '×';
+    deleteButton.title = translationsObj.delete_saved_face || 'Remove saved face';
+    deleteButton.onclick = function(e) {
+      e.stopPropagation(); // Prevent triggering the parent click event
+      removeSavedFace(face.id);
+    };
+    // On hover, show delete button
+    faceElement.addEventListener('mouseenter', () => {
+        deleteButton.classList.remove('hidden');
+    });
+    faceElement.addEventListener('mouseleave', () => {
+      deleteButton.classList.add('hidden');
+    });
+    faceElement.appendChild(faceImage);
+    faceElement.appendChild(deleteButton);
+    savedFacesContainer.appendChild(faceElement);
+    
+    // Add the same click handler as sample images
+    faceElement.addEventListener('click', async () => {
+      const sampleImages = document.querySelectorAll('.sample-image');
+      sampleImages.forEach(img => img.classList.remove('selected'));
+      faceElement.classList.add('selected');
+      
+      try {
+        // Convert data URL back to a File object
+        const response = await fetch(face.dataUrl);
+        const blob = await response.blob();
+        const imageFile = new File([blob], face.name || 'saved-face.jpg', { type: blob.type });
+        
+        // Create a DataTransfer to set the files property
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(imageFile);
+        
+        // Set the files property of the imageInput
+        const imageInput = document.getElementById('imageInput');
+        imageInput.files = dataTransfer.files;
+        
+        // Trigger the change event to update image preview and details
+        const event = new Event('change', { bubbles: true });
+        imageInput.dispatchEvent(event);
+      } catch (error) {
+        console.error('Error selecting saved face:', error);
+      }
+    });
+  });
+}
+
+// Function to remove a saved face from localStorage
+function removeSavedFace(faceId) {
+  // Get saved faces from localStorage
+  let savedFaces = JSON.parse(localStorage.getItem('savedFaces') || '[]');
+  
+  // Remove the face with the given ID
+  savedFaces = savedFaces.filter(face => face.id !== faceId);
+  
+  // Save back to localStorage
+  localStorage.setItem('savedFaces', JSON.stringify(savedFaces));
+  
+  // Update the display
+  displaySavedFaces();
+}
+
+// Check for videoUrl in query parameters on page load
+document.addEventListener('DOMContentLoaded', () => {
+  checkAndHideSkipPayment();
+  displaySavedFaces(); // Display saved faces from localStorage
+  setupSampleImageSelection(); // Initialize sample image selection
+  
+  const urlParams = new URLSearchParams(window.location.search);
+  const videoUrl = urlParams.get('videoUrl');
+
+  if (videoUrl) {
+    // Load the video from the URL and set it as the videoInput
+    loadVideoFromUrl(videoUrl);
+  }
+});
 
 // Check for videoUrl in query parameters on page load
 document.addEventListener('DOMContentLoaded', () => {
@@ -913,6 +1095,7 @@ function checkAndHideSkipPayment() {
 // Initialize on document load
 document.addEventListener('DOMContentLoaded', () => {
   checkAndHideSkipPayment();
+  displaySavedFaces(); // Display saved faces on page load
   setupSampleImageSelection();
   
   // Initialize with video mode active
