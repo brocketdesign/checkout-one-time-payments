@@ -259,5 +259,7 @@
   "close": "閉じる",
   "extracted_frames": "抽出されたフレーム",
   "click_frame_to_use": "使用するフレームをクリックしてください",
-  "your_saved_faces": "保存された顔"
+  "your_saved_faces": "保存された顔",
+  "upload_from_device": "デバイスからアップロード",
+  "load_from_url": "URLから読み込む"
 }

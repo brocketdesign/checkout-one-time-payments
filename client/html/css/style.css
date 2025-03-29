@@ -51,6 +51,7 @@ h1 {
   padding: 2em;
   text-align: center;
   min-height: 150px;
+  display: flex;
 }
 
 .drop-zone.hover {

@@ -250,5 +250,6 @@
   "no_url_provided": "Please enter a URL",
   "invalid_url": "Please enter a valid URL",
   "loading_from_url": "Loading from URL...",
-  "error_loading_image": "Error loading image from URL. The image might be restricted or the format is not supported."
+  "error_loading_image": "Error loading image from URL. The image might be restricted or the format is not supported.",
+  "load_from_url": "Load from URL"
 }
