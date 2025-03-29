@@ -1,0 +1,228 @@
+<div class="features">
+  <!-- Hero Section -->
+  <section id="hero" class="py-5 py-lg-6 bg-light">
+    <div class="container mx-auto">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-6">
+          <img src="/img/demo-swap1.webp" alt="{{ translations.hero.imageAlt }}" class="img-fluid rounded shadow-sm">
+        </div>
+        <div class="col-lg-6">
+          <h1 class="display-4 fw-bold mb-3">{{ translations.hero.headline }}</h1>
+          <p class="lead mb-4">{{ translations.hero.tagline }}</p>
+          {{#if translations.hero.cta}}
+            <a href="#top" class="btn btn-primary btn-lg rounded-pill px-4 py-2 cta">
+              {{ translations.hero.cta }}
+              <i class="bi bi-arrow-right-circle ms-2"></i>
+            </a>
+          {{/if}}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Demo Section -->
+  <section id="demo" class="py-5 py-lg-6">
+    <div class="container mx-auto">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-6 order-lg-2">
+          <img src="/img/demo-swap2.webp" alt="{{ translations.demo.imageAlt }}" class="img-fluid rounded shadow-sm">
+        </div>
+        <div class="col-lg-6 order-lg-1">
+          <div class="pe-lg-4">
+            <h2 class="display-5 fw-bold mb-3">{{ translations.demo.heading }}</h2>
+            <p class="lead">{{ translations.demo.description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section id="how-it-works" class="py-5 py-lg-6 bg-light">
+    <div class="container mx-auto">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-6">
+          <img src="/img/demo-swap3.gif" alt="{{ translations.howItWorks.heading }}" class="img-fluid rounded shadow-sm">
+        </div>
+        <div class="col-lg-6">
+          <div class="ps-lg-4">
+            <h2 class="display-5 fw-bold mb-3">{{ translations.howItWorks.heading }}</h2>
+            <p class="lead">{{ translations.howItWorks.step1.description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Benefits Section -->
+  <section id="benefits" class="py-5 py-lg-6">
+    <div class="container mx-auto">
+      <h2 class="display-5 fw-bold text-center mb-5">{{ translations.benefits.heading }}</h2>
+      <div class="row g-4 justify-content-center">
+        <div class="col-md-6 col-lg-3" data-animate="animate__bounceIn">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body text-center p-4">
+              <div class="text-primary mb-3">
+                <i class="bi bi-camera-video-fill fs-1"></i>
+              </div>
+              <h3 class="h4 mb-3">{{ translations.benefits.seamless.title }}</h3>
+              <p class="card-text">{{ translations.benefits.seamless.description }}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3" data-animate="animate__bounceIn" data-delay="delay-100ms">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body text-center p-4">
+              <div class="text-primary mb-3">
+                <i class="bi bi-shield-lock-fill fs-1"></i>
+              </div>
+              <h3 class="h4 mb-3">{{ translations.benefits.secure.title }}</h3>
+              <p class="card-text">{{ translations.benefits.secure.description }}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3" data-animate="animate__bounceIn" data-delay="delay-200ms">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body text-center p-4">
+              <div class="text-primary mb-3">
+                <i class="bi bi-lightning-charge-fill fs-1"></i>
+              </div>
+              <h3 class="h4 mb-3">{{ translations.benefits.fast.title }}</h3>
+              <p class="card-text">{{ translations.benefits.fast.description }}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3" data-animate="animate__bounceIn" data-delay="delay-300ms">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body text-center p-4">
+              <div class="text-primary mb-3">
+                <i class="bi bi-stars fs-1"></i>
+              </div>
+              <h3 class="h4 mb-3">{{ translations.benefits.quality.title }}</h3>
+              <p class="card-text">{{ translations.benefits.quality.description }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dynamic Pricing Section -->
+  <section id="pricing" class="py-5 py-lg-6 bg-light">
+    <div class="container mx-auto">
+      <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
+          <h2 class="display-5 fw-bold mb-4">{{ translations.dynamicPricing.heading }}</h2>
+          <p class="lead mb-4">{{ translations.dynamicPricing.description }}</p>
+          <p class="mb-5">{{ translations.dynamicPricing.reassurance }}</p>
+          
+          <a href="#top" class="btn btn-success btn-lg rounded-pill px-4 py-2 cta">
+            <i class="bi bi-credit-card me-2"></i>
+            {{ translations.dynamicPricing.ctaButton }}
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section id="faq" class="py-5 py-lg-6">
+    <div class="container mx-auto">
+      <h2 class="display-5 fw-bold text-center mb-5">{{ translations.faq.heading }}</h2>
+      
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="accordion" id="faqAccordion">
+            <div class="accordion-item border mb-3 rounded shadow-sm" data-animate="animate__fadeIn">
+              <h3 class="accordion-header" id="headingOne">
+                <button class="accordion-button fw-medium" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                  {{ translations.faq.q1.question }}
+                </button>
+              </h3>
+              <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                  {{ translations.faq.q1.answer }}
+                </div>
+              </div>
+            </div>
+            
+            <div class="accordion-item border mb-3 rounded shadow-sm" data-animate="animate__fadeIn" data-delay="delay-100ms">
+              <h3 class="accordion-header" id="headingTwo">
+                <button class="accordion-button collapsed fw-medium" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                  {{ translations.faq.q2.question }}
+                </button>
+              </h3>
+              <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                  {{ translations.faq.q2.answer }}
+                </div>
+              </div>
+            </div>
+            
+            <div class="accordion-item border mb-3 rounded shadow-sm" data-animate="animate__fadeIn" data-delay="delay-200ms">
+              <h3 class="accordion-header" id="headingThree">
+                <button class="accordion-button collapsed fw-medium" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                  {{ translations.faq.q3.question }}
+                </button>
+              </h3>
+              <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                  {{ translations.faq.q3.answer }}
+                </div>
+              </div>
+            </div>
+            
+            <div class="accordion-item border mb-3 rounded shadow-sm" data-animate="animate__fadeIn" data-delay="delay-300ms">
+              <h3 class="accordion-header" id="headingFour">
+                <button class="accordion-button collapsed fw-medium" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                  {{ translations.faq.q4.question }}
+                </button>
+              </h3>
+              <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                  {{ translations.faq.q4.answer }}
+                </div>
+              </div>
+            </div>
+            
+            <div class="accordion-item border mb-3 rounded shadow-sm" data-animate="animate__fadeIn" data-delay="delay-400ms">
+              <h3 class="accordion-header" id="headingFive">
+                <button class="accordion-button collapsed fw-medium" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                  {{ translations.faq.q5.question }}
+                </button>
+              </h3>
+              <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                  {{ translations.faq.q5.answer }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- CTA Footer Section -->
+  <section id="footer-cta" class="py-5 py-lg-6 bg-primary text-white">
+    <div class="container mx-auto">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="bg-white text-dark p-5 rounded shadow">
+            <h2 class="display-5 fw-bold text-center mb-3" data-animate="animate__fadeInDown">{{ translations.footer.ctaHeading }}</h2>
+            <p class="lead text-center mb-4" data-animate="animate__fadeInDown" data-delay="delay-100ms">{{ translations.footer.ctaMessage }}</p>
+            <div class="text-center">
+              <a href="#top" class="btn btn-primary btn-lg rounded-pill px-4 py-2 cta" data-animate="animate__zoomIn" data-delay="delay-200ms">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                {{ translations.footer.ctaButton }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
