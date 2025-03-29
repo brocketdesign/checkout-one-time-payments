@@ -88,6 +88,14 @@
   "video_too_large": "動画ファイルが大きすぎます。 最大サイズは10MBです。 動画を圧縮するか、小さいファイルを選択してください。",
   "image_too_large": "画像ファイルが大きすぎます。 最大サイズは1MBです。 画像を圧縮するか、小さいファイルを選択してください。",
   "current_size": "現在のサイズ",
+  "video_url_placeholder": "または動画のURLを入力",
+  "image_url_placeholder": "または画像のURLを入力",
+  "face_image_url_placeholder": "または顔画像のURLを入力",
+  "load_url": "読み込む",
+  "no_url_provided": "URLを入力してください",
+  "invalid_url": "有効なURLを入力してください",
+  "loading_from_url": "URLから読み込み中...",
+  "error_loading_image": "URLから画像を読み込めませんでした。画像が制限されているか、フォーマットがサポートされていない可能性があります。",
   "home": {
     "title": "ホーム"
   },

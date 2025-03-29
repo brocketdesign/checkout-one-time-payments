@@ -271,6 +271,7 @@ imageDropZone.addEventListener('drop', (event) => {
   imageInput.files = files;
   handleImageSelection(files[0]);
   getImageDetails(files[0]);
+  saveFaceToLocalStorage(files[0]);
 });
 
 imageUploadBtn.addEventListener('click', () => {
@@ -278,10 +279,17 @@ imageUploadBtn.addEventListener('click', () => {
 });
 
 imageInput.addEventListener('change', (event) => {
+  
+  // Check if this is a programmatic event from a saved face
+  const fromSavedFace = event.isTrusted === false;
   handleImageSelection(imageInput.files[0]);
   getImageDetails(imageInput.files[0]);
+  
+  // Only save to localStorage if not from a saved face selection
+  if (!fromSavedFace && imageInput.files[0]) {
+    saveFaceToLocalStorage(imageInput.files[0]);
+  }
 });
-
 // Function to handle video selection and display preview
 function handleVideoSelection(videoFile) {
   if (videoFile) {
@@ -347,190 +355,10 @@ function handleImageSelection(imageFile) {
     imagePreview.src = imageUrl;
     imageDetails.style.display = 'block'; // Show image details
     
-    // Save face image to localStorage
-    saveFaceToLocalStorage(imageFile);
   } else {
     imageDetails.style.display = 'none'; // Hide image details if no image
   }
 }
-
-// Proceed Button Logic
-payButton.addEventListener('click', async () => {
-  // Disable the button and add a spinner
-  payButton.disabled = true;
-  payButton.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> ${translationsObj.processing || 'Processing...'}`;
-
-  // Check based on current mode
-  if (isImageMode) {
-    // Image-to-image mode validation
-    if (!sourceImageInput.files.length || !imageInput.files.length) {
-      status.textContent = translationsObj.please_upload_both_images || 'Please upload both the source image and the face image.';
-      status.classList.remove('hidden');
-      status.className = 'alert alert-danger';
-      resetPayButton();
-      return;
-    }
-    
-    // Double-check source image file size
-    if (sourceImageInput.files[0].size > MAX_IMAGE_SIZE) {
-      status.textContent = translationsObj.image_too_large || `Source image file is too large. Maximum size is 1MB. Please compress your image or select a smaller file.`;
-      status.classList.remove('hidden');
-      status.className = 'alert alert-danger';
-      resetPayButton();
-      return;
-    }
-    
-    // Double-check face image file size
-    if (imageInput.files[0].size > MAX_IMAGE_SIZE) {
-      status.textContent = translationsObj.image_too_large || `Face image file is too large. Maximum size is 1MB. Please compress your image or select a smaller file.`;
-      status.classList.remove('hidden');
-      status.className = 'alert alert-danger';
-      resetPayButton();
-      return;
-    }
-    
-    // Process image-to-image swap
-    const formData = new FormData();
-    formData.append('image_file', sourceImageInput.files[0]);
-    formData.append('face_image_file', imageInput.files[0]);
-
-    try {
-      const response = await fetch('/api/process-image-swap', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to process image swap');
-      }
-
-      const result = await response.json();
-      
-      if (result.image_url) {
-        // Update modal to show comparison slider
-        const originalImageUrl = sourceImagePreview.dataset.originalUrl;
-        setupComparisonSlider(originalImageUrl, result.image_url);
-        
-        // Set the download link
-        document.getElementById('downloadLink').href = result.image_url;
-        document.getElementById('downloadLink').download = 'processed_image.jpg';
-        
-        // Show the modal
-        const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
-        imageModal.show();
-      } else {
-        throw new Error('No image URL in response');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      status.textContent = `${translationsObj.an_error_occurred}: ${error.message}`;
-      status.classList.remove('hidden');
-      status.className = 'alert alert-danger';
-    } finally {
-      resetPayButton();
-    }
-  } else {
-    // Original video mode validation and processing
-    if (!videoInput.files.length || !imageInput.files.length) {
-      status.textContent = translationsObj.please_upload_both;
-      status.classList.remove('hidden');
-      status.className = 'alert alert-danger';
-      console.log('Missing files');
-      resetPayButton();
-      return;
-    }
-    
-    // Dounble-check video file size
-    if (videoInput.files[0].size > MAX_VIDEO_SIZE) {
-      status.textContent = translationsObj.video_too_large || 'Video file is too large (Maximum: 10MB). Please compress your video or select a smaller file.';
-      status.classList.remove('hidden');
-      status.className = 'alert alert-danger';
-      resetPayButton();
-      return;
-    }
-    // Original video mode processing logic
-    // ...existing code for video mode...
-    const formData = new FormData();
-    formData.append('video_file', videoInput.files[0]);
-    formData.append('face_image_file', imageInput.files[0]);
-
-    try {
-      status.textContent = translationsObj.uploading_files;
-      status.classList.remove('hidden');
-      status.className = 'alert alert-info';
-      const response = await fetch('/api/temp-upload', {
-        method: 'POST',
-        body: formData,
-      });
-      console.log('Temp upload response:', response);
-
-      if (!response.ok) {
-        throw new Error('Failed to upload files temporarily');
-      }
-
-      const data = await response.json();
-      const tempId = data.tempId;
-
-      const skipPayment = document.getElementById('skipPayment').checked;
-      
-      // Get the current language from cookie preferredLanguage
-      const currentLanguage = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('preferredLanguage='))
-        ?.split('=')[1];
-      const baseUrl = currentLanguage === 'en' || !currentLanguage ? '/' : `/${currentLanguage}/`;
-      const redirectionUrl = `${baseUrl}success?tempId=${tempId}`;
-      if (skipPayment) {
-        window.location.href = `${baseUrl}success?tempId=${tempId}`;
-        console.log('Skipping payment, redirecting with tempId:', tempId);
-      } else {
-        // Extract video details and include currency
-        const sessionResponse = await fetch('/api/create-checkout-session', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ 
-            tempId: tempId, 
-            roundedSellingPrice,
-            currency: currency,
-            fileName: videoInput.files[0].name,
-            duration: videoPreview.duration,
-            resolution: `${videoPreview.videoWidth}x${videoPreview.videoHeight}`,
-            fileSize: videoInput.files[0].size,
-            frameCount: Math.round(videoPreview.duration * (videoPreview.frameRate || 30))
-          }),
-        });
-
-        if (!sessionResponse.ok) {
-          throw new Error('Failed to create checkout session');
-        }
-
-        const sessionData = await sessionResponse.json();
-        const sessionId = sessionData.id;
-
-        const result = await stripe.redirectToCheckout({
-          sessionId: sessionId,
-        });
-
-        if (result.error) {
-          status.textContent = result.error.message;
-          status.classList.remove('hidden');
-          status.className = 'alert alert-danger';
-        }
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      status.textContent = `${translationsObj.an_error_occurred}: ${error.message}`;
-      status.classList.remove('hidden');
-      status.className = 'alert alert-danger';
-    } finally {
-      resetPayButton();
-      status.textContent = "";
-      status.classList.add('hidden');
-    }
-  }
-});
 
 function resetPayButton() {
   payButton.disabled = false;
@@ -855,11 +683,7 @@ function setupSampleImageSelection() {
         
         // Set the files property of the imageInput
         const imageInput = document.getElementById('imageInput');
-        imageInput.files = dataTransfer.files;
-        
-        // Trigger the change event to update image preview and details
-        const event = new Event('change', { bubbles: true });
-        imageInput.dispatchEvent(event);
+        imageInput.files = dataTransfer.files; 
         
       } catch (error) {
         console.error('Error selecting sample image:', error);
@@ -895,7 +719,7 @@ function saveFaceToLocalStorage(imageFile) {
       dataUrl: imageDataUrl,
       timestamp: new Date().toISOString()
     };
-    
+
     // Check if the face already exists in saved faces
     const existingFaceIndex = savedFaces.findIndex(face => face.name === imageFile.name);
     if (existingFaceIndex !== -1) {
@@ -933,7 +757,7 @@ function saveFaceToLocalStorage(imageFile) {
   reader.readAsDataURL(imageFile);
 }
 
-// Function to load and display saved faces from localStorage
+// Update the displaySavedFaces function to handle URL-based faces properly
 function displaySavedFaces() {
   // Get the saved faces gallery container
   const savedFacesContainer = document.getElementById('savedFacesGallery');
@@ -1000,22 +824,53 @@ function displaySavedFaces() {
       faceElement.classList.add('selected');
       
       try {
-        // Convert data URL back to a File object
-        const response = await fetch(face.dataUrl);
-        const blob = await response.blob();
-        const imageFile = new File([blob], face.name || 'saved-face.jpg', { type: blob.type });
-        
-        // Create a DataTransfer to set the files property
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(imageFile);
-        
-        // Set the files property of the imageInput
-        const imageInput = document.getElementById('imageInput');
-        imageInput.files = dataTransfer.files;
-        
-        // Trigger the change event to update image preview and details
-        const event = new Event('change', { bubbles: true });
-        imageInput.dispatchEvent(event);
+        if (face.isUrlBased) {
+          // For URL-based faces, directly set the URL
+          faceImageUrlValue = face.originalUrl || face.dataUrl;
+          
+          // Update the UI
+          imagePreview.style.display = 'block';
+          imagePreview.src = face.dataUrl;
+          imagePreview.crossOrigin = 'anonymous';
+          
+          // Create a dummy image element to get dimensions for the details display
+          const img = new Image();
+          img.onload = function() {
+            // IMPORTANT: Only update details, don't save the face again
+            imageDetails.innerHTML = `
+              <h5>${translationsObj.image_details}</h5>
+              <ul style="text-align: left;">
+                <li><strong>${translationsObj.name}:</strong> ${face.name}</li>
+                <li><strong>${translationsObj.resolution}:</strong> ${img.width || img.naturalWidth}x${img.height || img.naturalHeight}</li>
+              </ul>
+            `;
+            imageDetails.style.display = 'block';
+          };
+          img.src = face.dataUrl;
+          
+          // Set the input field value if it exists
+          const faceImageUrlInput = document.getElementById('faceImageUrlInput');
+          if (faceImageUrlInput) {
+            faceImageUrlInput.value = face.originalUrl || face.dataUrl;
+          }
+        } else {
+          // For file-based faces, convert data URL back to a File object
+          const response = await fetch(face.dataUrl);
+          const blob = await response.blob();
+          const imageFile = new File([blob], face.name || 'saved-face.jpg', { type: blob.type });
+          
+          // Create a DataTransfer to set the files property
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(imageFile);
+          
+          // Set the files property of the imageInput
+          const imageInput = document.getElementById('imageInput');
+          imageInput.files = dataTransfer.files;
+          
+          // Trigger the change event to update image preview and details
+          const event = new Event('change', { bubbles: true });
+          imageInput.dispatchEvent(event);
+        }
       } catch (error) {
         console.error('Error selecting saved face:', error);
       }
@@ -1317,4 +1172,853 @@ function initComparison() {
     document.removeEventListener('mouseup', stopSliding);
     document.removeEventListener('touchend', stopSliding);
   }
+}
+
+// URL input variables
+let videoUrlValue = '';
+let sourceImageUrlValue = '';
+let faceImageUrlValue = '';
+
+// Add event listeners for URL input buttons
+document.addEventListener('DOMContentLoaded', () => {
+  // URL input handling
+  const videoUrlInput = document.getElementById('videoUrlInput');
+  const loadVideoUrlBtn = document.getElementById('loadVideoUrlBtn');
+  const sourceImageUrlInput = document.getElementById('sourceImageUrlInput');
+  const loadSourceImageUrlBtn = document.getElementById('loadSourceImageUrlBtn');
+  const faceImageUrlInput = document.getElementById('faceImageUrlInput');
+  const loadFaceImageUrlBtn = document.getElementById('loadFaceImageUrlBtn');
+  
+  if (loadVideoUrlBtn) {
+    loadVideoUrlBtn.addEventListener('click', () => {
+      loadVideoFromUrl(videoUrlInput.value);
+    });
+    
+    // Also load on Enter key
+    videoUrlInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        loadVideoFromUrl(videoUrlInput.value);
+      }
+    });
+  }
+  
+  if (loadSourceImageUrlBtn) {
+    loadSourceImageUrlBtn.addEventListener('click', () => {
+      loadSourceImageFromUrl(sourceImageUrlInput.value);
+    });
+    
+    // Also load on Enter key
+    sourceImageUrlInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        loadSourceImageFromUrl(sourceImageUrlInput.value);
+      }
+    });
+  }
+  
+  if (loadFaceImageUrlBtn) {
+    loadFaceImageUrlBtn.addEventListener('click', () => {
+      loadFaceImageFromUrl(faceImageUrlInput.value);
+    });
+    
+    // Also load on Enter key
+    faceImageUrlInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        loadFaceImageFromUrl(faceImageUrlInput.value);
+      }
+    });
+  }
+});
+
+// Function to validate a URL
+function isValidUrl(url) {
+  try {
+    new URL(url);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+// Function to load video from URL
+async function loadVideoFromUrl(url) {
+  if (!url) {
+    status.textContent = translationsObj.no_url_provided || 'Please enter a URL';
+    status.classList.remove('hidden');
+    status.className = 'alert alert-danger';
+    return;
+  }
+  
+  if (!isValidUrl(url)) {
+    status.textContent = translationsObj.invalid_url || 'Please enter a valid URL';
+    status.classList.remove('hidden');
+    status.className = 'alert alert-danger';
+    return;
+  }
+  
+  status.textContent = translationsObj.loading_from_url || 'Loading video from URL...';
+  status.classList.remove('hidden');
+  status.className = 'alert alert-info';
+  
+  try {
+    // Create a video element to test the URL
+    const video = document.createElement('video');
+    video.crossOrigin = 'anonymous';
+    video.controls = true;
+    video.preload = 'metadata';
+    video.style.display = 'none';
+    document.body.appendChild(video);
+    
+    // Set up event handlers
+    let videoLoaded = false;
+    
+    video.onloadedmetadata = function() {
+      videoLoaded = true;
+      document.body.removeChild(video);
+      
+      // Store the URL value for later use
+      videoUrlValue = url;
+      
+      // Update the UI
+      videoPreview.style.display = 'block';
+      videoPreview.src = url;
+      videoPreview.crossOrigin = 'anonymous'; // Ensure CORS support
+      videoDetails.style.display = 'block';
+      
+      // Get video details once metadata is loaded
+      videoPreview.onloadedmetadata = function() {
+        getVideoDetailsFromElement(videoPreview, url);
+        extractVideoFrames(url);
+      };
+      
+      status.textContent = '';
+      status.className = 'hidden';
+    };
+    
+    video.onerror = function() {
+      document.body.removeChild(video);
+      throw new Error('Failed to load video from URL. The video might be restricted or the format is not supported.');
+    };
+    
+    // Set timeout in case the video doesn't load
+    setTimeout(() => {
+      if (!videoLoaded) {
+        document.body.removeChild(video);
+        throw new Error('Timeout while loading video. Please check the URL and try again.');
+      }
+    }, 15000); // 15 second timeout
+    
+    video.src = url;
+  } catch (error) {
+    console.error('Error loading video from URL:', error);
+    status.textContent = `${translationsObj.error_loading_url || 'Error loading video from URL'}: ${error.message}`;
+    status.classList.remove('hidden');
+    status.className = 'alert alert-danger';
+  }
+}
+
+// Function to load source image from URL
+function loadSourceImageFromUrl(url) {
+  if (!url) {
+    status.textContent = translationsObj.no_url_provided || 'Please enter a URL';
+    status.classList.remove('hidden');
+    status.className = 'alert alert-danger';
+    return;
+  }
+  
+  if (!isValidUrl(url)) {
+    status.textContent = translationsObj.invalid_url || 'Please enter a valid URL';
+    status.classList.remove('hidden');
+    status.className = 'alert alert-danger';
+    return;
+  }
+  
+  status.textContent = translationsObj.loading_from_url || 'Loading image from URL...';
+  status.classList.remove('hidden');
+  status.className = 'alert alert-info';
+  
+  // Create a new image element
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  
+  img.onload = function() {
+    // Store the URL value for later use
+    sourceImageUrlValue = url;
+    
+    // Update the UI
+    sourceImagePreview.style.display = 'block';
+    sourceImagePreview.src = url;
+    sourceImagePreview.crossOrigin = 'anonymous';
+    
+    // Store the source image URL to use in the comparison slider
+    sourceImagePreview.dataset.originalUrl = url;
+    
+    // Display image details
+    getSourceImageDetailsFromElement(img, url);
+    
+    status.textContent = '';
+    status.className = 'hidden';
+  };
+  
+  img.onerror = function() {
+    console.error('Error loading image from URL');
+    status.textContent = translationsObj.error_loading_image || 'Error loading image from URL. The image might be restricted or the format is not supported.';
+    status.classList.remove('hidden');
+    status.className = 'alert alert-danger';
+  };
+  
+  img.src = url;
+}
+
+// Function to load face image from URL
+function loadFaceImageFromUrl(url) {
+  if (!url) {
+    status.textContent = translationsObj.no_url_provided || 'Please enter a URL';
+    status.classList.remove('hidden');
+    status.className = 'alert alert-danger';
+    return;
+  }
+  
+  if (!isValidUrl(url)) {
+    status.textContent = translationsObj.invalid_url || 'Please enter a valid URL';
+    status.classList.remove('hidden');
+    status.className = 'alert alert-danger';
+    return;
+  }
+  
+  status.textContent = translationsObj.loading_from_url || 'Loading image from URL...';
+  status.classList.remove('hidden');
+  status.className = 'alert alert-info';
+  
+  // Create a new image element
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  
+  img.onload = function() {
+    // Store the URL value for later use
+    faceImageUrlValue = url;
+    
+    // Update the UI
+    imagePreview.style.display = 'block';
+    imagePreview.src = url;
+    imagePreview.crossOrigin = 'anonymous';
+    
+    // Display image details
+    getImageDetailsFromElement(img, url);
+    
+    // Save face image URL to localStorage for future use
+    saveFaceImageFromUrl(url, img);
+    
+    status.textContent = '';
+    status.className = 'hidden';
+  };
+  
+  img.onerror = function() {
+    console.error('Error loading image from URL');
+    status.textContent = translationsObj.error_loading_image || 'Error loading image from URL. The image might be restricted or the format is not supported.';
+    status.classList.remove('hidden');
+    status.className = 'alert alert-danger';
+  };
+  
+  img.src = url;
+}
+
+// Function to get video details from a video element
+function getVideoDetailsFromElement(videoElement, url) {
+  try {
+    const duration = videoElement.duration;
+    const width = videoElement.videoWidth;
+    const height = videoElement.videoHeight;
+    const fileName = url.split('/').pop().split('?')[0] || 'video.mp4';
+    
+    // Attempt to get frame rate (frames per second)
+    let frameRate = videoElement.frameRate || 30; // Default to 30 FPS if not available
+    let frameCount = Math.round(duration * frameRate);
+    
+    // Price estimation logic (identical to original function)
+    const pricePerFrame = 0.0005;
+    const estimatedPrice = frameCount * pricePerFrame;
+    let sellingPrice = Math.max(estimatedPrice * 4, currency === 'jpy' ? 100 : 1);
+    
+    if (currency === 'jpy') {
+      roundedSellingPrice = Math.ceil(sellingPrice / 100) * 150;
+      formattedPrice = `¥${roundedSellingPrice.toLocaleString()}`;
+    } else {
+      roundedSellingPrice = Math.ceil(sellingPrice);
+      formattedPrice = `$${roundedSellingPrice.toFixed(2)}`;
+    }
+    
+    videoDetails.innerHTML = `
+      <h5>${translationsObj.video_details}</h5>
+      <ul style="text-align: left;">
+        <li><strong>${translationsObj.name}:</strong> ${fileName}</li>
+        <li><strong>${translationsObj.duration}:</strong> ${duration.toFixed(2)} ${translationsObj.seconds}</li>
+        <li><strong>${translationsObj.resolution}:</strong> ${width}x${height}</li>
+        <li><strong>${translationsObj.estimated_frame_count}:</strong> ${frameCount}</li>
+        <li class="d-none"><strong>${translationsObj.processing_fee}:</strong> ${formattedPrice}</li>
+      </ul>
+    `;
+  } catch (error) {
+    console.error('Error getting video details:', error);
+    videoDetails.innerHTML = `<p>${translationsObj.error_loading_metadata || 'Error loading video metadata'}</p>`;
+    videoDetails.style.display = 'block';
+  }
+}
+
+// Function to get source image details from an image element
+function getSourceImageDetailsFromElement(imgElement, url) {
+  try {
+    const width = imgElement.width || imgElement.naturalWidth;
+    const height = imgElement.height || imgElement.naturalHeight;
+    const fileName = url.split('/').pop().split('?')[0] || 'image.jpg';
+    
+    sourceImageDetails.innerHTML = `
+      <h5>${translationsObj.image_details || 'Source Image Details'}</h5>
+      <ul style="text-align: left;">
+        <li><strong>${translationsObj.name}:</strong> ${fileName}</li>
+        <li><strong>${translationsObj.resolution}:</strong> ${width}x${height}</li>
+      </ul>
+    `;
+    sourceImageDetails.style.display = 'block';
+  } catch (error) {
+    console.error('Error getting image details:', error);
+    sourceImageDetails.innerHTML = `<p>${translationsObj.error_loading_metadata || 'Error loading image metadata'}</p>`;
+    sourceImageDetails.style.display = 'block';
+  }
+}
+
+// Function to get image details from an image element
+function getImageDetailsFromElement(imgElement, url) {
+  try {
+    const width = imgElement.width || imgElement.naturalWidth;
+    const height = imgElement.height || imgElement.naturalHeight;
+    const fileName = url.split('/').pop().split('?')[0] || 'image.jpg';
+    
+    imageDetails.innerHTML = `
+      <h5>${translationsObj.image_details}</h5>
+      <ul style="text-align: left;">
+        <li><strong>${translationsObj.name}:</strong> ${fileName}</li>
+        <li><strong>${translationsObj.resolution}:</strong> ${width}x${height}</li>
+      </ul>
+    `;
+    imageDetails.style.display = 'block';
+  } catch (error) {
+    console.error('Error getting image details:', error);
+    imageDetails.innerHTML = `<p>${translationsObj.error_loading_metadata || 'Error loading image metadata'}</p>`;
+    imageDetails.style.display = 'block';
+  }
+}
+
+// Update the payButton event listener to handle URL inputs
+payButton.addEventListener('click', async () => {
+  // Disable the button and add a spinner
+  payButton.disabled = true;
+  payButton.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> ${translationsObj.processing || 'Processing...'}`;
+
+  // Check based on current mode
+  if (isImageMode) {
+    // Image-to-image mode validation
+    const hasSourceFile = sourceImageInput.files.length > 0;
+    const hasFaceFile = imageInput.files.length > 0;
+    const hasSourceUrl = !!sourceImageUrlValue;
+    const hasFaceUrl = !!faceImageUrlValue;
+    
+    // Check if we have both source and face images (either as files or URLs)
+    if ((!hasSourceFile && !hasSourceUrl) || (!hasFaceFile && !hasFaceUrl)) {
+      status.textContent = translationsObj.please_upload_both_images || 'Please upload both the source image and the face image or provide URLs.';
+      status.classList.remove('hidden');
+      status.className = 'alert alert-danger';
+      resetPayButton();
+      return;
+    }
+    
+    try {
+      let formData;
+      
+      // If we have URLs for both, use the dedicated API endpoint
+      if (hasSourceUrl && hasFaceUrl) {
+        // Use JSON payload with URLs
+        const response = await fetch('/api/process-image-swap', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            source_image_url: sourceImageUrlValue,
+            face_image_url: faceImageUrlValue
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to process image swap from URLs');
+        }
+        
+        const result = await response.json();
+        
+        if (result.image_url) {
+          console.log('Line : 1739')
+
+          // Update modal to show comparison slider
+          const originalImageUrl = sourceImagePreview.src;
+          setupComparisonSlider(originalImageUrl, result.image_url);
+          
+          // Set the download link
+          document.getElementById('downloadLink').href = result.image_url;
+          document.getElementById('downloadLink').download = 'processed_image.jpg';
+          
+          // Show the modal
+          const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+          imageModal.show();
+        } else {
+          throw new Error('No image URL in response');
+        }
+      } 
+      // If we have a mix of files and URLs or all files
+      else {
+        formData = new FormData();
+        
+        // Add source image (either file or URL)
+        if (hasSourceFile) {
+          formData.append('image_file', sourceImageInput.files[0]);
+        } else {
+          formData.append('source_image_url', sourceImageUrlValue);
+        }
+        
+        // Add face image (either file or URL)
+        if (hasFaceFile) {
+          formData.append('face_image_file', imageInput.files[0]);
+        } else {
+          formData.append('face_image_url', faceImageUrlValue);
+        }
+        
+        const response = await fetch('/api/process-image-swap', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to process image swap');
+        }
+        
+        const result = await response.json();
+        
+        if (result.image_url) {
+
+          // Update modal to show comparison slider
+          const originalImageUrl = sourceImagePreview.src;
+          setupComparisonSlider(originalImageUrl, result.image_url);
+          
+          // Set the download link
+          document.getElementById('downloadLink').href = result.image_url;
+          document.getElementById('downloadLink').download = 'processed_image.jpg';
+          
+          // Show the modal
+          const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+          imageModal.show();
+        } else {
+          throw new Error('No image URL in response');
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      status.textContent = `${translationsObj.an_error_occurred}: ${error.message}`;
+      status.classList.remove('hidden');
+      status.className = 'alert alert-danger';
+    } finally {
+      resetPayButton();
+    }
+  } else {
+    // Video mode validation
+    const hasVideoFile = videoInput.files.length > 0;
+    const hasFaceFile = imageInput.files.length > 0;
+    const hasVideoUrl = !!videoUrlValue;
+    const hasFaceUrl = !!faceImageUrlValue;
+    
+    // Check if we have both video and face image (either as files or URLs)
+    if ((!hasVideoFile && !hasVideoUrl) || (!hasFaceFile && !hasFaceUrl)) {
+      status.textContent = translationsObj.please_upload_both || 'Please upload both a video and a face image or provide URLs.';
+      status.classList.remove('hidden');
+      status.className = 'alert alert-danger';
+      resetPayButton();
+      return;
+    }
+    
+    try {
+      let tempId;
+      
+      status.textContent = translationsObj.uploading_files || 'Uploading files...';
+      status.classList.remove('hidden');
+      status.className = 'alert alert-info';
+      
+      // If we have URLs for both, use the dedicated API endpoint
+      if (hasVideoUrl && hasFaceUrl) {
+        const response = await fetch('/api/temp-upload-from-url', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            video_url: videoUrlValue, 
+            face_image_url: faceImageUrlValue 
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to process files from URLs');
+        }
+        
+        const data = await response.json();
+        tempId = data.tempId;
+      } 
+      // If we have a mix of files and URLs or all files
+      else {
+        const formData = new FormData();
+        
+        // Add video (either file or URL)
+        if (hasVideoFile) {
+          formData.append('video_file', videoInput.files[0]);
+        } else {
+          // For video URLs, we need to download it on the server side
+          formData.append('video_url', videoUrlValue);
+        }
+        
+        // Add face image (either file or URL)
+        if (hasFaceFile) {
+          formData.append('face_image_file', imageInput.files[0]);
+        } else {
+          // For image URLs, we need to download it on the server side
+          formData.append('face_image_url', faceImageUrlValue);
+        }
+        
+        const response = await fetch('/api/temp-upload', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to upload files temporarily');
+        }
+        
+        const data = await response.json();
+        tempId = data.tempId;
+      }
+      
+      const skipPayment = document.getElementById('skipPayment').checked;
+      
+      // Get the current language from cookie
+      const currentLanguage = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('preferredLanguage='))
+        ?.split('=')[1];
+      const baseUrl = currentLanguage === 'en' || !currentLanguage ? '/' : `/${currentLanguage}/`;
+      
+      if (skipPayment) {
+        window.location.href = `${baseUrl}success?tempId=${tempId}`;
+      } else {
+        // Extract video details for checkout session
+        const sessionResponse = await fetch('/api/create-checkout-session', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            tempId: tempId, 
+            roundedSellingPrice,
+            currency: currency,
+            fileName: hasVideoFile ? videoInput.files[0].name : videoUrlValue.split('/').pop().split('?')[0] || 'video.mp4',
+            duration: videoPreview.duration,
+            resolution: `${videoPreview.videoWidth}x${videoPreview.videoHeight}`,
+            fileSize: hasVideoFile ? videoInput.files[0].size : 0, // We don't know the file size for URLs
+            frameCount: Math.round(videoPreview.duration * (videoPreview.frameRate || 30))
+          }),
+        });
+        
+        if (!sessionResponse.ok) {
+          throw new Error('Failed to create checkout session');
+        }
+        
+        const sessionData = await sessionResponse.json();
+        const sessionId = sessionData.id;
+        
+        const result = await stripe.redirectToCheckout({
+          sessionId: sessionId,
+        });
+        
+        if (result.error) {
+          status.textContent = result.error.message;
+          status.classList.remove('hidden');
+          status.className = 'alert alert-danger';
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      status.textContent = `${translationsObj.an_error_occurred}: ${error.message}`;
+      status.classList.remove('hidden');
+      status.className = 'alert alert-danger';
+    } finally {
+      resetPayButton();
+      status.textContent = "";
+      status.classList.add('hidden');
+    }
+  }
+});
+
+// Improved function to extract a meaningful filename from a URL
+function getFilenameFromUrl(url) {
+  try {
+    // Check if it's a data URL
+    if (url.startsWith('data:')) {
+      return `face-data-${Date.now()}.jpg`;
+    }
+    
+    // Try to extract the filename from the URL path
+    const urlObj = new URL(url);
+    let pathname = urlObj.pathname;
+    
+    // Get the last part of the path which should be the filename
+    let filename = pathname.split('/').pop();
+    
+    // Remove any query parameters and fragments
+    filename = filename.split(/[?#]/)[0];
+    
+    // If no filename was found or it's empty or just a fragment/parameter, use a default name
+    if (!filename || filename === '' || filename.length < 3 || filename.includes('=')) {
+      return `face-from-url-${Date.now()}.jpg`;
+    }
+    
+    // If filename has no extension, add .jpg
+    if (!filename.includes('.')) {
+      filename = `${filename}.jpg`;
+    }
+    
+    return filename;
+  } catch (error) {
+    // If URL parsing fails, use a timestamp-based filename
+    return `face-from-url-${Date.now()}.jpg`;
+  }
+}
+
+// Improved function to save face image from URL with better duplicate detection
+function saveFaceImageFromUrl(url, imgElement) {
+  // Skip if the URL is from our sample images
+  if (url.includes('/face-sample-')) {
+    return;
+  }
+  
+  // Get existing saved faces or initialize empty array
+  let savedFaces = JSON.parse(localStorage.getItem('savedFaces') || '[]');
+  
+  // More comprehensive duplicate check
+  // Check both originalUrl and dataUrl to catch all duplicates
+  const existingFaceIndex = savedFaces.findIndex(face => 
+    (face.originalUrl === url) || (face.dataUrl === url)
+  );
+
+  if (existingFaceIndex !== -1) {
+    // Face already exists, don't save again
+    console.log('Face already exists in saved faces, not saving duplicate');
+    return;
+  }
+  
+  // Get a meaningful filename from the URL
+  const filename = getFilenameFromUrl(url);
+  
+  // Create face data object with consistent ID
+  const faceData = {
+    id: Date.now().toString(),
+    name: filename,
+    dataUrl: url,
+    originalUrl: url,
+    timestamp: new Date().toISOString(),
+    isUrlBased: true
+  };
+  
+  // Add new face to the beginning of the array
+  savedFaces.unshift(faceData);
+  
+  // Limit the number of saved faces
+  if (savedFaces.length > MAX_SAVED_FACES) {
+    savedFaces = savedFaces.slice(0, MAX_SAVED_FACES);
+  }
+  
+  // Save back to localStorage
+  try {
+    localStorage.setItem('savedFaces', JSON.stringify(savedFaces));
+    
+    // Update the saved faces gallery
+    displaySavedFaces();
+  } catch (e) {
+    console.error('localStorage quota exceeded:', e);
+    
+    if (savedFaces.length > 1) {
+      savedFaces.pop();
+      localStorage.setItem('savedFaces', JSON.stringify(savedFaces));
+      displaySavedFaces();
+    }
+  }
+}
+
+// Function to load face image from URL
+function loadFaceImageFromUrl(url) {
+  if (!url) {
+    status.textContent = translationsObj.no_url_provided || 'Please enter a URL';
+    status.classList.remove('hidden');
+    status.className = 'alert alert-danger';
+    return;
+  }
+  
+  if (!isValidUrl(url)) {
+    status.textContent = translationsObj.invalid_url || 'Please enter a valid URL';
+    status.classList.remove('hidden');
+    status.className = 'alert alert-danger';
+    return;
+  }
+  
+  status.textContent = translationsObj.loading_from_url || 'Loading image from URL...';
+  status.classList.remove('hidden');
+  status.className = 'alert alert-info';
+  
+  // Create a new image element
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  
+  img.onload = function() {
+    // Store the URL value for later use
+    faceImageUrlValue = url;
+    
+    // Update the UI
+    imagePreview.style.display = 'block';
+    imagePreview.src = url;
+    imagePreview.crossOrigin = 'anonymous';
+    
+    // Display image details
+    getImageDetailsFromElement(img, url);
+    
+    // Save face image URL to localStorage for future use
+    saveFaceImageFromUrl(url, img);
+    
+    status.textContent = '';
+    status.className = 'hidden';
+  };
+  
+  img.onerror = function() {
+    console.error('Error loading image from URL');
+    status.textContent = translationsObj.error_loading_image || 'Error loading image from URL. The image might be restricted or the format is not supported.';
+    status.classList.remove('hidden');
+    status.className = 'alert alert-danger';
+  };
+  
+  img.src = url;
+}
+
+// Update the displaySavedFaces function to handle URL-based faces
+function displaySavedFaces() {
+  // Get the saved faces gallery container
+  const savedFacesContainer = document.getElementById('savedFacesGallery');
+  if (!savedFacesContainer) return;
+  
+  // Clear current saved faces
+  savedFacesContainer.innerHTML = '';
+  
+  // Get saved faces from localStorage
+  const savedFaces = JSON.parse(localStorage.getItem('savedFaces') || '[]');
+  
+  if (savedFaces.length === 0) {
+    // Hide the saved faces section if no faces are saved
+    const savedFacesSection = document.querySelector('.saved-faces-section');
+    if (savedFacesSection) {
+      savedFacesSection.style.display = 'none';
+    }
+    return;
+  }
+  
+  // Show the saved faces section
+  const savedFacesSection = document.querySelector('.saved-faces-section');
+  if (savedFacesSection) {
+    savedFacesSection.style.display = 'block';
+  }
+  
+  // Add each saved face to the gallery
+  savedFaces.forEach(face => {
+    const faceElement = document.createElement('div');
+    faceElement.classList.add('sample-image');
+    faceElement.setAttribute('data-img-src', face.dataUrl);
+    faceElement.setAttribute('data-saved', 'true');
+    faceElement.setAttribute('data-face-id', face.id);
+    
+    const faceImage = document.createElement('img');
+    faceImage.src = face.dataUrl;
+    faceImage.alt = `Saved face ${face.name}`;
+    
+    // Add delete button
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'delete-saved-face';
+    deleteButton.classList.add('hidden');
+    deleteButton.innerHTML = '×';
+    deleteButton.title = translationsObj.delete_saved_face || 'Remove saved face';
+    deleteButton.onclick = function(e) {
+      e.stopPropagation(); // Prevent triggering the parent click event
+      removeSavedFace(face.id);
+    };
+    // On hover, show delete button
+    faceElement.addEventListener('mouseenter', () => {
+        deleteButton.classList.remove('hidden');
+    });
+    faceElement.addEventListener('mouseleave', () => {
+      deleteButton.classList.add('hidden');
+    });
+    faceElement.appendChild(faceImage);
+    faceElement.appendChild(deleteButton);
+    savedFacesContainer.appendChild(faceElement);
+    
+    // Add the same click handler as sample images
+    faceElement.addEventListener('click', async () => {
+      const sampleImages = document.querySelectorAll('.sample-image');
+      sampleImages.forEach(img => img.classList.remove('selected'));
+      faceElement.classList.add('selected');
+      
+      try {
+        if (face.isUrlBased) {
+          // For URL-based faces, directly set the URL
+          faceImageUrlValue = face.originalUrl || face.dataUrl;
+          
+          // Update the UI
+          imagePreview.style.display = 'block';
+          imagePreview.src = face.dataUrl;
+          imagePreview.crossOrigin = 'anonymous';
+          
+          // Create a dummy image element to get dimensions for the details display
+          const img = new Image();
+          img.onload = function() {
+            getImageDetailsFromElement(img, face.dataUrl);
+          };
+          img.src = face.dataUrl;
+          
+          // Set the input field value if it exists
+          const faceImageUrlInput = document.getElementById('faceImageUrlInput');
+          if (faceImageUrlInput) {
+            faceImageUrlInput.value = face.originalUrl || face.dataUrl;
+          }
+        } else {
+          // For file-based faces, convert data URL back to a File object (existing logic)
+          const response = await fetch(face.dataUrl);
+          const blob = await response.blob();
+          const imageFile = new File([blob], face.name || 'saved-face.jpg', { type: blob.type });
+          
+          // Create a DataTransfer to set the files property
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(imageFile);
+          
+          // Set the files property of the imageInput
+          const imageInput = document.getElementById('imageInput');
+          imageInput.files = dataTransfer.files;
+          
+          // Trigger the change event to update image preview and details
+          const event = new Event('change', { bubbles: true });
+          imageInput.dispatchEvent(event);
+        }
+      } catch (error) {
+        console.error('Error selecting saved face:', error);
+      }
+    });
+  });
 }

@@ -242,5 +242,13 @@
   "close": "Close",
   "extracted_frames": "Extracted Frames",
   "click_frame_to_use": "Click on a frame to use it",
-  "your_saved_faces": "Your Saved Faces"
+  "your_saved_faces": "Your Saved Faces",
+  "video_url_placeholder": "Or enter video URL",
+  "image_url_placeholder": "Or enter image URL",
+  "face_image_url_placeholder": "Or enter face image URL",
+  "load_url": "Load",
+  "no_url_provided": "Please enter a URL",
+  "invalid_url": "Please enter a valid URL",
+  "loading_from_url": "Loading from URL...",
+  "error_loading_image": "Error loading image from URL. The image might be restricted or the format is not supported."
 }

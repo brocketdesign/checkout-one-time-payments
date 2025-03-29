@@ -71,6 +71,13 @@
                 </button>
               </div>
               <p id="drop_video" class="drop-text">{{ translations.drop_video }}</p>
+              <!-- Add URL input -->
+              <div class="url-input-container mt-2">
+                <div class="input-group">
+                  <input type="text" id="videoUrlInput" class="form-control" placeholder="{{#if translations.video_url_placeholder}}{{translations.video_url_placeholder}}{{else}}Or enter video URL{{/if}}">
+                  <button class="btn btn-outline-secondary" type="button" id="loadVideoUrlBtn">{{#if translations.load_url}}{{translations.load_url}}{{else}}Load{{/if}}</button>
+                </div>
+              </div>
               <video id="videoPreview" width="100%" controls style="display: none;"></video>
               <div id="videoDetails" class="video-details bg-white"></div>
               
@@ -137,6 +144,13 @@
                 </button>
               </div>
               <p id="drop_source_image" class="drop-text">{{#if translations.drop_source_image}}{{ translations.drop_source_image }}{{else}}...or drop image here{{/if}}</p>
+              <!-- Add URL input -->
+              <div class="url-input-container mt-2">
+                <div class="input-group">
+                  <input type="text" id="sourceImageUrlInput" class="form-control" placeholder="{{#if translations.image_url_placeholder}}{{translations.image_url_placeholder}}{{else}}Or enter image URL{{/if}}">
+                  <button class="btn btn-outline-secondary" type="button" id="loadSourceImageUrlBtn">{{#if translations.load_url}}{{translations.load_url}}{{else}}Load{{/if}}</button>
+                </div>
+              </div>
               <img id="sourceImagePreview" src="#" alt="Source image preview" style="max-width: 100%; height: auto; display: none;">
               <div id="sourceImageDetails" class="image-details bg-white"></div>
             </div>
@@ -156,6 +170,13 @@
                 </button>
               </div>
               <p id="drop_photo" class="drop-text">{{ translations.drop_photo }}</p>
+              <!-- Add URL input -->
+              <div class="url-input-container mt-2">
+                <div class="input-group">
+                  <input type="text" id="faceImageUrlInput" class="form-control" placeholder="{{#if translations.face_image_url_placeholder}}{{translations.face_image_url_placeholder}}{{else}}Or enter face image URL{{/if}}">
+                  <button class="btn btn-outline-secondary" type="button" id="loadFaceImageUrlBtn">{{#if translations.load_url}}{{translations.load_url}}{{else}}Load{{/if}}</button>
+                </div>
+              </div>
               <img id="imagePreview" src="#" alt="Image preview" style="max-width: 100%; height: auto; display: none;">
               <div id="imageDetails" class="image-details bg-white"></div>
               

@@ -662,16 +662,41 @@ app.post('/api/process-image-swap', upload.fields([
   { name: 'face_image_file', maxCount: 1 }
 ]), async (req, res) => {
   try {
-    if (!req.files || !req.files['image_file'] || !req.files['face_image_file']) {
-      return res.status(400).json({ error: 'Missing required files' });
+    // Check if we have URL inputs instead of files
+    const sourceImageUrl = req.body.source_image_url;
+    const faceImageUrl = req.body.face_image_url;
+    
+    let sourceImageBase64, faceImageBase64;
+    
+    // Process files or URLs for source image
+    if (sourceImageUrl && isValidUrl(sourceImageUrl)) {
+      try {
+        // Download image from URL
+        const response = await axios.get(sourceImageUrl, { responseType: 'arraybuffer' });
+        sourceImageBase64 = imageToBase64(Buffer.from(response.data));
+      } catch (error) {
+        return res.status(400).json({ error: 'Failed to download source image from URL' });
+      }
+    } else if (req.files && req.files['image_file']) {
+      sourceImageBase64 = imageToBase64(req.files['image_file'][0].buffer);
+    } else {
+      return res.status(400).json({ error: 'No source image provided (file or URL)' });
     }
-
-    const sourceImageFile = req.files['image_file'][0];
-    const faceImageFile = req.files['face_image_file'][0];
-
-    // Convert both images to base64
-    const sourceImageBase64 = imageToBase64(sourceImageFile.buffer);
-    const faceImageBase64 = imageToBase64(faceImageFile.buffer);
+    
+    // Process files or URLs for face image
+    if (faceImageUrl && isValidUrl(faceImageUrl)) {
+      try {
+        // Download image from URL
+        const response = await axios.get(faceImageUrl, { responseType: 'arraybuffer' });
+        faceImageBase64 = imageToBase64(Buffer.from(response.data));
+      } catch (error) {
+        return res.status(400).json({ error: 'Failed to download face image from URL' });
+      }
+    } else if (req.files && req.files['face_image_file']) {
+      faceImageBase64 = imageToBase64(req.files['face_image_file'][0].buffer);
+    } else {
+      return res.status(400).json({ error: 'No face image provided (file or URL)' });
+    }
     
     // Prepare request body for Novita image-to-image API
     const requestBody = {
@@ -726,6 +751,54 @@ app.post('/api/process-image-swap', upload.fields([
       // Network error or timeout
       return res.status(500).json({ error: 'Failed to process image' });
     }
+  }
+});
+
+// Add endpoint for handling video processing from URL
+app.post('/api/temp-upload-from-url', async (req, res) => {
+  try {
+    const { video_url, face_image_url } = req.body;
+    
+    if (!video_url || !isValidUrl(video_url)) {
+      return res.status(400).json({ error: 'Invalid or missing video URL' });
+    }
+    
+    if (!face_image_url || !isValidUrl(face_image_url)) {
+      return res.status(400).json({ error: 'Invalid or missing face image URL' });
+    }
+
+    // Download files from URLs
+    console.log("Downloading video from URL:", video_url);
+    const videoResponse = await axios.get(video_url, { responseType: 'arraybuffer' });
+    console.log("Downloading face image from URL:", face_image_url);
+    const faceImageResponse = await axios.get(face_image_url, { responseType: 'arraybuffer' });
+    
+    // Upload files to S3
+    const videoBuffer = Buffer.from(videoResponse.data);
+    const videoHash = createHash('sha256').update(videoBuffer).digest('hex');
+    const videoFilename = `video-${Date.now()}.mp4`;
+    const videoUrl = await uploadToS3(videoBuffer, videoHash, videoFilename);
+    
+    const faceImageBuffer = Buffer.from(faceImageResponse.data);
+    const faceHash = createHash('sha256').update(faceImageBuffer).digest('hex');
+    const faceFilename = `face-${Date.now()}.jpg`;
+    const faceImageUrl = await uploadToS3(faceImageBuffer, faceHash, faceFilename);
+
+    // Generate a unique ID for this file pair
+    const tempId = uuidv4();
+    
+    // Store mapping in memory
+    tempFiles.set(tempId, {
+      videoUrl,
+      faceImageUrl,
+      videoFilename: videoFilename, // Use the generated filename
+      createdAt: Date.now()
+    });
+
+    return res.json({ tempId });
+  } catch (error) {
+    console.error('URL upload error:', error);
+    return res.status(500).json({ error: error.message });
   }
 });
 
