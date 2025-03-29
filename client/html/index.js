@@ -861,11 +861,6 @@ function setupSampleImageSelection() {
         const event = new Event('change', { bubbles: true });
         imageInput.dispatchEvent(event);
         
-        // If this is a user-saved face (has data-saved attribute), no need to save it again
-        if (!imgContainer.hasAttribute('data-saved')) {
-          // Save sample face to localStorage
-          saveFaceToLocalStorage(imageFile);
-        }
       } catch (error) {
         console.error('Error selecting sample image:', error);
         status.textContent = translationsObj.error_loading_sample_image || 'Error loading sample image';
@@ -878,6 +873,13 @@ function setupSampleImageSelection() {
 
 // Function to save face image to localStorage
 function saveFaceToLocalStorage(imageFile) {
+  // Check if it is a sample image by name
+  const isSampleImage = imageFile.name.startsWith('face-sample');
+  if (isSampleImage) {
+    // Don't save sample images to localStorage
+    return;
+  }
+  
   // Create a FileReader to convert the image to a data URL
   const reader = new FileReader();
   reader.onload = function(event) {
@@ -893,6 +895,12 @@ function saveFaceToLocalStorage(imageFile) {
       dataUrl: imageDataUrl,
       timestamp: new Date().toISOString()
     };
+    
+    // Check if the face already exists in saved faces
+    const existingFaceIndex = savedFaces.findIndex(face => face.name === imageFile.name);
+    if (existingFaceIndex !== -1) {
+      return; // Face already exists, do not save again
+    }
     
     // Add new face to the beginning of the array
     savedFaces.unshift(faceData);
