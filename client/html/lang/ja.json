@@ -236,5 +236,11 @@
   "click_frame_to_use": "使用するフレームをクリックしてください",
   "your_saved_faces": "保存された顔",
   "upload_from_device": "デバイスからアップロード",
-  "load_from_url": "URLから読み込む"
+  "load_from_url": "URLから読み込む",
+  "compressing_image": "画像を圧縮中...",
+  "compression_complete": "画像の圧縮に成功しました！",
+  "compression_error": "画像の圧縮エラー：",
+  "reduction": "削減",
+  "auto_compressed": "最適なサイズに自動圧縮されました",
+  "compress_now": "圧縮する"
 }

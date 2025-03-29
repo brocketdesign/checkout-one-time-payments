@@ -231,6 +231,12 @@
       "ctaHeading": "Ready to Experience Better Payments?",
       "ctaMessage": "Join thousands of satisfied customers who've already made the switch to our simple, secure payment system.",
       "ctaButton": "Start Using It Today"
-    }
+    },
+    "compressing_image": "Compressing image...",
+    "compression_complete": "Image compressed successfully!",
+    "compression_error": "Error compressing image:",
+    "reduction": "reduction",
+    "auto_compressed": "Auto-compressed for optimal size",
+    "compress_now": "Compress Now"
   
 }
