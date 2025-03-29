@@ -27,7 +27,7 @@ const MAX_VIDEO_SIZE = 10 * 1024 * 1024; // 10MB in bytes
 const MAX_IMAGE_SIZE = 1 * 1024 * 1024; // 1MB in bytes
 
 // Number of frames to extract from video
-const NUM_FRAMES_TO_EXTRACT = 10;
+const NUM_FRAMES_TO_EXTRACT = 20;
 
 // Maximum number of saved faces to store
 const MAX_SAVED_FACES = 5;
@@ -68,58 +68,13 @@ videoDetails.style.display = 'none';
 // Mode toggle functionality
 videoModeBtn.addEventListener('click', () => {
   if (isImageMode) {
-    isImageMode = false;
-    videoModeBtn.classList.add('active');
-    videoModeBtn.classList.remove('btn-outline-primary');
-    videoModeBtn.classList.add('btn-primary');
-    imageModeBtn.classList.remove('active');
-    imageModeBtn.classList.add('btn-outline-primary');
-    imageModeBtn.classList.remove('btn-primary');
-
-    imageFreeBadge.style.display = 'none';
-    videoSourceSection.style.display = 'block';
-    imageSourceSection.style.display = 'none';
-    
-    // Move video frames section back to the video source section if it exists
-    const framesSection = document.querySelector('.video-frames-section');
-    if (framesSection && framesSection.parentNode !== videoSourceSection) {
-      videoSourceSection.appendChild(framesSection);
-    }
-    
-    // Recalculate pricing if we have a video uploaded
-    if (videoInput.files.length > 0) {
-      getVideoDetails(videoInput.files[0]);
-    }
+    setVideoMode();
   }
 });
 
 imageModeBtn.addEventListener('click', () => {
   if (!isImageMode) {
-    isImageMode = true;
-    imageModeBtn.classList.add('active');
-    imageModeBtn.classList.remove('btn-outline-primary');
-    imageModeBtn.classList.add('btn-primary');
-    videoModeBtn.classList.remove('active');
-    videoModeBtn.classList.add('btn-outline-primary');
-    videoModeBtn.classList.remove('btn-primary');
-
-    imageFreeBadge.style.display = 'block';
-    videoSourceSection.style.display = 'none';
-    imageSourceSection.style.display = 'block';
-    
-    // Move video frames section to image source section if it exists and has frames
-    const framesSection = document.querySelector('.video-frames-section');
-    const framesGallery = document.getElementById('videoFramesGallery');
-    if (framesSection && framesGallery && framesGallery.children.length > 0) {
-      if (framesSection.parentNode !== imageSourceSection) {
-        imageSourceSection.appendChild(framesSection);
-      }
-      framesSection.style.display = 'block';
-    }
-    
-    // Clear video pricing since image mode is free
-    roundedSellingPrice = 0;
-    formattedPrice = 'Free';
+    setImageMode();
   }
 });
 
@@ -362,7 +317,7 @@ function handleImageSelection(imageFile) {
 
 function resetPayButton() {
   payButton.disabled = false;
-  payButton.innerHTML = `<span>${translationsObj.proceed || 'Proceed'}</span>`;
+  payButton.innerHTML = `<i class="bi bi-arrow-right-circle me-2"></i><span>${translationsObj.proceed || 'Proceed'}</span>`;
 }
 
 // Function to get video details
@@ -684,6 +639,12 @@ function setupSampleImageSelection() {
         // Set the files property of the imageInput
         const imageInput = document.getElementById('imageInput');
         imageInput.files = dataTransfer.files; 
+
+        // Trigger the change event to update image preview and details only for face-sample images
+        if (imageInput.files[0].name.startsWith('face-sample')) {
+          const event = new Event('change', { bubbles: true });
+          imageInput.dispatchEvent(event);
+        }
         
       } catch (error) {
         console.error('Error selecting sample image:', error);
@@ -1510,7 +1471,7 @@ function getImageDetailsFromElement(imgElement, url) {
 
 // Update the payButton event listener to handle URL inputs
 payButton.addEventListener('click', async () => {
-  // Disable the button and add a spinner
+  // Disable the button and add a spinner with Bootstrap icons
   payButton.disabled = true;
   payButton.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> ${translationsObj.processing || 'Processing...'}`;
 
@@ -1949,11 +1910,11 @@ function displaySavedFaces() {
     faceImage.src = face.dataUrl;
     faceImage.alt = `Saved face ${face.name}`;
     
-    // Add delete button
+    // Add delete button with Bootstrap icon
     const deleteButton = document.createElement('button');
     deleteButton.className = 'delete-saved-face';
     deleteButton.classList.add('hidden');
-    deleteButton.innerHTML = '×';
+    // We're using the CSS ::after pseudo-element with the Bootstrap icon SVG now
     deleteButton.title = translationsObj.delete_saved_face || 'Remove saved face';
     deleteButton.onclick = function(e) {
       e.stopPropagation(); // Prevent triggering the parent click event
@@ -2021,4 +1982,89 @@ function displaySavedFaces() {
       }
     });
   });
+}
+
+// Ensure the mode toggle works correctly and consistently
+function setVideoMode() {
+  isImageMode = false;
+  videoModeBtn.classList.add('active');
+  videoModeBtn.classList.remove('btn-outline-primary');
+  videoModeBtn.classList.add('btn-primary');
+  imageModeBtn.classList.remove('active');
+  imageModeBtn.classList.add('btn-outline-primary');
+  imageModeBtn.classList.remove('btn-primary');
+
+  imageFreeBadge.style.display = 'none';
+  videoSourceSection.style.display = 'block';
+  imageSourceSection.style.display = 'none';
+  
+  // Move video frames section back to the video source section if it exists
+  const framesSection = document.querySelector('.video-frames-section');
+  if (framesSection && framesSection.parentNode !== videoSourceSection) {
+    videoSourceSection.appendChild(framesSection);
+  }
+  
+  // Recalculate pricing if we have a video uploaded
+  if (videoInput.files.length > 0) {
+    getVideoDetails(videoInput.files[0]);
+  }
+}
+
+function setImageMode() {
+  isImageMode = true;
+  imageModeBtn.classList.add('active');
+  imageModeBtn.classList.remove('btn-outline-primary');
+  imageModeBtn.classList.add('btn-primary');
+  videoModeBtn.classList.remove('active');
+  videoModeBtn.classList.add('btn-outline-primary');
+  videoModeBtn.classList.remove('btn-primary');
+
+  imageFreeBadge.style.display = 'block';
+  videoSourceSection.style.display = 'none';
+  imageSourceSection.style.display = 'block';
+  
+  // Move video frames section to image source section if it exists and has frames
+  const framesSection = document.querySelector('.video-frames-section');
+  const framesGallery = document.getElementById('videoFramesGallery');
+  if (framesSection && framesGallery && framesGallery.children.length > 0) {
+    if (framesSection.parentNode !== imageSourceSection) {
+      imageSourceSection.appendChild(framesSection);
+    }
+    framesSection.style.display = 'block';
+  }
+  
+  // Clear video pricing since image mode is free
+  roundedSellingPrice = 0;
+  formattedPrice = 'Free';
+}
+// Initialize with video mode active on page load
+document.addEventListener('DOMContentLoaded', () => {
+  checkAndHideSkipPayment();
+  displaySavedFaces(); // Display saved faces on page load
+  setupSampleImageSelection();
+  
+  // Ensure we start in video mode
+  setVideoMode();
+  
+  const urlParams = new URLSearchParams(window.location.search);
+  const videoUrl = urlParams.get('videoUrl');
+
+  if (videoUrl) {
+    loadVideoFromUrl(videoUrl);
+  }
+});
+
+// Update video upload button with proper Bootstrap icon
+if (videoUploadBtn) {
+  videoUploadBtn.innerHTML = `<i class="bi bi-cloud-arrow-up me-2"></i><span>${translationsObj.upload_video || 'Upload Video'}</span>`;
+}
+
+// Update image upload button with proper Bootstrap icon
+if (imageUploadBtn) {
+  imageUploadBtn.innerHTML = `<i class="bi bi-person-square me-2"></i><span>${translationsObj.upload_photo || 'Upload Photo'}</span>`;
+}
+
+// Update source image upload button with proper Bootstrap icon
+if (sourceImageUploadBtn) {
+  sourceImageUploadBtn.innerHTML = `<i class="bi bi-image me-2"></i><span>${translationsObj.upload_source_image || 'Upload Source Image'}</span>`;
 }

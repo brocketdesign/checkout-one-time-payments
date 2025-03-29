@@ -42,244 +42,268 @@
 
           <!-- Mode Selection Toggle -->
             <div class="mode-toggle-container" style="margin: 20px auto; text-align: center;">
-            <div class="btn-group mode-toggle" role="group" aria-label="Choose mode">
-              <button type="button" class="btn btn-primary active" id="videoModeBtn">{{#if translations.video_mode}}{{ translations.video_mode }}{{else}}Video Mode{{/if}}</button>
-              <button type="button" class="btn btn-outline-primary position-relative" id="imageModeBtn">
-              {{#if translations.image_mode}}{{ translations.image_mode }}{{else}}Image Mode{{/if}}
-              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
-                {{#if translations.free_mode}}{{ translations.free_mode }}{{else}}Free!{{/if}}
-                <span class="visually-hidden">Free!</span>
-              </span>
-              </button>
-            </div>
-            <p class="mt-2 text-muted">{{#if translations.mode_description}}{{ translations.mode_description }}{{else}}Choose between video or image face swap{{/if}}</p>
-            </div>
-
-          <div class="upload-container row mx-auto">
-            <div id="videoSourceSection" class="upload-section bg-light border shadow-sm col-12 col-sm-5 mx-0 mb-2">
-              <h4 id="instruction_video" class="instruction">{{ translations.instruction_video }}</h4>
-              <div id="videoDropZone" class="drop-zone">
-                <input
-                  type="file"
-                  id="videoInput"
-                  name="video_file"
-                  accept="video/*"
-                  style="display: none"
-                />
-                <button id="videoUploadBtn" class="upload-btn">
-                  <span>{{ translations.upload_video }}</span>
+              <div class="btn-group mode-toggle" role="group" aria-label="Choose mode">
+                <button type="button" class="btn btn-primary active" id="videoModeBtn">{{#if translations.video_mode}}{{ translations.video_mode }}{{else}}Video Mode{{/if}}</button>
+                <button type="button" class="btn btn-outline-primary position-relative" id="imageModeBtn">
+                {{#if translations.image_mode}}{{ translations.image_mode }}{{else}}Image Mode{{/if}}
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+                  {{#if translations.free_mode}}{{ translations.free_mode }}{{else}}Free!{{/if}}
+                  <span class="visually-hidden">Free!</span>
+                </span>
                 </button>
               </div>
-              <p id="drop_video" class="drop-text">{{ translations.drop_video }}</p>
-              <!-- Add URL input -->
-              <div class="url-input-container mt-2">
-                <div class="input-group">
-                  <input type="text" id="videoUrlInput" class="form-control" placeholder="{{#if translations.video_url_placeholder}}{{translations.video_url_placeholder}}{{else}}Or enter video URL{{/if}}">
-                  <button class="btn btn-outline-secondary" type="button" id="loadVideoUrlBtn">{{#if translations.load_url}}{{translations.load_url}}{{else}}Load{{/if}}</button>
-                </div>
-              </div>
-              <video id="videoPreview" width="100%" controls style="display: none;"></video>
-              <div id="videoDetails" class="video-details bg-white"></div>
-              
-              <!-- Video Frames Gallery -->
-              <div class="video-frames-section" style="display: none;">
-                <h5 class="mt-3">{{#if translations.extracted_frames}}{{translations.extracted_frames}}{{else}}Extracted Frames:{{/if}}</h5>
-                <p class="text-muted small">{{#if translations.click_frame_to_use}}{{translations.click_frame_to_use}}{{else}}Click on a frame to use for face swap{{/if}}</p>
-                <div id="videoFramesGallery" class="video-frames-carousel"></div>
-              </div>
-              
-              <style>
-                .video-frames-section {
-                  margin-top: 15px;
-                  width: 100%;
-                }
-                
-                .video-frames-carousel {
-                  display: flex;
-                  overflow-x: auto;
-                  gap: 10px;
-                  padding: 10px 0;
-                  -webkit-overflow-scrolling: touch;
-                  scrollbar-width: thin;
-                }
-                
-                .video-frame {
-                  flex: 0 0 auto;
-                  cursor: pointer;
-                  border: 2px solid transparent;
-                  border-radius: 5px;
-                  transition: border-color 0.3s;
-                }
-                
-                .video-frame:hover {
-                  border-color: #007bff;
-                }
-                
-                .video-frame.selected {
-                  border-color: #007bff;
-                }
-                
-                .video-frame img {
-                  width: 80px;
-                  height: 80px;
-                  object-fit: cover;
-                  border-radius: 3px;
-                }
-              </style>
+              <p class="mt-2 text-muted">{{#if translations.mode_description}}{{ translations.mode_description }}{{else}}Choose between video or image face swap{{/if}}</p>
             </div>
-
-            <!-- Image Source Section (Hidden by default) -->
-            <div id="imageSourceSection" class="upload-section bg-light border shadow-sm col-12 col-sm-5 mx-0 mb-2" style="display: none;">
-              <h4 id="instruction_source_image" class="instruction">{{#if translations.instruction_source_image}}{{ translations.instruction_source_image }}{{else}}Upload source image{{/if}}</h4>
-              <div id="sourceImageDropZone" class="drop-zone">
-                <input
-                  type="file"
-                  id="sourceImageInput"
-                  name="image_file"
-                  accept="image/*"
-                  style="display: none"
-                />
-                <button id="sourceImageUploadBtn" class="upload-btn">
-                  <span>{{#if translations.upload_source_image}}{{ translations.upload_source_image }}{{else}}Upload Source Image{{/if}}</span>
-                </button>
-              </div>
-              <p id="drop_source_image" class="drop-text">{{#if translations.drop_source_image}}{{ translations.drop_source_image }}{{else}}...or drop image here{{/if}}</p>
-              <!-- Add URL input -->
-              <div class="url-input-container mt-2">
-                <div class="input-group">
-                  <input type="text" id="sourceImageUrlInput" class="form-control" placeholder="{{#if translations.image_url_placeholder}}{{translations.image_url_placeholder}}{{else}}Or enter image URL{{/if}}">
-                  <button class="btn btn-outline-secondary" type="button" id="loadSourceImageUrlBtn">{{#if translations.load_url}}{{translations.load_url}}{{else}}Load{{/if}}</button>
+            
+            <div class="upload-container mx-auto flex-column mx-auto col-12 col-sm-6">
+              <!-- Video Source Section (Visible by default) -->
+              <div id="videoSourceSection" class="upload-section bg-light border shadow-sm mb-4 w-100">
+                <h4 id="instruction_video" class="instruction">{{ translations.instruction_video }}</h4>
+                
+                <div class="upload-options">
+                  <!-- File Upload Option -->
+                  <div class="upload-option">
+                    <div class="upload-option-title">
+                      <i class="bi bi-file-earmark-arrow-up"></i> {{#if translations.upload_from_device}}{{translations.upload_from_device}}{{else}}Upload from your device{{/if}}
+                    </div>
+                    <div id="videoDropZone" class="drop-zone">
+                      <input
+                        type="file"
+                        id="videoInput"
+                        name="video_file"
+                        accept="video/*"
+                        style="display: none"
+                      />
+                      <button id="videoUploadBtn" class="upload-btn">
+                        <i class="bi bi-cloud-arrow-up me-2"></i>
+                        <span>{{#if translations.upload_video}}{{translations.upload_video}}{{else}}Upload Video{{/if}}</span>
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <!-- URL Input Option -->
+                  <div class="upload-option">
+                    <div class="upload-option-title">
+                      <i class="bi bi-link-45deg"></i> {{#if translations.load_from_url}}{{translations.load_from_url}}{{else}}Load from URL{{/if}}
+                    </div>
+                    <div class="input-group">
+                      <input type="text" id="videoUrlInput" class="form-control" placeholder="{{#if translations.video_url_placeholder}}{{translations.video_url_placeholder}}{{else}}Enter video URL{{/if}}">
+                      <button class="btn btn-outline-secondary" type="button" id="loadVideoUrlBtn">
+                        <i class="bi bi-box-arrow-in-down me-1"></i>
+                        {{#if translations.load_url}}{{translations.load_url}}{{else}}Load{{/if}}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <video id="videoPreview" width="100%" controls style="display: none;"></video>
+                <div id="videoDetails" class="video-details bg-white"></div>
+                
+                <!-- Video Frames Gallery -->
+                <div class="video-frames-section" style="display: none;">
+                  <h5 class="mt-3">{{#if translations.extracted_frames}}{{translations.extracted_frames}}{{else}}Extracted Frames:{{/if}}</h5>
+                  <p class="text-muted small">{{#if translations.click_frame_to_use}}{{translations.click_frame_to_use}}{{else}}Click on a frame to use for face swap{{/if}}</p>
+                  <div id="videoFramesGallery" class="video-frames-carousel"></div>
                 </div>
               </div>
-              <img id="sourceImagePreview" src="#" alt="Source image preview" style="max-width: 100%; height: auto; display: none;">
-              <div id="sourceImageDetails" class="image-details bg-white"></div>
-            </div>
 
-            <div class="upload-section bg-light border shadow-sm col-12 col-sm-5 mx-0">
-              <h4 id="instruction_image" class="instruction">{{ translations.instruction_image }}</h4>
-              <div id="imageDropZone" class="drop-zone">
-                <input
-                  type="file"
-                  id="imageInput"
-                  name="face_image_file"
-                  accept="image/*"
-                  style="display: none"
-                />
-                <button id="imageUploadBtn" class="upload-btn">
-                  <span>{{ translations.upload_photo }}</span>
-                </button>
-              </div>
-              <p id="drop_photo" class="drop-text">{{ translations.drop_photo }}</p>
-              <!-- Add URL input -->
-              <div class="url-input-container mt-2">
-                <div class="input-group">
-                  <input type="text" id="faceImageUrlInput" class="form-control" placeholder="{{#if translations.face_image_url_placeholder}}{{translations.face_image_url_placeholder}}{{else}}Or enter face image URL{{/if}}">
-                  <button class="btn btn-outline-secondary" type="button" id="loadFaceImageUrlBtn">{{#if translations.load_url}}{{translations.load_url}}{{else}}Load{{/if}}</button>
+              <!-- Image Source Section (Hidden by default) -->
+              <div id="imageSourceSection" class="upload-section bg-light border shadow-sm mb-4 w-100" style="display: none;">
+                <h4 id="instruction_source_image" class="instruction">{{#if translations.instruction_source_image}}{{ translations.instruction_source_image }}{{else}}Upload source image{{/if}}</h4>
+                
+                <div class="upload-options">
+                  <!-- File Upload Option -->
+                  <div class="upload-option">
+                    <div class="upload-option-title">
+                      <i class="bi bi-file-earmark-image"></i> {{#if translations.upload_from_device}}{{translations.upload_from_device}}{{else}}Upload from your device{{/if}}
+                    </div>
+                    <div id="sourceImageDropZone" class="drop-zone">
+                      <input
+                        type="file"
+                        id="sourceImageInput"
+                        name="image_file"
+                        accept="image/*"
+                        style="display: none"
+                      />
+                      <button id="sourceImageUploadBtn" class="upload-btn">
+                        <i class="bi bi-image me-2"></i>
+                        <span>{{#if translations.upload_source_image}}{{ translations.upload_source_image }}{{else}}Upload Source Image{{/if}}</span>
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <!-- URL Input Option -->
+                  <div class="upload-option">
+                    <div class="upload-option-title">
+                      <i class="bi bi-link-45deg"></i> {{#if translations.load_from_url}}{{translations.load_from_url}}{{else}}Load from URL{{/if}}
+                    </div>
+                    <div class="input-group">
+                      <input type="text" id="sourceImageUrlInput" class="form-control" placeholder="{{#if translations.image_url_placeholder}}{{translations.image_url_placeholder}}{{else}}Enter image URL{{/if}}">
+                      <button class="btn btn-outline-secondary" type="button" id="loadSourceImageUrlBtn">
+                        <i class="bi bi-box-arrow-in-down me-1"></i>
+                        {{#if translations.load_url}}{{translations.load_url}}{{else}}Load{{/if}}
+                      </button>
+                    </div>
+                  </div>
                 </div>
+                <img id="sourceImagePreview" src="#" alt="Source image preview" style="max-width: 100%; height: auto; display: none; margin-top: 15px;">
+                <div id="sourceImageDetails" class="image-details bg-white"></div>
               </div>
-              <img id="imagePreview" src="#" alt="Image preview" style="max-width: 100%; height: auto; display: none;">
-              <div id="imageDetails" class="image-details bg-white"></div>
-              
-              <!-- Sample Images Gallery -->
-              <div class="sample-images-section">
-                <h5 class="mt-3">{{#if translations.or_choose_sample}}{{translations.or_choose_sample}}{{else}}Or choose from samples:{{/if}}</h5>
-                <div class="sample-images-carousel">
+
+              <!-- Face Image Section (Always visible) -->
+              <div class="upload-section bg-light border shadow-sm w-100">
+                <h4 id="instruction_image" class="instruction">{{ translations.instruction_image }}</h4>
+                
+                <div class="upload-options">
+                  <!-- File Upload Option -->
+                  <div class="upload-option">
+                    <div class="upload-option-title">
+                      <i class="bi bi-person-square"></i> {{#if translations.upload_from_device}}{{translations.upload_from_device}}{{else}}Upload from your device{{/if}}
+                    </div>
+                    <div id="imageDropZone" class="drop-zone">
+                      <input
+                        type="file"
+                        id="imageInput"
+                        name="face_image_file"
+                        accept="image/*"
+                        style="display: none"
+                      />
+                      <button id="imageUploadBtn" class="upload-btn">
+                        <i class="bi bi-person-square me-2"></i>
+                        <span>{{ translations.upload_photo }}</span>
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <!-- URL Input Option -->
+                  <div class="upload-option">
+                    <div class="upload-option-title">
+                      <i class="bi bi-link-45deg"></i> {{#if translations.load_from_url}}{{translations.load_from_url}}{{else}}Load from URL{{/if}}
+                    </div>
+                    <div class="input-group">
+                      <input type="text" id="faceImageUrlInput" class="form-control" placeholder="{{#if translations.face_image_url_placeholder}}{{translations.face_image_url_placeholder}}{{else}}Enter face image URL{{/if}}">
+                      <button class="btn btn-outline-secondary" type="button" id="loadFaceImageUrlBtn">
+                        <i class="bi bi-box-arrow-in-down me-1"></i>
+                        {{#if translations.load_url}}{{translations.load_url}}{{else}}Load{{/if}}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <img id="imagePreview" src="#" alt="Image preview" style="max-width: 100%; height: auto; display: none; margin-top: 15px;">
+                <div id="imageDetails" class="image-details bg-white"></div>
+                
+                <!-- Sample Images Gallery -->
+                <div class="sample-images-section">
+                  <h5 class="mt-3">{{#if translations.or_choose_sample}}{{translations.or_choose_sample}}{{else}}Or choose from samples:{{/if}}</h5>
+                  <div class="sample-images-carousel">
                     <div class="sample-image" data-img-src="/img/face-sample-1.png"><img src="/img/face-sample-1.png" alt="Sample 1"></div>
                     <div class="sample-image" data-img-src="/img/face-sample-2.png"><img src="/img/face-sample-2.png" alt="Sample 2"></div>
                     <div class="sample-image" data-img-src="/img/face-sample-3.png"><img src="/img/face-sample-3.png" alt="Sample 3"></div>
                     <div class="sample-image" data-img-src="/img/face-sample-4.png"><img src="/img/face-sample-4.png" alt="Sample 4"></div>
                     <div class="sample-image" data-img-src="/img/face-sample-5.png"><img src="/img/face-sample-5.png" alt="Sample 5"></div>
-                    <div class="sample-image" data-img-src="/img/face-sample-6.png"><img src="/img/face-sample-6.png" alt="Sample 6"></div></div>
+                    <div class="sample-image" data-img-src="/img/face-sample-6.png"><img src="/img/face-sample-6.png" alt="Sample 6"></div>
+                  </div>
+                </div>
+                
+                <!-- Saved Faces Gallery -->
+                <div class="saved-faces-section" style="display: none;">
+                  <h5 class="mt-3">{{#if translations.your_saved_faces}}{{translations.your_saved_faces}}{{else}}Your saved faces:{{/if}}</h5>
+                  <div id="savedFacesGallery" class="sample-images-carousel"></div>
+                </div>
               </div>
-              
-              <!-- Saved Faces Gallery -->
-              <div class="saved-faces-section" style="display: none;">
-                <h5 class="mt-3">{{#if translations.your_saved_faces}}{{translations.your_saved_faces}}{{else}}Your saved faces:{{/if}}</h5>
-                <div id="savedFacesGallery" class="sample-images-carousel"></div>
-              </div>
-              
-              <style>
-                .sample-images-section, .saved-faces-section {
-                  margin-top: 15px;
-                  width: 100%;
-                }
-                
-                .sample-images-carousel {
-                  display: flex;
-                  overflow-x: auto;
-                  gap: 10px;
-                  padding: 10px 0;
-                  -webkit-overflow-scrolling: touch;
-                  scrollbar-width: thin;
-                }
-                
-                .sample-image {
-                  flex: 0 0 auto;
-                  cursor: pointer;
-                  border: 2px solid transparent;
-                  border-radius: 5px;
-                  transition: border-color 0.3s;
-                  position: relative;
-                }
-                
-                .sample-image:hover {
-                  border-color: #007bff;
-                }
-                
-                .sample-image.selected {
-                  border-color: #007bff;
-                }
-                
-                .sample-image img {
-                  width: 80px;
-                  height: 80px;
-                  object-fit: cover;
-                  border-radius: 3px;
-                }
-                
-                .delete-saved-face {
-                  position: absolute;
-                  top: -8px;
-                  right: -8px;
-                  width: 20px;
-                  height: 20px;
-                  background: #cacaca;
-                  color: black;
-                  border: none;
-                  border-radius: 50%;
-                  font-size: 12px;
-                  line-height: 1;
-                  padding: 0;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  cursor: pointer;
-                  opacity: 0.8;
-                  z-index: 1;
-                }
-                
-                .delete-saved-face:hover {
-                  opacity: 1;
-                }
-                
-                /* Mode toggle styling */
-                .mode-toggle-container {
-                  max-width: 400px;
-                  margin: 20px auto 30px;
-                }
-                
-                .mode-toggle .btn {
-                  min-width: 120px;
-                  font-weight: 500;
-                }
-              </style>
             </div>
-          </div>
-
+                      
+              
+            <style>
+              .sample-images-section, .saved-faces-section {
+                margin-top: 15px;
+                width: 100%;
+              }
+              
+              .sample-images-carousel {
+                display: flex;
+                overflow-x: auto;
+                gap: 10px;
+                padding: 10px 0;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: thin;
+              }
+              
+              .sample-image {
+                flex: 0 0 auto;
+                cursor: pointer;
+                border: 2px solid transparent;
+                border-radius: 5px;
+                transition: border-color 0.3s;
+                position: relative;
+              }
+              
+              .sample-image:hover {
+                border-color: #007bff;
+              }
+              
+              .sample-image.selected {
+                border-color: #007bff;
+              }
+              
+              .sample-image img {
+                width: 80px;
+                height: 80px;
+                object-fit: cover;
+                border-radius: 3px;
+              }
+              
+              .delete-saved-face {
+                position: absolute;
+                top: -8px;
+                right: -8px;
+                width: 20px;
+                height: 20px;
+                background: #cacaca;
+                color: black;
+                border: none;
+                border-radius: 50%;
+                font-size: 12px;
+                line-height: 1;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                opacity: 0.8;
+                z-index: 1;
+              }
+              
+              .delete-saved-face:hover {
+                opacity: 1;
+              }
+              
+              .delete-saved-face::after {
+                content: "";
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-x' viewBox='0 0 16 16'%3E%3Cpath d='M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+                width: 100%;
+                height: 100%;
+                display: block;
+                background-repeat: no-repeat;
+                background-position: center;
+              }
+              
+              /* Mode toggle styling */
+              .mode-toggle-container {
+                max-width: 400px;
+                margin: 20px auto 30px;
+              }
+              
+              .mode-toggle .btn {
+                min-width: 120px;
+                font-weight: 500;
+              }
+            </style>
+   
           <div class="payment-section"style="max-width: 80%; margin: 50px auto 0 auto;">
             <input type="checkbox" id="skipPayment" name="skipPayment" checked />
             <label for="skipPayment"><span>{{ translations.skip_payment }}</span></label>
             <button id="payButton" class="btn btn-primary rounded d-block proceed-btn shadow border border-white position-relative">
+              <i class="bi bi-arrow-right-circle me-2"></i>
               <span>{{ translations.proceed }}</span>
               <span class="image-free-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success border border-white" style="display: none;">
                 {{#if translations.free_mode}}{{ translations.free_mode }}{{else}}Free!{{/if}}
@@ -287,6 +311,140 @@
               </span>
             </button>
           </div>
+
+          <style>
+            /* Improved upload section styling */
+            .upload-section {
+              padding: 20px;
+              border-radius: 10px;
+              transition: all 0.3s ease;
+            }
+            
+            .upload-section:hover {
+              box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            }
+            
+            .upload-options {
+              display: flex;
+              flex-direction: column;
+              gap: 15px;
+              margin-top: 15px;
+            }
+            
+            .upload-option {
+              background: white;
+              border-radius: 8px;
+              padding: 15px;
+              box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+              transition: all 0.2s ease;
+            }
+            
+            .upload-option:hover {
+              box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+              transform: translateY(-2px);
+            }
+            
+            .upload-option-title {
+              font-weight: 600;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              margin-bottom: 10px;
+              color: #333;
+            }
+            
+            .upload-option-title i {
+              color: #007bff;
+            }
+            
+            .drop-zone {
+              border: 2px dashed #ccc;
+              border-radius: 8px;
+              padding: 25px 15px;
+              text-align: center;
+              transition: all 0.3s ease;
+              cursor: pointer;
+              background-color: rgba(0,123,255,0.03);
+            }
+            
+            .drop-zone:hover {
+              border-color: #007bff;
+              background-color: rgba(0,123,255,0.05);
+            }
+            
+            .upload-btn {
+              background: #007bff;
+              color: white;
+              border: none;
+              border-radius: 6px;
+              padding: 10px 15px;
+              font-weight: 500;
+              transition: all 0.3s ease;
+              display: inline-flex;
+              align-items: center;
+              gap: 8px;
+            }
+            
+            .upload-btn:hover {
+              background: #0069d9;
+              transform: translateY(-2px);
+              box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            }
+            
+            .drop-text {
+              margin-top: 10px;
+              color: #6c757d;
+              font-size: 0.9rem;
+            }
+            
+            .url-input-container {
+              margin-top: 15px;
+            }
+            
+            .url-input-group {
+              display: flex;
+              border: 1px solid #ced4da;
+              border-radius: 6px;
+              overflow: hidden;
+              transition: all 0.3s ease;
+            }
+            
+            .url-input-group:focus-within {
+              border-color: #007bff;
+              box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+            }
+            
+            .url-input-group input {
+              flex-grow: 1;
+              border: none;
+              padding: 10px 15px;
+              outline: none;
+            }
+            
+            .url-load-btn {
+              background: #f8f9fa;
+              border: none;
+              border-left: 1px solid #ced4da;
+              color: #495057;
+              padding: 10px 15px;
+              font-weight: 500;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              white-space: nowrap;
+            }
+            
+            .url-load-btn:hover {
+              background: #e9ecef;
+              color: #007bff;
+            }
+            
+            .img-preview-container {
+              margin-top: 15px;
+              border-radius: 8px;
+              overflow: hidden;
+              box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            }
+          </style>
 
           <script>
             if (window.location.hostname !== 'localhost') {
@@ -312,7 +470,10 @@
         <div id="imageComparisonContainer" class="mb-3"></div>
         </div>
         <div class="modal-footer">
-        <a id="downloadLink" href="#" class="btn btn-primary" download="processed_image.jpg">{{ translations.download }}</a>
+          <a id="downloadLink" href="#" class="btn btn-primary" download="processed_image.jpg">
+            <i class="bi bi-download me-2"></i>
+            {{ translations.download }}
+          </a>
         </div>
       </div>
       </div>
