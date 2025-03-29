@@ -95,8 +95,8 @@ sourceImageDropZone.addEventListener('drop', async (event) => {
   const files = event.dataTransfer.files;
   const file = files[0];
   
-  await handleSourceImageSelection(file);
-  getSourceImageDetails(file);
+  const newFile = await handleSourceImageSelection(file);
+  getSourceImageDetails(newFile);
 });
 
 sourceImageUploadBtn.addEventListener('click', () => {
@@ -106,40 +106,14 @@ sourceImageUploadBtn.addEventListener('click', () => {
 // Update sourceImageInput event listener
 sourceImageInput.addEventListener('change', async (event) => {
   const file = sourceImageInput.files[0];
-  await handleSourceImageSelection(file);
-  getSourceImageDetails(file);
+  const newFile = await handleSourceImageSelection(file);
+  getSourceImageDetails(newFile);
 });
 
 // Function to get source image details
 async function getSourceImageDetails(imageFile) {
   // Check file size first
   if (imageFile.size > MAX_IMAGE_SIZE) {
-    sourceImageDetails.innerHTML = `
-      <h5>${translationsObj.image_details || 'Source Image Details'}</h5>
-      <div class="alert alert-warning">
-        ${translationsObj.image_too_large || 'Image file is too large (Maximum: 1MB).'} 
-        <p><strong>${translationsObj.current_size || 'Current size'}:</strong> ${(imageFile.size / (1024 * 1024)).toFixed(2)} MB</p>
-        <button class="btn btn-sm btn-primary mt-2" id="compressSourceImageBtn">
-          <i class="bi bi-file-zip me-1"></i> ${translationsObj.compress_now || 'Compress Now'}
-        </button>
-      </div>
-    `;
-    sourceImageDetails.style.display = 'block';
-    
-    // Add event listener to the compress button
-    document.getElementById('compressSourceImageBtn').addEventListener('click', async () => {
-      const compressedFile = await compressImageIfNeeded(imageFile);
-      if (compressedFile) {
-        // Replace the file in the input
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(compressedFile);
-        sourceImageInput.files = dataTransfer.files;
-        
-        // Update the preview and details
-        handleSourceImageSelection(compressedFile);
-        getSourceImageDetails(compressedFile);
-      }
-    });
     return;
   }
 
@@ -220,9 +194,9 @@ imageDropZone.addEventListener('drop', async (event) => {
   const files = event.dataTransfer.files;
   const file = files[0];
   
-  await handleImageSelection(file);
-  getImageDetails(file);
-  saveFaceToLocalStorage(file);
+  const newFile = await handleImageSelection(file);
+  getImageDetails(newFile);
+  saveFaceToLocalStorage(newFile);
 });
 
 imageUploadBtn.addEventListener('click', () => {
@@ -235,17 +209,20 @@ imageInput.addEventListener('change', async (event) => {
   const fromSavedFace = event.isTrusted === false;
   const file = imageInput.files[0];
   
-  await handleImageSelection(file);
-  getImageDetails(file);
+  const newFile = await handleImageSelection(file);
+  getImageDetails(newFile);
   
   // Only save to localStorage if not from a saved face selection
-  if (!fromSavedFace && file) {
-    saveFaceToLocalStorage(file);
+  if (!fromSavedFace && newFile) {
+    saveFaceToLocalStorage(newFile);
   }
 });
 
 // Function to handle video selection and display preview
 function handleVideoSelection(videoFile) {
+  // Reset URL value when a file is uploaded directly
+  videoUrlValue = '';
+
   if (videoFile) {
     // Check if file size exceeds the maximum allowed
     if (videoFile.size > MAX_VIDEO_SIZE) {
@@ -351,6 +328,9 @@ async function compressImageIfNeeded(imageFile) {
 
 // Update handleSourceImageSelection to use compression
 async function handleSourceImageSelection(imageFile) {
+  // Reset URL value when a file is uploaded directly
+  sourceImageUrlValue = '';
+
   if (imageFile) {
     // Compress the image if it's too large
     if (imageFile.size > MAX_IMAGE_SIZE) {
@@ -377,10 +357,14 @@ async function handleSourceImageSelection(imageFile) {
   } else {
     sourceImageDetails.style.display = 'none';
   }
+  return imageFile;
 }
 
 // Update handleImageSelection to use compression
 async function handleImageSelection(imageFile) {
+  // Reset URL value when a file is uploaded directly
+  faceImageUrlValue = '';
+
   if (imageFile) {
     // Compress the image if it's too large
     if (imageFile.size > MAX_IMAGE_SIZE) {
@@ -409,6 +393,7 @@ async function handleImageSelection(imageFile) {
   } else {
     imageDetails.style.display = 'none'; // Hide image details if no image
   }
+  return imageFile;
 }
 
 function resetPayButton() {
@@ -489,32 +474,6 @@ async function getVideoDetails(videoFile) {
 async function getImageDetails(imageFile) {
   // Check file size first
   if (imageFile.size > MAX_IMAGE_SIZE) {
-    imageDetails.innerHTML = `
-      <h5>${translationsObj.image_details || 'Image Details'}</h5>
-      <div class="alert alert-warning">
-        ${translationsObj.image_too_large || 'Image file is too large (Maximum: 1MB).'} 
-        <p><strong>${translationsObj.current_size || 'Current size'}:</strong> ${(imageFile.size / (1024 * 1024)).toFixed(2)} MB</p>
-        <button class="btn btn-sm btn-primary mt-2" id="compressFaceImageBtn">
-          <i class="bi bi-file-zip me-1"></i> ${translationsObj.compress_now || 'Compress Now'}
-        </button>
-      </div>
-    `;
-    imageDetails.style.display = 'block';
-    
-    // Add event listener to the compress button
-    document.getElementById('compressFaceImageBtn').addEventListener('click', async () => {
-      const compressedFile = await compressImageIfNeeded(imageFile);
-      if (compressedFile) {
-        // Replace the file in the input
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(compressedFile);
-        imageInput.files = dataTransfer.files;
-        
-        // Update the preview and details
-        handleImageSelection(compressedFile);
-        getImageDetails(compressedFile);
-      }
-    });
     return;
   }
 
@@ -997,6 +956,28 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function loadVideoFromUrl(videoUrl) {
+
+  if (!url) {
+    status.textContent = translationsObj.no_url_provided || 'Please enter a URL';
+    status.classList.remove('hidden');
+    status.className = 'alert alert-danger';
+    return;
+  }
+  
+  if (!isValidUrl(url)) {
+    status.textContent = translationsObj.invalid_url || 'Please enter a valid URL';
+    status.classList.remove('hidden');
+    status.className = 'alert alert-danger';
+    return;
+  }
+  
+  // Clear the file input when loading from URL
+  videoInput.value = '';
+  
+  status.textContent = translationsObj.loading_from_url || 'Loading video from URL...';
+  status.classList.remove('hidden');
+  status.className = 'alert alert-info';
+
   try {
     const response = await fetch(videoUrl);
     const blob = await response.blob();
@@ -1407,6 +1388,9 @@ function loadSourceImageFromUrl(url) {
     return;
   }
   
+  // Clear the file input when loading from URL
+  sourceImageInput.value = '';
+
   status.textContent = translationsObj.loading_from_url || 'Loading image from URL...';
   status.classList.remove('hidden');
   status.className = 'alert alert-info';
@@ -1460,6 +1444,9 @@ function loadFaceImageFromUrl(url) {
     return;
   }
   
+  // Clear the file input when loading from URL
+  imageInput.value = '';
+
   status.textContent = translationsObj.loading_from_url || 'Loading image from URL...';
   status.classList.remove('hidden');
   status.className = 'alert alert-info';
@@ -1596,7 +1583,7 @@ payButton.addEventListener('click', async () => {
     const hasFaceFile = imageInput.files.length > 0;
     const hasSourceUrl = !!sourceImageUrlValue;
     const hasFaceUrl = !!faceImageUrlValue;
-    
+
     // Check if we have both source and face images (either as files or URLs)
     if ((!hasSourceFile && !hasSourceUrl) || (!hasFaceFile && !hasFaceUrl)) {
       status.textContent = translationsObj.please_upload_both_images || 'Please upload both the source image and the face image or provide URLs.';
