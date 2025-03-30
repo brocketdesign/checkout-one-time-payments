@@ -342,6 +342,7 @@ async function handleSourceImageSelection(imageFile) {
         sourceImageInput.files = dataTransfer.files;
         imageFile = compressedFile;
       }
+      payButton.disabled = false;
     }
     
     // Reset status if previously showed an error
@@ -376,6 +377,7 @@ async function handleImageSelection(imageFile) {
         imageInput.files = dataTransfer.files;
         imageFile = compressedFile;
       }
+      payButton.disabled = false;
     }
     
     // Reset status if previously showed an error
@@ -1257,7 +1259,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-  
+   
   if (loadSourceImageUrlBtn) {
     loadSourceImageUrlBtn.addEventListener('click', () => {
       loadSourceImageFromUrl(sourceImageUrlInput.value);
@@ -2168,4 +2170,81 @@ if (imageUploadBtn) {
 // Update source image upload button with proper Bootstrap icon
 if (sourceImageUploadBtn) {
   sourceImageUploadBtn.innerHTML = `<i class="bi bi-image me-2"></i><span>${translationsObj.upload_source_image || 'Upload Source Image'}</span>`;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize all comparison sliders in the examples section
+  initExampleSliders();
+});
+
+function initExampleSliders() {
+  const containers = document.querySelectorAll('#examples .img-comp-container');
+  
+  containers.forEach(container => {
+    const slider = container.querySelector('.img-comp-slider');
+    const before = container.querySelector('.img-comp-before');
+    let isDragging = false;
+    
+    // Set initial position (center)
+    updateSliderPosition(container, slider, before, 50);
+    
+    // Mouse events
+    slider.addEventListener('mousedown', e => {
+      e.preventDefault();
+      isDragging = true;
+    });
+    
+    window.addEventListener('mousemove', e => {
+      if (!isDragging) return;
+      const pos = getPosition(container, e);
+      updateSliderPosition(container, slider, before, pos);
+    });
+    
+    window.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
+    
+    // Touch events
+    slider.addEventListener('touchstart', e => {
+      e.preventDefault();
+      isDragging = true;
+    });
+    
+    window.addEventListener('touchmove', e => {
+      if (!isDragging) return;
+      const touch = e.touches[0];
+      const pos = getPosition(container, touch);
+      updateSliderPosition(container, slider, before, pos);
+    });
+    
+    window.addEventListener('touchend', () => {
+      isDragging = false;
+    });
+    
+    // Click on container to move slider
+    container.addEventListener('click', e => {
+      if (e.target !== slider && !slider.contains(e.target)) {
+        const pos = getPosition(container, e);
+        updateSliderPosition(container, slider, before, pos);
+      }
+    });
+  });
+}
+
+function getPosition(container, event) {
+  const rect = container.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  // Calculate position as percentage
+  return (x / rect.width) * 100;
+}
+
+function updateSliderPosition(container, slider, before, position) {
+  // Constrain position between 1% and 99%
+  const constrainedPos = Math.min(99, Math.max(1, position));
+  
+  // Update slider position
+  slider.style.left = `${constrainedPos}%`;
+  
+  // Update clip path for before image
+  before.style.clipPath = `inset(0 ${100 - constrainedPos}% 0 0)`;
 }

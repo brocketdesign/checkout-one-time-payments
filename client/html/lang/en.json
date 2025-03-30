@@ -237,6 +237,43 @@
     "compression_error": "Error compressing image:",
     "reduction": "reduction",
     "auto_compressed": "Auto-compressed for optimal size",
-    "compress_now": "Compress Now"
+    "compress_now": "Compress Now",
+    "howToFaceSwap": {
+      "heading": "How to Face Swap With AI in 3 Easy Steps?",
+      "step1": {
+        "title": "Upload Media",
+        "description": "Upload your image, GIF or video that contains faces",
+        "support": "Supports most common formats like JPG, PNG, GIF and MP4",
+        "tip": "Make sure faces are clearly visible for best results"
+      },
+      "step2": {
+        "title": "Select Faces",
+        "description": "Choose which faces you want to swap",
+        "select": "Select target faces to replace them with. You can select and swap multiple faces at once"
+      },
+      "step3": {
+        "title": "Generate & Download",
+        "description": "Click the 'Swap Faces' button to start the process",
+        "wait": "Wait a few seconds for AI to work its magic",
+        "download": "Download your face-swapped result in original quality"
+      }
+    },
+    "examples": {
+      "heading": "See the Results",
+      "description": "Drag the slider to compare before and after images",
+      "example1": {
+        "title": "Perfect Face Swapping",
+        "description": "Our AI seamlessly integrates facial features while maintaining natural expressions"
+      },
+      "example2": {
+        "title": "Lighting and Color Matching",
+        "description": "Advanced algorithms automatically adjust lighting and skin tones for realistic results"
+      },
+      "example3": {
+        "title": "Detail Preservation",
+        "description": "High-quality output preserves important details for professional-looking swaps"
+      },
+      "tryButton": "Try It Yourself"
+    }
   
 }

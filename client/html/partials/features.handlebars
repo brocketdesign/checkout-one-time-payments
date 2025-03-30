@@ -1,4 +1,149 @@
 <div class="features">
+  <!-- How to face swap -->
+  <section id="how-to-faceswap" class="py-5">
+    <div class="container mx-auto">
+      <h2 class="display-5 fw-bold text-center mb-5">{{ translations.howToFaceSwap.heading }}</h2>
+      <div class="row">
+        <div class="col-lg-4 mb-4">
+          <div class="card shadow-sm h-100">
+            <div class="card-body text-center">
+              <div class="rounded-circle bg-primary d-inline-flex justify-content-center align-items-center mb-3" style="width: 60px; height: 60px;">
+                <span class="text-white fw-bold">01</span>
+              </div>
+              <h3 class="h5 card-title">{{ translations.howToFaceSwap.step1.title }}</h3>
+              <p class="card-text">{{ translations.howToFaceSwap.step1.description }}</p>
+              <p class="card-text">{{ translations.howToFaceSwap.step1.support }}</p>
+              <p class="card-text">{{ translations.howToFaceSwap.step1.tip }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4 mb-4">
+          <div class="card shadow-sm h-100">
+            <div class="card-body text-center">
+              <div class="rounded-circle bg-primary d-inline-flex justify-content-center align-items-center mb-3" style="width: 60px; height: 60px;">
+                <span class="text-white fw-bold">02</span>
+              </div>
+              <h3 class="h5 card-title">{{ translations.howToFaceSwap.step2.title }}</h3>
+              <p class="card-text">{{ translations.howToFaceSwap.step2.description }}</p>
+              <p class="card-text">{{ translations.howToFaceSwap.step2.select }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4 mb-4">
+          <div class="card shadow-sm h-100">
+            <div class="card-body text-center">
+              <div class="rounded-circle bg-primary d-inline-flex justify-content-center align-items-center mb-3" style="width: 60px; height: 60px;">
+                <span class="text-white fw-bold">03</span>
+              </div>
+              <h3 class="h5 card-title">{{ translations.howToFaceSwap.step3.title }}</h3>
+              <p class="card-text">{{ translations.howToFaceSwap.step3.description }}</p>
+              <p class="card-text">{{ translations.howToFaceSwap.step3.wait }}</p>
+              <p class="card-text">{{ translations.howToFaceSwap.step3.download }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+<!-- Example Section -->
+<section id="examples" class="py-5 py-lg-6 bg-light">
+  <div class="container mx-auto">
+    <h2 class="display-5 fw-bold text-center mb-5">{{ translations.examples.heading }}</h2>
+    <p class="lead text-center mb-4">{{ translations.examples.description }}</p>
+
+    <div class="row g-4 justify-content-center">
+      <!-- Example 1 -->
+      <div class="col-md-12 col-lg-10 mb-5">
+        <div class="card shadow-sm">
+          <div class="card-body p-0">
+            <div class="img-comp-container mx-auto">
+              <div class="img-comp-after">
+                <img src="/img/examples/main-1.jpg" alt="Original image">
+              </div>
+              <div class="img-comp-before">
+                <img src="/img/examples/swap-1.jpg" alt="Face swapped image">
+              </div>
+              <div class="img-comp-slider">
+                <div class="img-comp-vertical-line"></div>
+                <div class="img-comp-handle">
+                  <span class="img-comp-arrow-left">❮</span>
+                  <span class="img-comp-arrow-right">❯</span>
+                </div>
+              </div>
+            </div>
+            <div class="p-4">
+              <h3 class="h4">{{ translations.examples.example1.title }}</h3>
+              <p>{{ translations.examples.example1.description }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Example 2 -->
+      <div class="col-md-12 col-lg-10 mb-5">
+        <div class="card shadow-sm">
+          <div class="card-body p-0">
+            <div class="img-comp-container mx-auto">
+              <div class="img-comp-after">
+                <img src="/img/examples/face-1.jpg" alt="Original image">
+              </div>
+              <div class="img-comp-before">
+                <img src="/img/examples/swap-1.jpg" alt="Face swapped image">
+              </div>
+              <div class="img-comp-slider">
+                <div class="img-comp-vertical-line"></div>
+                <div class="img-comp-handle">
+                  <span class="img-comp-arrow-left">❮</span>
+                  <span class="img-comp-arrow-right">❯</span>
+                </div>
+              </div>
+            </div>
+            <div class="p-4">
+              <h3 class="h4">{{ translations.examples.example2.title }}</h3>
+              <p>{{ translations.examples.example2.description }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Example 3 -->
+      <div class="col-md-12 col-lg-10 mb-5">
+        <div class="card shadow-sm">
+          <div class="card-body p-0">
+            <div class="img-comp-container mx-auto">
+              <div class="img-comp-after">
+                <img src="/img/examples/main-1.png" alt="Original image">
+              </div>
+              <div class="img-comp-before">
+                <img src="/img/examples/face-1.jpg" alt="Face swapped image">
+              </div>
+              <div class="img-comp-slider">
+                <div class="img-comp-vertical-line"></div>
+                <div class="img-comp-handle">
+                  <span class="img-comp-arrow-left">❮</span>
+                  <span class="img-comp-arrow-right">❯</span>
+                </div>
+              </div>
+            </div>
+            <div class="p-4">
+              <h3 class="h4">{{ translations.examples.example3.title }}</h3>
+              <p>{{ translations.examples.example3.description }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="text-center mt-4">
+      <a href="#top" class="btn btn-primary btn-lg rounded-pill px-4 py-2 cta">
+        {{ translations.examples.tryButton }}
+        <i class="bi bi-arrow-right-circle ms-2"></i>
+      </a>
+    </div>
+  </div>
+</section>
   <!-- Hero Section -->
   <section id="hero" class="py-5 py-lg-6 bg-light">
     <div class="container mx-auto">
