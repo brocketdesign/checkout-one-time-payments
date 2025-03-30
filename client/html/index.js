@@ -634,6 +634,9 @@ function useFrameForFaceSwap(frameDataUrl, timeStamp) {
     }
   }
   
+  // Re-enable pay button since we're using a frame, not the large video
+  payButton.disabled = false;
+  
   // Convert data URL to a file and set it as the source image
   fetch(frameDataUrl)
     .then(res => res.blob())
@@ -1039,7 +1042,7 @@ function setupComparisonSlider(originalImageUrl, processedImageUrl) {
 
   // Create the structure for the comparison slider
   comparisonContainer.innerHTML = `
-    <div class="img-comp-container">
+    <div class="img-comp-container dynamic-slider mx-auto">
       <div class="img-comp-after">
         <img src="${processedImageUrl}" alt="Processed Image">
       </div>
@@ -1066,7 +1069,7 @@ function setupComparisonSlider(originalImageUrl, processedImageUrl) {
       img.onload = () => {
         // Check for natural dimensions after load
         if (!img.naturalWidth || !img.naturalHeight) {
-          console.warn('Image dimensions not available yet, delaying initComparison');
+          console.warn('Image dimensions not available yet, delaying initSlider');
           setTimeout(() => {
             img.onload(); // Re-trigger onload after a delay
           }, 200);
@@ -1091,8 +1094,10 @@ function setupComparisonSlider(originalImageUrl, processedImageUrl) {
 
   Promise.all(imagePromises)
     .then(() => {
-      // Delay initComparison to ensure images are rendered
-      setTimeout(initComparison, 100);
+      // Delay initSlider to ensure images are rendered
+      setTimeout(() => {
+        initSlider(comparisonContainer.querySelector('.img-comp-container'));
+      }, 100);
     })
     .catch(error => {
       console.error('Image loading failed:', error);
@@ -1102,84 +1107,34 @@ function setupComparisonSlider(originalImageUrl, processedImageUrl) {
   document.getElementById('processedImage').src = processedImageUrl;
 }
 
-// Function to initialize the comparison slider
-function initComparison() {
-  const container = document.querySelector('.img-comp-container');
-  const slider = document.querySelector('.img-comp-slider');
-  const before = document.querySelector('.img-comp-before');
-  const after = document.querySelector('.img-comp-after');
-  const afterImg = document.querySelector('.img-comp-after img');
-  const beforeImg = document.querySelector('.img-comp-before img');
+// Unified function to initialize all comparison sliders
+function initSlider(container) {
+  if (!container) return;
+  
+  const slider = container.querySelector('.img-comp-slider');
+  const before = container.querySelector('.img-comp-before');
+  const after = container.querySelector('.img-comp-after');
+  const beforeImg = before.querySelector('img');
+  const afterImg = after.querySelector('img');
 
-  // Check if images have valid dimensions
-  if (!afterImg.naturalWidth || !afterImg.naturalHeight || !beforeImg.naturalWidth || !beforeImg.naturalHeight) {
-    console.error('Images have no dimensions!');
-    return;
+  // Check if images have loaded properly
+  if (beforeImg && afterImg) {
+    // Set initial slider position (center)
+    const initialPosition = 50;
+    slider.style.left = initialPosition + '%';
+    updateClipPath(before, initialPosition);
+    
+    // Add event listeners for slider interaction
+    slider.addEventListener('mousedown', startSliding);
+    slider.addEventListener('touchstart', startSliding, { passive: true });
+    
+    // Add click functionality to container
+    container.addEventListener('click', handleContainerClick);
   }
-
-  // Calculate natural aspect ratio of images
-  const imgWidth = afterImg.naturalWidth;
-  const imgHeight = afterImg.naturalHeight;
-  const aspectRatio = imgWidth / imgHeight;
-
-  // Calculate container dimensions based on aspect ratio
-  let containerWidth = container.offsetWidth;
-  let containerHeight = containerWidth / aspectRatio;
-
-  // If the calculated height exceeds max-height, adjust width accordingly
-  if (containerHeight > 400) {
-    containerHeight = 400;
-    containerWidth = containerHeight * aspectRatio;
-  }
-
-  // Set container height
-  container.style.height = containerHeight + 'px';
-
-  // Calculate the actual displayed dimensions of the images
-  let displayedWidth, displayedHeight, scale;
-
-  if (aspectRatio > container.offsetWidth / containerHeight) {
-    // Width constrained - image will be full width
-    displayedWidth = container.offsetWidth;
-    displayedHeight = displayedWidth / aspectRatio;
-    scale = displayedWidth / imgWidth;
-  } else {
-    // Height constrained - image will be full height
-    displayedHeight = containerHeight;
-    displayedWidth = displayedHeight * aspectRatio;
-    scale = displayedHeight / imgHeight;
-  }
-
-  // Calculate horizontal offset to center images
-  const horizontalOffset = (container.offsetWidth - displayedWidth) / 2;
-
-  // Style both images identically
-  afterImg.style.width = 'auto';
-  afterImg.style.height = 'auto';
-  afterImg.style.maxWidth = `${displayedWidth}px`;
-  afterImg.style.maxHeight = `${containerHeight}px`;
-  afterImg.style.left = `${horizontalOffset}px`;
-
-  beforeImg.style.width = 'auto';
-  beforeImg.style.height = 'auto';
-  beforeImg.style.maxWidth = `${displayedWidth}px`;
-  beforeImg.style.maxHeight = `${containerHeight}px`;
-  beforeImg.style.left = `${horizontalOffset}px`;
-
-  // Set initial slider position (center)
-  const initialPosition = container.offsetWidth / 2;
-  slider.style.left = initialPosition + 'px';
-
-  // Set initial clip for before image (show left half)
-  updateClipPath(initialPosition);
-
-  // Add event listeners for slider interaction
-  slider.addEventListener('mousedown', startSliding);
-  slider.addEventListener('touchstart', startSliding, { passive: true });
 
   function startSliding(e) {
     e.preventDefault();
-
+    
     // Add event listeners for moving and stopping
     document.addEventListener('mousemove', slide);
     document.addEventListener('touchmove', slide, { passive: false });
@@ -1187,40 +1142,35 @@ function initComparison() {
     document.addEventListener('touchend', stopSliding);
   }
 
+  function handleContainerClick(e) {
+    // Ignore clicks on the slider itself
+    if (e.target === slider || slider.contains(e.target)) return;
+    
+    const rect = container.getBoundingClientRect();
+    const position = ((e.clientX - rect.left) / rect.width) * 100;
+    
+    // Update slider position and clip path
+    slider.style.left = position + '%';
+    updateClipPath(before, position);
+  }
+
   function slide(e) {
-    let pos = getPosition(e);
-
-    // Constrain position within the valid image bounds
-    if (pos < horizontalOffset) pos = horizontalOffset;
-    if (pos > horizontalOffset + displayedWidth) pos = horizontalOffset + displayedWidth;
-
-    // Update slider position
-    slider.style.left = pos + 'px';
-
-    // Update clip path instead of width
-    updateClipPath(pos);
-  }
-
-  function updateClipPath(position) {
-    // Calculate how much of the right side to clip (as a percentage)
-    const rightClip = 100 - ((position / container.offsetWidth) * 100);
-
-    // Apply clip-path to show only the portion left of the slider
-    before.style.clipPath = `inset(0 ${rightClip}% 0 0)`;
-  }
-
-  function getPosition(e) {
-    const containerRect = container.getBoundingClientRect();
-    let clientX;
-
+    const rect = container.getBoundingClientRect();
+    let position;
+    
     // Handle both mouse and touch events
     if (e.type.includes('touch')) {
-      clientX = e.touches[0].clientX;
+      position = ((e.touches[0].clientX - rect.left) / rect.width) * 100;
     } else {
-      clientX = e.clientX;
+      position = ((e.clientX - rect.left) / rect.width) * 100;
     }
-
-    return clientX - containerRect.left;
+    
+    // Constrain position between 1% and 99%
+    position = Math.min(99, Math.max(1, position));
+    
+    // Update slider position and clip path
+    slider.style.left = position + '%';
+    updateClipPath(before, position);
   }
 
   function stopSliding() {
@@ -1231,6 +1181,30 @@ function initComparison() {
     document.removeEventListener('touchend', stopSliding);
   }
 }
+
+// Helper function to update clip path based on position percentage
+function updateClipPath(element, position) {
+  if (!element) return;
+  // Use percentage for clip-path to keep it consistent
+  element.style.clipPath = `inset(0 ${100 - position}% 0 0)`;
+}
+
+// Initialize all example sliders on page load
+document.addEventListener('DOMContentLoaded', function() {
+  initAllSliders();
+});
+
+// Function to initialize all sliders on the page
+function initAllSliders() {
+  const containers = document.querySelectorAll('.img-comp-container');
+  containers.forEach(container => {
+    initSlider(container);
+  });
+}
+
+// Replace the old functions with the new unified approach
+// The initComparison function is now replaced by initSlider
+// And initExampleSliders is now replaced by initAllSliders
 
 // URL input variables
 let videoUrlValue = '';
