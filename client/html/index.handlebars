@@ -148,7 +148,19 @@
                 </div>
                 <img id="sourceImagePreview" src="#" alt="Source image preview" style="max-width: 100%; height: auto; display: none; margin-top: 15px;">
                 <div id="sourceImageDetails" class="image-details bg-white"></div>
-              </div>
+                
+                <!-- Template Images Gallery -->
+                <div class="template-images-section">
+                  <h5 class="mt-3">{{#if translations.or_choose_template}}{{translations.or_choose_template}}{{else}}Or choose from templates:{{/if}}</h5>
+                  <div class="sample-images-carousel">
+                  {{#each (range 1 17)}}
+                    <div class="sample-image" data-img-src="/img/template/image-template-{{this}}.png">
+                    <img src="/img/template/image-template-{{this}}.png" alt="Template {{this}}">
+                    </div>
+                  {{/each}}
+                  </div>
+                </div>
+                </div>
 
               <!-- Face Image Section (Always visible) -->
               <div class="upload-section bg-light border shadow-sm w-100">
@@ -196,12 +208,11 @@
                 <div class="sample-images-section">
                   <h5 class="mt-3">{{#if translations.or_choose_sample}}{{translations.or_choose_sample}}{{else}}Or choose from samples:{{/if}}</h5>
                   <div class="sample-images-carousel">
-                    <div class="sample-image" data-img-src="/img/face-sample-1.png"><img src="/img/face-sample-1.png" alt="Sample 1"></div>
-                    <div class="sample-image" data-img-src="/img/face-sample-2.png"><img src="/img/face-sample-2.png" alt="Sample 2"></div>
-                    <div class="sample-image" data-img-src="/img/face-sample-3.png"><img src="/img/face-sample-3.png" alt="Sample 3"></div>
-                    <div class="sample-image" data-img-src="/img/face-sample-4.png"><img src="/img/face-sample-4.png" alt="Sample 4"></div>
-                    <div class="sample-image" data-img-src="/img/face-sample-5.png"><img src="/img/face-sample-5.png" alt="Sample 5"></div>
-                    <div class="sample-image" data-img-src="/img/face-sample-6.png"><img src="/img/face-sample-6.png" alt="Sample 6"></div>
+                    {{#each (range 1 11)}}
+                      <div class="sample-image" data-img-src="/img/sample/face-sample-{{this}}.png">
+                        <img src="/img/sample/face-sample-{{this}}.png" alt="Sample {{this}}">
+                      </div>
+                    {{/each}}
                   </div>
                 </div>
                 

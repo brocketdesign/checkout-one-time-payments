@@ -128,7 +128,7 @@ async function getSourceImageDetails(imageFile) {
     sourceImageDetails.innerHTML = `
       <h5>${translationsObj.image_details || 'Source Image Details'}</h5>
       <ul style="text-align: left;">
-        <li><strong>${translationsObj.name}:</strong> ${fileName}</li>
+        <li class="d-none"><strong>${translationsObj.name}:</strong> ${fileName}</li>
         <li><strong>${translationsObj.resolution}:</strong> ${width}x${height}</li>
         <li><strong>${translationsObj.size}:</strong> ${(fileSize / (1024 * 1024)).toFixed(2)} MB</li>
       </ul>
@@ -490,7 +490,7 @@ async function getImageDetails(imageFile) {
     imageDetails.innerHTML = `
       <h5>${translationsObj.image_details}</h5>
       <ul style="text-align: left;">
-        <li><strong>${translationsObj.name}:</strong> ${fileName}</li>
+        <li class="d-none"><strong>${translationsObj.name}:</strong> ${fileName}</li>
         <li><strong>${translationsObj.resolution}:</strong> ${width}x${height}</li>
         <li><strong>${translationsObj.size}:</strong> ${(fileSize / (1024 * 1024)).toFixed(2)} MB</li>
       </ul>
@@ -714,6 +714,18 @@ function setupSampleImageSelection() {
         const dataTransfer = new DataTransfer();
         dataTransfer.items.add(imageFile);
         
+        // For source image templates, set the file to sourceImageInput
+        if (filename.startsWith('image-template')) {
+          const sourceImageInput = document.getElementById('sourceImageInput');
+          sourceImageInput.files = dataTransfer.files;
+          
+          // Trigger change event to update image preview and details
+          const event = new Event('change', { bubbles: true });
+          sourceImageInput.dispatchEvent(event);
+          return;
+        }
+        
+        // For face samples (existing code)
         // Set the files property of the imageInput
         const imageInput = document.getElementById('imageInput');
         imageInput.files = dataTransfer.files; 
@@ -932,34 +944,6 @@ function removeSavedFace(faceId) {
   displaySavedFaces();
 }
 
-// Check for videoUrl in query parameters on page load
-document.addEventListener('DOMContentLoaded', () => {
-  checkAndHideSkipPayment();
-  displaySavedFaces(); // Display saved faces from localStorage
-  setupSampleImageSelection(); // Initialize sample image selection
-  
-  const urlParams = new URLSearchParams(window.location.search);
-  const videoUrl = urlParams.get('videoUrl');
-
-  if (videoUrl) {
-    // Load the video from the URL and set it as the videoInput
-    loadVideoFromUrl(videoUrl);
-  }
-});
-
-// Check for videoUrl in query parameters on page load
-document.addEventListener('DOMContentLoaded', () => {
-  checkAndHideSkipPayment();
-  setupSampleImageSelection(); // Initialize sample image selection
-  const urlParams = new URLSearchParams(window.location.search);
-  const videoUrl = urlParams.get('videoUrl');
-
-  if (videoUrl) {
-    // Load the video from the URL and set it as the videoInput
-    loadVideoFromUrl(videoUrl);
-  }
-});
-
 async function loadVideoFromUrl(videoUrl) {
 
   if (!url) {
@@ -1015,23 +999,6 @@ function checkAndHideSkipPayment() {
     }
   }
 }
-
-// Initialize on document load
-document.addEventListener('DOMContentLoaded', () => {
-  checkAndHideSkipPayment();
-  displaySavedFaces(); // Display saved faces on page load
-  setupSampleImageSelection();
-  
-  // Initialize with video mode active
-  isImageMode = false;
-  
-  const urlParams = new URLSearchParams(window.location.search);
-  const videoUrl = urlParams.get('videoUrl');
-
-  if (videoUrl) {
-    loadVideoFromUrl(videoUrl);
-  }
-});
 
 // Function to set up the image comparison slider
 function setupComparisonSlider(originalImageUrl, processedImageUrl) {
@@ -1488,7 +1455,7 @@ function getVideoDetailsFromElement(videoElement, url) {
     videoDetails.innerHTML = `
       <h5>${translationsObj.video_details}</h5>
       <ul style="text-align: left;">
-        <li><strong>${translationsObj.name}:</strong> ${fileName}</li>
+        <li class="d-none"><strong>${translationsObj.name}:</strong> ${fileName}</li>
         <li><strong>${translationsObj.duration}:</strong> ${duration.toFixed(2)} ${translationsObj.seconds}</li>
         <li><strong>${translationsObj.resolution}:</strong> ${width}x${height}</li>
         <li><strong>${translationsObj.estimated_frame_count}:</strong> ${frameCount}</li>
@@ -2114,6 +2081,7 @@ function setImageMode() {
   roundedSellingPrice = 0;
   formattedPrice = 'Free';
 }
+
 // Initialize with video mode active on page load
 document.addEventListener('DOMContentLoaded', () => {
   checkAndHideSkipPayment();
@@ -2121,7 +2089,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupSampleImageSelection();
   
   // Ensure we start in video mode
-  setVideoMode();
+  setImageMode();
   
   const urlParams = new URLSearchParams(window.location.search);
   const videoUrl = urlParams.get('videoUrl');

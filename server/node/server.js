@@ -164,6 +164,14 @@ const hbs = handlebars.create({
         default:
           return options.inverse(this);
       }
+    },
+    // Add the range helper function
+    range: function(start, end) {
+      const result = [];
+      for (let i = start; i < end; i++) {
+        result.push(i);
+      }
+      return result;
     }
   },
   defaultLayout: false // Disable default layout
