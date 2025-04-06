@@ -2214,7 +2214,8 @@ document.addEventListener('DOMContentLoaded', () => {
   setupSampleVideoSelection();
 
   // Ensure we start in video mode
-  setImageMode();
+  setVideoMode();
+  //setImageMode();
   
   const urlParams = new URLSearchParams(window.location.search);
   const videoUrl = urlParams.get('videoUrl');
