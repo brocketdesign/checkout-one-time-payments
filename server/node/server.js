@@ -525,7 +525,7 @@ app.post('/api/temp-upload', upload.fields([
 
     return res.json({ tempId });
   } catch (error) {
-    console.error('Temp upload error:', error);
+    console.log('Temp upload error:', error);
     return res.status(500).json({ error: error.message });
   }
 });

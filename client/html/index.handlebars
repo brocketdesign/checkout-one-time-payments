@@ -105,8 +105,21 @@
                   <p class="text-muted small">{{#if translations.click_frame_to_use}}{{translations.click_frame_to_use}}{{else}}Click on a frame to use for face swap{{/if}}</p>
                   <div id="videoFramesGallery" class="video-frames-carousel"></div>
                 </div>
-              </div>
 
+                <!-- Template Videos Gallery -->
+                <div class="template-videos-section">
+                  <h5 class="mt-3">{{#if translations.or_choose_video_template}}{{ translations.or_choose_video_template }}{{else}}Or choose from video templates:{{/if}}</h5>
+                  <div class="sample-videos-carousel">
+                    {{#each (range 1 10)}}
+                      <div class="sample-video" data-video-src="/img/template/video-template-{{this}}.mp4">
+                        <img class="video-thumbnail" src="/img/template/video-template-{{this}}-thumbnail.jpg" alt="Video template {{this}}">
+                      </div>
+                    {{/each}}
+                  </div>
+                </div>
+                
+              </div>
+              
               <!-- Image Source Section (Hidden by default) -->
               <div id="imageSourceSection" class="upload-section bg-light border shadow-sm mb-4 w-100" style="display: none;">
                 <h4 id="instruction_source_image" class="instruction">{{#if translations.instruction_source_image}}{{ translations.instruction_source_image }}{{else}}Upload source image{{/if}}</h4>

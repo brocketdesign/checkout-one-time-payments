@@ -684,8 +684,132 @@ function resetForm() {
   payButton.disabled = false; // Re-enable the pay button when form is reset
 }
 
+// Function to handle sample video selection
+function setupSampleVideoSelection() {
+  const sampleVideos = document.querySelectorAll('.sample-video');
+  const videoPreview = document.getElementById('videoPreview');
+  const videoDetails = document.getElementById('videoDetails');
+  const status = document.getElementById('status');
+  
+  sampleVideos.forEach(videoContainer => {
+    // Convert video elements to image thumbnails
+    const videoSrc = videoContainer.getAttribute('data-video-src');
+    const videoElement = videoContainer.querySelector('video');
+    
+    if (videoElement) {
+      // Create thumbnail image to replace video element
+      const thumbnailImg = document.createElement('img');
+      thumbnailImg.alt = 'Video thumbnail';
+      thumbnailImg.classList.add('video-thumbnail');
+      
+      // Generate thumbnail from the first frame of the video
+      const tempVideo = document.createElement('video');
+      tempVideo.src = videoSrc;
+      tempVideo.crossOrigin = 'anonymous';
+      tempVideo.preload = 'metadata';
+      tempVideo.muted = true;
+      
+      // Extract first frame when metadata is loaded
+      tempVideo.onloadedmetadata = function() {
+        tempVideo.currentTime = 0.1; // Seek to first frame (slightly offset to avoid black frame)
+      };
+      
+      tempVideo.onseeked = function() {
+        // Create canvas to capture the frame
+        const canvas = document.createElement('canvas');
+        canvas.width = tempVideo.videoWidth;
+        canvas.height = tempVideo.videoHeight;
+        const ctx = canvas.getContext('2d');
+        
+        // Draw video frame to canvas
+        ctx.drawImage(tempVideo, 0, 0, canvas.width, canvas.height);
+        
+        // Convert canvas to image data URL
+        thumbnailImg.src = canvas.toDataURL('image/jpeg');
+        
+        // Replace video element with thumbnail
+        videoContainer.innerHTML = '';
+        videoContainer.appendChild(thumbnailImg);
+      };
+      
+      // Start loading the video
+      tempVideo.load();
+    }
+        
+    // Add click handler to use this template video
+    videoContainer.addEventListener('click', async () => {
+      // Remove selected class from all samples
+      sampleVideos.forEach(sample => sample.classList.remove('selected'));
+      
+      // Add selected class to clicked sample
+      videoContainer.classList.add('selected');
+      
+      try {
+        // Get the video source path
+        const videoSrc = videoContainer.getAttribute('data-video-src');
+        
+        // Convert the relative path to an absolute URL
+        const absoluteVideoUrl = new URL(videoSrc, window.location.origin).href;
+        
+        // Set video URL
+        videoUrlValue = absoluteVideoUrl;
+        
+        // Update the UI
+        videoPreview.style.display = 'block';
+        videoPreview.src = videoSrc; // Keep using relative path for display
+        videoPreview.crossOrigin = 'anonymous';
+        videoDetails.style.display = 'block';
+        
+        // Fetch the video and create a file object
+        try {
+          const response = await fetch(videoSrc);
+          const blob = await response.blob();
+          const fileName = videoSrc.split('/').pop();
+          const videoFile = new File([blob], fileName, { type: 'video/mp4' });
+          
+          // Create a DataTransfer to set the files property
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(videoFile);
+          
+          // Set the file input with the video file
+          const videoInput = document.getElementById('videoInput');
+          videoInput.files = dataTransfer.files;
+          
+          // Clear videoUrlValue since we're using a file now
+          videoUrlValue = '';
+        } catch (fileError) {
+          console.warn('Could not create file object from video, will use URL instead:', fileError);
+        }
+        
+        // Get video details once metadata is loaded
+        videoPreview.onloadedmetadata = function() {
+          getVideoDetailsFromElement(videoPreview, videoSrc);
+          extractVideoFrames(videoSrc);
+        };
+        
+        // Show loading message
+        status.textContent = translationsObj.loading_video || 'Loading video template...';
+        status.classList.remove('hidden');
+        status.className = 'alert alert-info';
+        
+        // Clear the message after video is loaded
+        videoPreview.oncanplay = function() {
+          status.textContent = '';
+          status.className = 'hidden';
+        };
+        
+      } catch (error) {
+        console.error('Error selecting sample video:', error);
+        status.textContent = translationsObj.error_loading_video || 'Error loading sample video';
+        status.classList.remove('hidden');
+        status.className = 'alert alert-danger';
+      }
+    });
+  });
+}
+
 // Function to handle sample image selection
-function setupSampleImageSelection() {
+function setupSampleImageSelection() { 
   const sampleImages = document.querySelectorAll('.sample-image');
   const status = document.getElementById('status');
   
@@ -2087,7 +2211,8 @@ document.addEventListener('DOMContentLoaded', () => {
   checkAndHideSkipPayment();
   displaySavedFaces(); // Display saved faces on page load
   setupSampleImageSelection();
-  
+  setupSampleVideoSelection();
+
   // Ensure we start in video mode
   setImageMode();
   
