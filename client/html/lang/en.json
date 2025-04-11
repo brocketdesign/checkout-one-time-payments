@@ -137,6 +137,8 @@
   "instruction_source_image": "Upload source image",
   "upload_source_image": "Upload Source Image",
   "drop_source_image": "...or drop image here",
+  "paid_mode": "Time Sale !",
+  "paid_mode_description": "Video faceswap from 1$ only",
   "free_mode": "Free!",
   "free_mode_description": "Image to image face swap is 100% free",
   "please_upload_both_images": "Please upload both the source image and the face image.",

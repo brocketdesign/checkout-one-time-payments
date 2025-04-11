@@ -1350,6 +1350,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  startCountdown();
 });
 
 // Function to validate a URL
@@ -2315,4 +2317,43 @@ function updateSliderPosition(container, slider, before, position) {
   
   // Update clip path for before image
   before.style.clipPath = `inset(0 ${100 - constrainedPos}% 0 0)`;
+}
+
+function startCountdown() {
+  const countdownElements = document.querySelectorAll('.countdown-timer');
+  let storedEndTime = localStorage.getItem('countdownEndTime');
+  const now = Date.now();
+
+  if (!storedEndTime) {
+    storedEndTime = now + 30 * 60 * 1000;
+    localStorage.setItem('countdownEndTime', storedEndTime);
+  } else {
+    storedEndTime = parseInt(storedEndTime);
+  }
+
+  countdownElements.forEach(element => {
+    const id = element.id || `countdown-${Math.random().toString(36).substr(2, 9)}`;
+    element.id = id;
+
+    const interval = setInterval(() => updateCountdown(element, storedEndTime, interval), 10); // Update every 10ms
+    updateCountdown(element, storedEndTime, interval);
+  });
+}
+
+function updateCountdown(element, endTime, interval) {
+  const remaining = endTime - Date.now();
+
+  if (remaining <= 0) {
+    element.textContent = '00:00.00';
+    localStorage.removeItem('countdownEndTime');
+    clearInterval(interval);
+    loadPlanPage();
+    return;
+  }
+
+  const minutes = Math.floor(remaining / (60 * 1000));
+  const seconds = Math.floor((remaining % (60 * 1000)) / 1000);
+  const milliseconds = Math.floor((remaining % 1000) / 10); // Convert to two-digit milliseconds
+  element.textContent =
+    `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(2, '0')}`;
 }

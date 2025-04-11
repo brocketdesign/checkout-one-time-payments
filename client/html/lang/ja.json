@@ -225,6 +225,8 @@
   "instruction_source_image": "ソース画像をアップロード",
   "upload_source_image": "ソース画像をアップロード",
   "drop_source_image": "...または画像をここにドロップ",
+  "paid_mode": "タイムセール！",
+  "paid_mode_description": "ビデオの顔交換が100円から",
   "free_mode": "無料！",
   "free_mode_description": "画像から画像への顔交換は完全に無料です",
   "please_upload_both_images": "ソース画像と顔画像の両方をアップロードしてください。",

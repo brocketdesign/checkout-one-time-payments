@@ -27,8 +27,13 @@
   <body>
     {{> header translations=translations}}
     <!-- Free badge for image mode -->
-    <div id="freeModeBadgeTop" class="alert alert-success w-100 rounded-0" style="text-align: center;">
+    <div id="freeModeBadgeTop" class="alert alert-success w-100 rounded-0 d-none" style="text-align: center;">
       <strong>{{#if translations.free_mode}}{{ translations.free_mode }}{{else}}Free!{{/if}}</strong> {{#if translations.free_mode_description}}{{ translations.free_mode_description }}{{else}}Image to image face swap is 100% free{{/if}}
+    </div>
+    <!-- 1$/100¥ badge for video mode -->
+    <div id="paidModeBadgeTop" class="alert alert-danger w-100 rounded-0" style="text-align: center;">
+      <strong>{{#if translations.paid_mode}}{{ translations.paid_mode }}{{else}}1$ / 100¥{{/if}}</strong> {{#if translations.paid_mode_description}}{{ translations.paid_mode_description }}{{else}}Video to video face swap from 1${{/if}}
+      <p id="countdown-timer" class="countdown-timer mb-0 pb-0 fs-4 fw-bold text-dark"></p>
     </div>
     <div class="container mx-auto mt-5 bg-white text-dark">
       <div class="main" style="width: 100%;">
