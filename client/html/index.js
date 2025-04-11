@@ -2347,7 +2347,6 @@ function updateCountdown(element, endTime, interval) {
     element.textContent = '00:00.00';
     localStorage.removeItem('countdownEndTime');
     clearInterval(interval);
-    loadPlanPage();
     return;
   }
 
