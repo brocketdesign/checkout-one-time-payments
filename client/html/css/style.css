@@ -121,3 +121,6 @@ body{margin:0;font-family:Arial, sans-serif;background:linear-gradient(to bottom
     display: block;
     border-radius: 8px;
   }
+  .img-comp-container{
+    max-width: 100%;
+  }
