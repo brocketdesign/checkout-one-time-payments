@@ -1,0 +1,441 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dropzone@5.9.3/dist/min/dropzone.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js@9.0.1/public/assets/styles/choices.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nouislider@15.6.1/dist/nouislider.min.css">
+
+<style>
+    /* Modern styling for drag and drop area */
+    .custom-dropzone {
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+        background-color: #fafafa;
+        min-height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .custom-dropzone:hover, .custom-dropzone.hover {
+        border-color: #007bff;
+        background-color: rgba(0, 123, 255, 0.05);
+    }
+    
+    .custom-dropzone .upload-icon {
+        font-size: 2.5rem;
+        color: #6c757d;
+    }
+    
+    .custom-dropzone .upload-text {
+        margin-top: 0.5rem;
+        color: #6c757d;
+    }
+    
+    .preview-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #fafafa;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .form-switch .form-check-input {
+        width: 2.5em;
+    }
+    
+    /* Modern card styling */
+    .modern-card {
+        border-radius: 12px;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+        border: none;
+        overflow: hidden;
+    }
+    
+    /* Modern button styling */
+    .btn-modern {
+        border-radius: 6px;
+        padding: 10px 20px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-modern:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    /* Form elements styling */
+    .form-control, .form-select {
+        border-radius: 6px;
+        padding: 10px 12px;
+    }
+    
+    .noUi-connect {
+        background: #007bff;
+    }
+    
+    /* Sample gallery */
+    .sample-card {
+        border-radius: 8px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .sample-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+    
+    /* Accordion styling */
+    .accordion-button:not(.collapsed) {
+        background-color: rgba(0, 123, 255, 0.05);
+        color: #007bff;
+        box-shadow: none;
+    }
+    
+    .accordion-button:focus {
+        box-shadow: none;
+        border-color: rgba(0, 123, 255, 0.1);
+    }
+    
+    .accordion-item {
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, 0.125);
+        margin-bottom: 1rem;
+    }
+    
+    .accordion-item:last-of-type {
+        margin-bottom: 1.5rem;
+    }
+    
+    .accordion-body {
+        padding: 1rem 1.25rem;
+    }
+    
+    /* Custom accordion styles for fallback */
+    .accordion-button {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        padding: 1rem 1.25rem;
+        font-size: 1rem;
+        color: #212529;
+        text-align: left;
+        background-color: #fff;
+        border: 0;
+        border-radius: 0;
+        overflow-anchor: none;
+        transition: all 0.3s ease;
+    }
+    
+    .accordion-button::after {
+        flex-shrink: 0;
+        width: 1.25rem;
+        height: 1.25rem;
+        margin-left: auto;
+        content: "";
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23212529'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-size: 1.25rem;
+        transition: transform .3s ease-in-out;
+    }
+    
+    .accordion-button:not(.collapsed)::after {
+        transform: rotate(-180deg);
+    }
+    
+    .accordion-collapse {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s ease;
+    }
+    
+    .accordion-collapse.show {
+        max-height: 2000px; /* A large value to accommodate all content */
+    }
+</style>
+
+<body style="display: flex; flex-direction: column; min-height: 100vh; margin: 0;">
+    {{> sidebar}}
+    <div id="main-content" style="flex: 1 0 auto; display: flex; flex-direction: column;">
+        <!-- This empty div creates space for the content below the navbar -->
+        <div style="width: 100%; height: 60px;"></div>
+        
+        <div class="container-fluid mt-3">
+            {{> header}}
+            <div class="row">
+                <!-- Left Column: Controls -->
+                <div class="col-md-6">
+                    <div class="card modern-card">
+                        <div class="card-body p-4">
+                            <h3 class="i2v-title text-start fw-bold">{{t "image_to_video_title" "Image to Video"}}</h3>
+                            <hr class="my-4 text-secondary">
+                            <div class="mb-4">
+                                <label for="i2vModelSelect" class="form-label fw-medium">{{t "select_model" "Select Model"}}</label>
+                                <select id="i2vModelSelect" class="form-select mb-0">
+                                    <option value="kling-v1.6-i2v" selected>{{t "kling_model" "Kling v1.6 (Recommended)"}}</option>
+                                    <option value="wan-i2v">{{t "wanx_model" "WanX I2V"}}</option>
+                                </select>
+                                <div class="form-text text-muted">{{t "model_select_help_i2v" "Choose a model for video generation."}}</div>
+                            </div>
+                            
+                            <h5 class="card-title">{{t "upload_image_i2v" "Upload Image"}}</h5>
+                            
+                            <div id="i2vImageDropZone" class="custom-dropzone mb-4">
+                                <div id="i2vImageDetails" class="text-center">
+                                    <div class="upload-icon">
+                                        <i class="bi bi-cloud-arrow-up"></i>
+                                    </div>
+                                    <p class="upload-text">{{t "drag_drop_image_i2v" "Drag & drop an image here, or click to select"}}</p>
+                                    <button id="i2vImageUploadBtn" class="btn btn-outline-primary btn-sm mt-2 w-auto">{{t "select_image_btn" "Select Image"}}</button>
+                                    <div class="form-text text-muted small mt-2">
+                                        {{t "i2v_image_requirements" "Upload JPG/PNG/WEBP images up to 10MB, with a minimum width/height of 300px."}}
+                                    </div>
+                                </div>
+                                <input type="file" id="i2vImageInput" accept="image/jpeg,image/png,image/webp" class="d-none">
+                                <div id="i2vImagePreviewContainer" class="preview-container" style="display: none;">
+                                    <img id="i2vImagePreview" src="#" alt="{{t 'image_preview_alt' 'Image preview'}}" class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;"/>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="i2vPrompt" class="form-label fw-medium">{{t "prompt_optional" "Prompt (Optional)"}}</label>
+                                <textarea id="i2vPrompt" class="form-control" rows="3" maxlength="2000" placeholder="{{t 'i2v_prompt_placeholder' 'Describe what you want to create with this image...'}}"></textarea>
+                                <div class="d-flex justify-content-between mt-1">
+                                    <div class="form-text text-muted">{{t "prompt_help_i2v" "Describe the desired motion, scene, or story for your video."}}</div>
+                                    <div class="small text-muted"><span id="i2vPromptCharCount">0</span>/2000</div>
+                                </div>
+                            </div>
+
+                            
+                            <!-- Accordion for advanced options -->
+                            <div class="accordion" id="advancedOptionsAccordion">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header mt-0" id="advancedOptionsHeading">
+                                        <button class="accordion-button collapsed mt-0" type="button" data-bs-toggle="collapse" data-bs-target="#advancedOptionsCollapse" aria-expanded="false" aria-controls="advancedOptionsCollapse">
+                                            {{t "advanced_options" "Advanced Options"}}
+                                        </button>
+                                    </h2>
+                                    <div id="advancedOptionsCollapse" class="accordion-collapse collapse" aria-labelledby="advancedOptionsHeading" data-bs-parent="#advancedOptionsAccordion">
+                                        <div class="accordion-body bg-light">
+                                            <div class="mb-4">
+                                                <label for="i2vMode" class="form-label fw-medium">{{t "mode" "Mode"}}</label>
+                                                <select id="i2vMode" class="form-select">
+                                                    <option value="Standard" selected>{{t "standard_mode" "Standard (720p, faster)"}}</option>
+                                                    <option value="Professional">{{t "professional_mode" "Professional (1080p, higher quality)"}}</option>
+                                                </select>
+                                                <div class="form-text text-muted">{{t "mode_help_i2v" "Standard: faster 720p. Professional: higher quality 1080p."}}</div>
+                                            </div>
+                                            <div class="row mb-4">
+                                                <div class="col-md-12">
+                                                    <label for="i2vMotionIntensity" class="form-label fw-medium">{{t "motion_intensity" "Motion Intensity"}}</label>
+                                                    <div id="i2vMotionIntensitySlider" class="mt-2 mb-2"></div>
+                                                    <div class="d-flex justify-content-between">
+                                                        <span class="small text-muted">Subtle</span>
+                                                        <span class="small text-muted fw-medium"><span id="i2vMotionIntensityValue">127</span></span>
+                                                        <span class="small text-muted">Dynamic</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mb-4">
+                                                <label for="i2vNegativePrompt" class="form-label fw-medium">{{t "negative_prompt" "Negative Prompt (Optional)"}}</label>
+                                                <textarea id="i2vNegativePrompt" class="form-control" rows="2" maxlength="2000" placeholder="{{t 'i2v_negative_prompt_placeholder' 'Specify what to avoid in the video...'}}"></textarea>
+                                                <div class="d-flex justify-content-between mt-1">
+                                                    <div class="form-text text-muted">{{t "negative_prompt_help_i2v" "Describe elements to avoid (e.g. 'no text, no watermark')."}}</div>
+                                                    <div class="small text-muted"><span id="i2vNegativePromptCharCount">0</span>/2000</div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Model-specific options -->
+                                            <div id="i2vKlingOptions">
+                                                <div class="mb-4">
+                                                    <label for="i2vGuidanceScale" class="form-label fw-medium">{{t "guidance_scale" "Guidance Scale"}}</label>
+                                                    <div id="i2vGuidanceScaleSlider" class="mt-2 mb-2"></div>
+                                                    <div class="d-flex justify-content-between">
+                                                        <span class="small text-muted">Creative</span>
+                                                        <span class="small text-muted fw-medium"><span id="i2vGuidanceScaleValue">0.5</span></span>
+                                                        <span class="small text-muted">Precise</span>
+                                                    </div>
+                                                </div>
+                                                
+                                                
+                                                <div id="i2vEndImageContainer" class="mb-4 d-none">
+                                                    <div class="form-check form-switch mb-3">
+                                                        <input class="form-check-input" type="checkbox" role="switch" id="i2vAddEndFrame">
+                                                        <label class="form-check-label" for="i2vAddEndFrame">
+                                                            {{t "add_end_frame" "Add End Frame"}}
+                                                        </label>
+                                                    </div>
+                                                    
+                                                    <div id="endFrameSection" class="d-none">
+                                                        <label class="form-label fw-medium">{{t "end_image" "End Frame Image"}}</label>
+                                                        <div id="i2vEndImageDropZone" class="custom-dropzone" style="min-height: 150px;">
+                                                            <div class="text-center">
+                                                                <i class="bi bi-file-earmark-image upload-icon" style="font-size: 1.8rem;"></i>
+                                                                <p class="upload-text small mb-1">{{t "drag_drop_end_image" "Drag & drop end frame image"}}</p>
+                                                                <button id="i2vEndImageUploadBtn" class="btn btn-outline-secondary btn-sm">{{t "select_end_image_btn" "Select"}}</button>
+                                                            </div>
+                                                            <input type="file" id="i2vEndImageInput" accept="image/jpeg,image/png,image/webp" class="d-none">
+                                                            <div id="i2vEndImagePreviewContainer" class="preview-container" style="display: none;">
+                                                                <img id="i2vEndImagePreview" src="#" alt="End frame preview" class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-text text-muted mt-1">{{t "end_image_help_i2v" "Specify a target image for the last frame (Professional mode only)."}}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div id="i2vWanOptions" class="d-none">
+                                                <!-- Wan model options with modern styling -->
+                                                <div class="mb-4">
+                                                    <label for="i2vResolution" class="form-label fw-medium">{{t "resolution" "Resolution"}}</label>
+                                                    <select id="i2vResolution" class="form-select">
+                                                        <option value="720p" selected>{{t "720p" "720p (1280x720)"}}</option>
+                                                        <option value="480p">{{t "480p" "480p (832x480)"}}</option>
+                                                    </select>
+                                                    <div class="form-text text-muted">{{t "resolution_help_i2v" "Choose output video resolution."}}</div>
+                                                </div>
+                                                
+                                                <div class="mb-4">
+                                                    <label for="i2vSeed" class="form-label fw-medium">{{t "seed" "Seed (-1 for random)"}}</label>
+                                                    <input type="number" id="i2vSeed" class="form-control" min="-1" max="9999999999" value="-1">
+                                                    <div class="form-text text-muted">{{t "seed_help_i2v" "Set a random seed for reproducibility."}}</div>
+                                                </div>
+                                                
+                                                <div class="row mb-4">
+                                                    <div class="col-md-6 mb-3 mb-md-0">
+                                                        <label for="i2vSteps" class="form-label fw-medium">{{t "steps" "Steps"}}</label>
+                                                        <div id="i2vStepsSlider" class="mt-2 mb-2"></div>
+                                                        <div class="d-flex justify-content-between">
+                                                            <span class="small text-muted">Fast</span>
+                                                            <span class="small text-muted fw-medium"><span id="i2vStepsValue">30</span></span>
+                                                            <span class="small text-muted">Quality</span>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="col-md-6">
+                                                        <label for="i2vWanGuidanceScale" class="form-label fw-medium">{{t "wan_guidance_scale" "Guidance Scale"}}</label>
+                                                        <div id="i2vWanGuidanceScaleSlider" class="mt-2 mb-2"></div>
+                                                        <div class="d-flex justify-content-between">
+                                                            <span class="small text-muted">Creative</span>
+                                                            <span class="small text-muted fw-medium"><span id="i2vWanGuidanceScaleValue">5.0</span></span>
+                                                            <span class="small text-muted">Precise</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="mb-4">
+                                                    <label for="i2vFlowShift" class="form-label fw-medium">{{t "flow_shift" "Flow Shift (Motion Speed)"}}</label>
+                                                    <div id="i2vFlowShiftSlider" class="mt-2 mb-2"></div>
+                                                    <div class="d-flex justify-content-between">
+                                                        <span class="small text-muted">Slow</span>
+                                                        <span class="small text-muted fw-medium"><span id="i2vFlowShiftValue">5.0</span></span>
+                                                        <span class="small text-muted">Fast</span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="form-check form-switch mb-3">
+                                                    <input class="form-check-input" type="checkbox" role="switch" id="i2vFastMode">
+                                                    <label class="form-check-label" for="i2vFastMode">
+                                                        {{t "fast_mode" "Fast Mode"}}
+                                                    </label>
+                                                    <div class="form-text text-muted">{{t "fast_mode_help_i2v" "Faster but lower quality results."}}</div>
+                                                </div>
+                                                
+                                                <div class="form-check form-switch mb-4">
+                                                    <input class="form-check-input" type="checkbox" role="switch" id="i2vSafetyChecker" checked>
+                                                    <label class="form-check-label" for="i2vSafetyChecker">
+                                                        {{t "safety_checker" "Enable Safety Filter"}}
+                                                    </label>
+                                                    <div class="form-text text-muted">{{t "safety_checker_help_i2v" "Filter out inappropriate content."}}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Payment section -->
+                            <div class="card mb-4 bg-light border-0 rounded-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h5 class="card-title mb-0 fw-bold">{{t "payment_info" "Payment"}}</h5>
+                                        <span class="badge bg-primary rounded-pill px-3 py-2">$2.00</span>
+                                    </div>
+                                    <p class="card-text small">{{t "i2v_payment_description" "Image to video conversion cost is $2.00 per video."}}</p>
+                                    
+                                    <div id="i2vPaymentControls" class="d-flex align-items-center mt-2">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" role="switch" id="i2vSkipPayment" style="display: none;">
+                                        </div>
+                                        <span class="flex-grow-1 small text-muted" id="i2vPaymentStatus">
+                                            <i class="bi bi-info-circle-fill me-1"></i>
+                                            {{t "payment_required" "Payment required for video generation."}}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <script>
+                                // Only show skip payment checkbox on localhost
+                                if (window.location.hostname === 'localhost' || window.location.hostname.includes('192.168.')) {
+                                    document.getElementById('i2vSkipPayment').style.display = 'block';
+                                    document.getElementById('i2vSkipPayment').checked = true;
+                                    document.getElementById('i2vPaymentStatus').innerHTML = '<i class="bi bi-check-circle-fill text-success me-1"></i> {{t "payment_skipped_local" "Payment skipped in local environment."}}';
+                                }
+                            </script>
+
+                            <button id="generateImageToVideoButton" class="btn btn-primary w-100 btn-lg btn-modern">
+                                <i class="bi bi-magic me-2"></i>{{t "create_video_btn" "Create Video"}}
+                            </button>
+                            <div id="i2vStatus" class="mt-3"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Sample/Generated Video -->
+                <div class="col-md-6">
+                    <div class="card modern-card h-100">
+                        <div class="card-body p-4">
+                            <h5 class="card-title">{{t "output_video_title" "Output Video"}}</h5>
+                            <div id="i2vResultSection" class="text-center mb-4" style="display: none;">
+                                <video id="i2vGeneratedVideo" controls class="img-fluid rounded mb-3 shadow-sm" style="max-height: 450px; width: 100%;"></video>
+                                <a id="downloadVideoLink" href="#" class="btn btn-success btn-modern" download="generated_video.mp4" style="display:none;">
+                                    <i class="bi bi-download me-2"></i>{{t "download_video_btn" "Download Video"}}
+                                </a>
+                            </div>
+                            <div id="i2vSampleVideoPlaceholder" class="text-center p-5 bg-light rounded text-white mb-4" style="min-height: 350px; display: flex; align-items: center; justify-content: center;">
+                                <div>
+                                    <i class="bi bi-film text-secondary" style="font-size: 3rem; opacity: 0.5;"></i>
+                                    <h3 class="mt-3" style="opacity: 0.7;">{{t "video_placeholder_text" "Your generated video will appear here"}}</h3>
+                                </div>
+                            </div>
+                            <div>
+                                <h6 class="mb-3 fw-medium">{{t "sample_gallery_title" "Sample Gallery"}}</h6>
+                                <div class="row row-cols-2 g-3" id="i2vSampleGallery">
+                                    <!-- Sample gallery items will be injected here by JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{> footer}}
+        </div>
+    </div>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/dropzone@5.9.3/dist/min/dropzone.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/choices.js@9.0.1/public/assets/scripts/choices.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/nouislider@15.6.1/dist/nouislider.min.js"></script>
+<script src="/image-to-video.js"></script>

@@ -1,7 +1,7 @@
-<footer class="bg-light text-dark py-4">
+<footer class="text-dark py-4"></footer>
   <div class="container bg-transparent border-0 shadow-none w-100 mx-auto">
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-md-4">
         <h5>{{ translations.footer_links }}</h5>
         <ul class="list-unstyled">
           <li><a href="/{{language}}/#demo" class="text-dark">{{ translations.demo_heading }}</a></li>
@@ -22,17 +22,33 @@
     <hr class="bg-secondary">
     <div class="row">
       <div class="col-md-12 text-center">
+        <ul class="list-inline">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-globe"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+              <li>
+                <a class="dropdown-item" href="#" data-lang="en">
+            <span class="language-option"> English</span>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#" data-lang="ja">
+            <span class="language-option">日本語</span>
+                </a>
+              </li>
+            </ul>
+          </li>
+        </ul>
         <p>&copy; {{ currentYear }} {{translations.footer_company_name}}. {{translations.footer_rights_reserved}}</p>
       </div>
     </div>
   </div>
 </footer>
 
+<script src="../sidebar.js" defer></script>
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const currentYear = new Date().getFullYear();
-    document.querySelector('footer .container .row:last-child .col-md-12 p').innerHTML = `&copy; ${currentYear} {{translations.footer_company_name}}. {{translations.footer_rights_reserved}}`;
-  });
   document.addEventListener('DOMContentLoaded', function() {
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {

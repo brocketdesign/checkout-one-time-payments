@@ -20,7 +20,6 @@
 body {
   font-family: var(--body-font-family);
   font-size: 16px;
-  color: var(--body-color);
   -webkit-font-smoothing: antialiased;
 }
 h1,
@@ -48,7 +47,6 @@ h4 {
   display: flex;
   flex-direction: row;
   width: 100%;
-  max-width: 980px;
   padding: 24px;
   align-content: center;
   justify-content: center;
@@ -321,6 +319,7 @@ pre {
   padding-top: 12px;
 }
 
+
 /* Responsiveness */
 @media (max-width: 720px) {
   .sr-root {
@@ -469,7 +468,7 @@ pre {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  max-width: 400px;
+  width: 100% !important;
 }
 
 .container .pasha-image-stack {
@@ -503,6 +502,17 @@ input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+.form-select{
+  --bs-form-select-bg-img:none;
+  margin-bottom: 0;
+}
+.form-text.text-muted {
+padding-left: 15px;
+}
+.choices__inner {
+  border: none !important;
+  background-color: transparent !important;
 }
 
 /* Animated form */

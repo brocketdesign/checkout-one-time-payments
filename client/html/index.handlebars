@@ -16,279 +16,279 @@
     </script>
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="/css/normalize.css" />
-    <link rel="stylesheet" href="/css/global.css" />
-    <link rel="stylesheet" href="/css/style.css" />
     <script src="https://js.stripe.com/v3/"></script>
     <script>const translations = `{{{json translations}}}`;</script> 
     <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.0/dist/browser-image-compression.js"></script>
     <script src="/index.js" defer></script>
   </head>
 
-  <body>
-    {{> header translations=translations}}
-    <!-- Free badge for image mode -->
-    <div id="freeModeBadgeTop" class="alert alert-success w-100 rounded-0 d-none" style="text-align: center;">
-      <strong>{{#if translations.free_mode}}{{ translations.free_mode }}{{else}}Free!{{/if}}</strong> {{#if translations.free_mode_description}}{{ translations.free_mode_description }}{{else}}Image to image face swap is 100% free{{/if}}
-    </div>
-    <!-- 1$/100¥ badge for video mode -->
-    <div id="paidModeBadgeTop" class="alert alert-danger w-100 rounded-0" style="text-align: center;">
-      <strong>{{#if translations.paid_mode}}{{ translations.paid_mode }}{{else}}1$ / 100¥{{/if}}</strong> {{#if translations.paid_mode_description}}{{ translations.paid_mode_description }}{{else}}Video to video face swap from 1${{/if}}
-      <p id="countdown-timer" class="countdown-timer mb-0 pb-0 fs-4 fw-bold text-dark"></p>
-    </div>
-    <div class="container mx-auto mt-5 bg-white text-dark">
-      <div class="main" style="width: 100%;">
-        <section id="top" class="main-container">
-            <div style="display: flex; flex-direction: column;align-items: center;justify-content: center;">
-              <img src="/img/logo.png" alt="Logo" style="height: 50px; margin-right: 10px;">
-              <div>
-                <h1 id="title" >{{ translations.title }}</h1>
-                <h4 id="subtitle" class="subtitle mb-0">{{ translations.subtitle }}</h4>
-              </div>
-            </div>
+  <body style="display: flex; flex-direction: column; min-height: 100vh; margin: 0;">
+    {{> sidebar }}
+    <div id="main-content" style="flex: 1 0 auto; display: flex; flex-direction: column;">
+      {{> header translations=translations}}
 
-          <!-- Mode Selection Toggle -->
-            <div class="mode-toggle-container" style="margin: 20px auto; text-align: center;">
-              <div class="btn-group mode-toggle" role="group" aria-label="Choose mode">
-                <button type="button" class="btn btn-primary active" id="videoModeBtn">{{#if translations.video_mode}}{{ translations.video_mode }}{{else}}Video Mode{{/if}}</button>
-                <button type="button" class="btn btn-outline-primary position-relative" id="imageModeBtn">
-                {{#if translations.image_mode}}{{ translations.image_mode }}{{else}}Image Mode{{/if}}
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+      <!-- Free badge for image mode -->
+      <div id="freeModeBadgeTop" class="alert alert-success w-100 rounded-0 d-none" style="text-align: center;">
+        <strong>{{#if translations.free_mode}}{{ translations.free_mode }}{{else}}Free!{{/if}}</strong> {{#if translations.free_mode_description}}{{ translations.free_mode_description }}{{else}}Image to image face swap is 100% free{{/if}}
+      </div>
+      <!-- 1$/100¥ badge for video mode -->
+      <div id="paidModeBadgeTop" class="d-none alert alert-danger w-100 rounded-0" style="text-align: center;">
+        <strong>{{#if translations.paid_mode}}{{ translations.paid_mode }}{{else}}1$ / 100¥{{/if}}</strong> {{#if translations.paid_mode_description}}{{ translations.paid_mode_description }}{{else}}Video to video face swap from 1${{/if}}
+        <p id="countdown-timer" class="countdown-timer mb-0 pb-0 fs-4 fw-bold text-dark"></p>
+      </div>
+      <div class="container mx-auto bg-white text-dark">
+        <div class="main" style="width: 100%;">
+          <section id="top" class="main-container">
+              <div style="display: flex; flex-direction: column;align-items: center;justify-content: center;">
+                <div>
+                  <h1 id="title" class="mt-0" >{{ translations.title }}</h1>
+                  <h4 id="subtitle" class="subtitle mb-0">{{ translations.subtitle }}</h4>
+                </div>
+              </div>
+
+            <!-- Mode Selection Toggle -->
+              <div class="mode-toggle-container" style="margin: 20px auto; text-align: center;">
+                <div class="btn-group mode-toggle" role="group" aria-label="Choose mode">
+                  <button type="button" class="btn btn-primary active" id="videoModeBtn">{{#if translations.video_mode}}{{ translations.video_mode }}{{else}}Video Mode{{/if}}</button>
+                  <button type="button" class="btn btn-outline-primary position-relative" id="imageModeBtn">
+                  {{#if translations.image_mode}}{{ translations.image_mode }}{{else}}Image Mode{{/if}}
+                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+                    {{#if translations.free_mode}}{{ translations.free_mode }}{{else}}Free!{{/if}}
+                    <span class="visually-hidden">Free!</span>
+                  </span>
+                  </button>
+                </div>
+                <p class="mt-2 text-muted">{{#if translations.mode_description}}{{ translations.mode_description }}{{else}}Choose between video or image face swap{{/if}}</p>
+              </div>
+              
+              <div class="upload-container mx-auto mx-auto row">
+                <!-- Video Source Section (Visible by default) -->
+                <div id="videoSourceSection" class="upload-section border shadow-sm mb-4 col-12 col-sm-6">
+                  <h4 id="instruction_video" class="instruction">{{ translations.instruction_video }}</h4>
+                  
+                  <div class="upload-options">
+                    <!-- File Upload Option -->
+                    <div class="upload-option">
+                      <div class="upload-option-title">
+                        <i class="bi bi-file-earmark-arrow-up"></i> {{#if translations.upload_from_device}}{{translations.upload_from_device}}{{else}}Upload from your device{{/if}}
+                      </div>
+                      <div id="videoDropZone" class="drop-zone">
+                        <input
+                          type="file"
+                          id="videoInput"
+                          name="video_file"
+                          accept="video/*"
+                          style="display: none"
+                        />
+                        <button id="videoUploadBtn" class="upload-btn">
+                          <i class="bi bi-cloud-arrow-up me-2"></i>
+                          <span>{{#if translations.upload_video}}{{translations.upload_video}}{{else}}Upload Video{{/if}}</span>
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <!-- URL Input Option -->
+                    <div class="upload-option">
+                      <div class="upload-option-title">
+                        <i class="bi bi-link-45deg"></i> {{#if translations.load_from_url}}{{translations.load_from_url}}{{else}}Load from URL{{/if}}
+                      </div>
+                      <div class="input-group">
+                        <input type="text" id="videoUrlInput" class="form-control" placeholder="{{#if translations.video_url_placeholder}}{{translations.video_url_placeholder}}{{else}}Enter video URL{{/if}}">
+                        <button class="btn btn-outline-secondary" type="button" id="loadVideoUrlBtn">
+                          <i class="bi bi-box-arrow-in-down me-1"></i>
+                          {{#if translations.load_url}}{{translations.load_url}}{{else}}Load{{/if}}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <video id="videoPreview" width="100%" controls style="display: none;"></video>
+                  <div id="videoDetails" class="video-details bg-white"></div>
+                  
+                  <!-- Video Frames Gallery -->
+                  <div class="video-frames-section" style="display: none;">
+                    <h5 class="mt-3">{{#if translations.extracted_frames}}{{translations.extracted_frames}}{{else}}Extracted Frames:{{/if}}</h5>
+                    <p class="text-muted small">{{#if translations.click_frame_to_use}}{{translations.click_frame_to_use}}{{else}}Click on a frame to use for face swap{{/if}}</p>
+                    <div id="videoFramesGallery" class="video-frames-carousel"></div>
+                  </div>
+
+                  <!-- Template Videos Gallery -->
+                  <div class="template-videos-section">
+                    <h5 class="mt-3">{{#if translations.or_choose_video_template}}{{ translations.or_choose_video_template }}{{else}}Or choose from video templates:{{/if}}</h5>
+                    <div class="sample-videos-carousel">
+                      {{#each (range 1 10)}}
+                        <div class="sample-video" data-video-src="/img/template/video-template-{{this}}.mp4">
+                          <img class="video-thumbnail" src="/img/template/video-template-{{this}}-thumbnail.jpg" alt="Video template {{this}}">
+                        </div>
+                      {{/each}}
+                    </div>
+                  </div>
+                  
+                </div>
+                
+                <!-- Image Source Section (Hidden by default) -->
+                <div id="imageSourceSection" class="upload-section border shadow-sm mb-4 col-12 col-sm-6" style="display: none;">
+                  <h4 id="instruction_source_image" class="instruction">{{#if translations.instruction_source_image}}{{ translations.instruction_source_image }}{{else}}Upload source image{{/if}}</h4>
+                  
+                  <div class="upload-options">
+                    <!-- File Upload Option -->
+                    <div class="upload-option">
+                      <div class="upload-option-title">
+                        <i class="bi bi-file-earmark-image"></i> {{#if translations.upload_from_device}}{{translations.upload_from_device}}{{else}}Upload from your device{{/if}}
+                      </div>
+                      <div id="sourceImageDropZone" class="drop-zone">
+                        <input
+                          type="file"
+                          id="sourceImageInput"
+                          name="image_file"
+                          accept="image/*"
+                          style="display: none"
+                        />
+                        <button id="sourceImageUploadBtn" class="upload-btn">
+                          <i class="bi bi-image me-2"></i>
+                          <span>{{#if translations.upload_source_image}}{{ translations.upload_source_image }}{{else}}Upload Source Image{{/if}}</span>
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <!-- URL Input Option -->
+                    <div class="upload-option">
+                      <div class="upload-option-title">
+                        <i class="bi bi-link-45deg"></i> {{#if translations.load_from_url}}{{translations.load_from_url}}{{else}}Load from URL{{/if}}
+                      </div>
+                      <div class="input-group">
+                        <input type="text" id="sourceImageUrlInput" class="form-control" placeholder="{{#if translations.image_url_placeholder}}{{translations.image_url_placeholder}}{{else}}Enter image URL{{/if}}">
+                        <button class="btn btn-outline-secondary" type="button" id="loadSourceImageUrlBtn">
+                          <i class="bi bi-box-arrow-in-down me-1"></i>
+                          {{#if translations.load_url}}{{translations.load_url}}{{else}}Load{{/if}}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <img id="sourceImagePreview" src="#" alt="Source image preview" style="max-width: 100%; height: auto; display: none; margin-top: 15px;">
+                  <div id="sourceImageDetails" class="image-details bg-white"></div>
+                  
+                  <!-- Template Images Gallery -->
+                  <div class="template-images-section">
+                    <h5 class="mt-3">{{#if translations.or_choose_template}}{{translations.or_choose_template}}{{else}}Or choose from templates:{{/if}}</h5>
+                    <div class="sample-images-carousel">
+                    {{#each (range 1 17)}}
+                      <div class="sample-image" data-img-src="/img/template/image-template-{{this}}.png">
+                      <img src="/img/template/image-template-{{this}}.png" alt="Template {{this}}">
+                      </div>
+                    {{/each}}
+                    </div>
+                  </div>
+                  </div>
+
+                <!-- Face Image Section (Always visible) -->
+                <div class="upload-section border shadow-sm col-12 col-sm-6">
+                  <h4 id="instruction_image" class="instruction">{{ translations.instruction_image }}</h4>
+                  
+                  <div class="upload-options">
+                    <!-- File Upload Option -->
+                    <div class="upload-option">
+                      <div class="upload-option-title">
+                        <i class="bi bi-person-square"></i> {{#if translations.upload_from_device}}{{translations.upload_from_device}}{{else}}Upload from your device{{/if}}
+                      </div>
+                      <div id="imageDropZone" class="drop-zone">
+                        <input
+                          type="file"
+                          id="imageInput"
+                          name="face_image_file"
+                          accept="image/*"
+                          style="display: none"
+                        />
+                        <button id="imageUploadBtn" class="upload-btn">
+                          <i class="bi bi-person-square me-2"></i>
+                          <span>{{ translations.upload_photo }}</span>
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <!-- URL Input Option -->
+                    <div class="upload-option">
+                      <div class="upload-option-title">
+                        <i class="bi bi-link-45deg"></i> {{#if translations.load_from_url}}{{translations.load_from_url}}{{else}}Load from URL{{/if}}
+                      </div>
+                      <div class="input-group">
+                        <input type="text" id="faceImageUrlInput" class="form-control" placeholder="{{#if translations.face_image_url_placeholder}}{{translations.face_image_url_placeholder}}{{else}}Enter face image URL{{/if}}">
+                        <button class="btn btn-outline-secondary" type="button" id="loadFaceImageUrlBtn">
+                          <i class="bi bi-box-arrow-in-down me-1"></i>
+                          {{#if translations.load_url}}{{translations.load_url}}{{else}}Load{{/if}}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <img id="imagePreview" src="#" alt="Image preview" style="max-width: 100%; height: auto; display: none; margin-top: 15px;">
+                  <div id="imageDetails" class="image-details bg-white"></div>
+                  
+                  <!-- Sample Images Gallery -->
+                  <div class="sample-images-section">
+                    <h5 class="mt-3">{{#if translations.or_choose_sample}}{{translations.or_choose_sample}}{{else}}Or choose from samples:{{/if}}</h5>
+                    <div class="sample-images-carousel">
+                      {{#each (range 1 11)}}
+                        <div class="sample-image" data-img-src="/img/sample/face-sample-{{this}}.png">
+                          <img src="/img/sample/face-sample-{{this}}.png" alt="Sample {{this}}">
+                        </div>
+                      {{/each}}
+                    </div>
+                  </div>
+                  
+                  <!-- Saved Faces Gallery -->
+                  <div class="saved-faces-section" style="display: none;">
+                    <h5 class="mt-3">{{#if translations.your_saved_faces}}{{translations.your_saved_faces}}{{else}}Your saved faces:{{/if}}</h5>
+                    <div id="savedFacesGallery" class="sample-images-carousel"></div>
+                  </div>
+                </div>
+              </div>
+            <!-- Processing Section -->
+            <div class="payment-section"style="max-width: 80%; margin: 50px auto 0 auto;">
+              <input type="checkbox" id="skipPayment" name="skipPayment" checked />
+              <label for="skipPayment"><span>{{ translations.skip_payment }}</span></label>
+              <button id="payButton" class="btn btn-primary rounded d-block proceed-btn shadow border border-white position-relative">
+                <i class="bi bi-arrow-right-circle me-2"></i>
+                <span>{{ translations.proceed }}</span>
+                <span class="image-free-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success border border-white" style="display: none;">
                   {{#if translations.free_mode}}{{ translations.free_mode }}{{else}}Free!{{/if}}
                   <span class="visually-hidden">Free!</span>
                 </span>
-                </button>
-              </div>
-              <p class="mt-2 text-muted">{{#if translations.mode_description}}{{ translations.mode_description }}{{else}}Choose between video or image face swap{{/if}}</p>
+              </button>
             </div>
-            
-            <div class="upload-container mx-auto flex-column mx-auto col-12 col-sm-6">
-              <!-- Video Source Section (Visible by default) -->
-              <div id="videoSourceSection" class="upload-section bg-light border shadow-sm mb-4 w-100">
-                <h4 id="instruction_video" class="instruction">{{ translations.instruction_video }}</h4>
-                
-                <div class="upload-options">
-                  <!-- File Upload Option -->
-                  <div class="upload-option">
-                    <div class="upload-option-title">
-                      <i class="bi bi-file-earmark-arrow-up"></i> {{#if translations.upload_from_device}}{{translations.upload_from_device}}{{else}}Upload from your device{{/if}}
-                    </div>
-                    <div id="videoDropZone" class="drop-zone">
-                      <input
-                        type="file"
-                        id="videoInput"
-                        name="video_file"
-                        accept="video/*"
-                        style="display: none"
-                      />
-                      <button id="videoUploadBtn" class="upload-btn">
-                        <i class="bi bi-cloud-arrow-up me-2"></i>
-                        <span>{{#if translations.upload_video}}{{translations.upload_video}}{{else}}Upload Video{{/if}}</span>
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <!-- URL Input Option -->
-                  <div class="upload-option">
-                    <div class="upload-option-title">
-                      <i class="bi bi-link-45deg"></i> {{#if translations.load_from_url}}{{translations.load_from_url}}{{else}}Load from URL{{/if}}
-                    </div>
-                    <div class="input-group">
-                      <input type="text" id="videoUrlInput" class="form-control" placeholder="{{#if translations.video_url_placeholder}}{{translations.video_url_placeholder}}{{else}}Enter video URL{{/if}}">
-                      <button class="btn btn-outline-secondary" type="button" id="loadVideoUrlBtn">
-                        <i class="bi bi-box-arrow-in-down me-1"></i>
-                        {{#if translations.load_url}}{{translations.load_url}}{{else}}Load{{/if}}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <video id="videoPreview" width="100%" controls style="display: none;"></video>
-                <div id="videoDetails" class="video-details bg-white"></div>
-                
-                <!-- Video Frames Gallery -->
-                <div class="video-frames-section" style="display: none;">
-                  <h5 class="mt-3">{{#if translations.extracted_frames}}{{translations.extracted_frames}}{{else}}Extracted Frames:{{/if}}</h5>
-                  <p class="text-muted small">{{#if translations.click_frame_to_use}}{{translations.click_frame_to_use}}{{else}}Click on a frame to use for face swap{{/if}}</p>
-                  <div id="videoFramesGallery" class="video-frames-carousel"></div>
-                </div>
 
-                <!-- Template Videos Gallery -->
-                <div class="template-videos-section">
-                  <h5 class="mt-3">{{#if translations.or_choose_video_template}}{{ translations.or_choose_video_template }}{{else}}Or choose from video templates:{{/if}}</h5>
-                  <div class="sample-videos-carousel">
-                    {{#each (range 1 10)}}
-                      <div class="sample-video" data-video-src="/img/template/video-template-{{this}}.mp4">
-                        <img class="video-thumbnail" src="/img/template/video-template-{{this}}-thumbnail.jpg" alt="Video template {{this}}">
-                      </div>
-                    {{/each}}
-                  </div>
-                </div>
-                
-              </div>
-              
-              <!-- Image Source Section (Hidden by default) -->
-              <div id="imageSourceSection" class="upload-section bg-light border shadow-sm mb-4 w-100" style="display: none;">
-                <h4 id="instruction_source_image" class="instruction">{{#if translations.instruction_source_image}}{{ translations.instruction_source_image }}{{else}}Upload source image{{/if}}</h4>
-                
-                <div class="upload-options">
-                  <!-- File Upload Option -->
-                  <div class="upload-option">
-                    <div class="upload-option-title">
-                      <i class="bi bi-file-earmark-image"></i> {{#if translations.upload_from_device}}{{translations.upload_from_device}}{{else}}Upload from your device{{/if}}
-                    </div>
-                    <div id="sourceImageDropZone" class="drop-zone">
-                      <input
-                        type="file"
-                        id="sourceImageInput"
-                        name="image_file"
-                        accept="image/*"
-                        style="display: none"
-                      />
-                      <button id="sourceImageUploadBtn" class="upload-btn">
-                        <i class="bi bi-image me-2"></i>
-                        <span>{{#if translations.upload_source_image}}{{ translations.upload_source_image }}{{else}}Upload Source Image{{/if}}</span>
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <!-- URL Input Option -->
-                  <div class="upload-option">
-                    <div class="upload-option-title">
-                      <i class="bi bi-link-45deg"></i> {{#if translations.load_from_url}}{{translations.load_from_url}}{{else}}Load from URL{{/if}}
-                    </div>
-                    <div class="input-group">
-                      <input type="text" id="sourceImageUrlInput" class="form-control" placeholder="{{#if translations.image_url_placeholder}}{{translations.image_url_placeholder}}{{else}}Enter image URL{{/if}}">
-                      <button class="btn btn-outline-secondary" type="button" id="loadSourceImageUrlBtn">
-                        <i class="bi bi-box-arrow-in-down me-1"></i>
-                        {{#if translations.load_url}}{{translations.load_url}}{{else}}Load{{/if}}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <img id="sourceImagePreview" src="#" alt="Source image preview" style="max-width: 100%; height: auto; display: none; margin-top: 15px;">
-                <div id="sourceImageDetails" class="image-details bg-white"></div>
-                
-                <!-- Template Images Gallery -->
-                <div class="template-images-section">
-                  <h5 class="mt-3">{{#if translations.or_choose_template}}{{translations.or_choose_template}}{{else}}Or choose from templates:{{/if}}</h5>
-                  <div class="sample-images-carousel">
-                  {{#each (range 1 17)}}
-                    <div class="sample-image" data-img-src="/img/template/image-template-{{this}}.png">
-                    <img src="/img/template/image-template-{{this}}.png" alt="Template {{this}}">
-                    </div>
-                  {{/each}}
-                  </div>
-                </div>
-                </div>
+            <script>
+              if (window.location.hostname !== 'localhost') {
+                document.getElementById('skipPayment').style.display = 'none';
+                document.querySelector('label[for="skipPayment"]').style.display = 'none';
+              }
+            </script>
 
-              <!-- Face Image Section (Always visible) -->
-              <div class="upload-section bg-light border shadow-sm w-100">
-                <h4 id="instruction_image" class="instruction">{{ translations.instruction_image }}</h4>
-                
-                <div class="upload-options">
-                  <!-- File Upload Option -->
-                  <div class="upload-option">
-                    <div class="upload-option-title">
-                      <i class="bi bi-person-square"></i> {{#if translations.upload_from_device}}{{translations.upload_from_device}}{{else}}Upload from your device{{/if}}
-                    </div>
-                    <div id="imageDropZone" class="drop-zone">
-                      <input
-                        type="file"
-                        id="imageInput"
-                        name="face_image_file"
-                        accept="image/*"
-                        style="display: none"
-                      />
-                      <button id="imageUploadBtn" class="upload-btn">
-                        <i class="bi bi-person-square me-2"></i>
-                        <span>{{ translations.upload_photo }}</span>
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <!-- URL Input Option -->
-                  <div class="upload-option">
-                    <div class="upload-option-title">
-                      <i class="bi bi-link-45deg"></i> {{#if translations.load_from_url}}{{translations.load_from_url}}{{else}}Load from URL{{/if}}
-                    </div>
-                    <div class="input-group">
-                      <input type="text" id="faceImageUrlInput" class="form-control" placeholder="{{#if translations.face_image_url_placeholder}}{{translations.face_image_url_placeholder}}{{else}}Enter face image URL{{/if}}">
-                      <button class="btn btn-outline-secondary" type="button" id="loadFaceImageUrlBtn">
-                        <i class="bi bi-box-arrow-in-down me-1"></i>
-                        {{#if translations.load_url}}{{translations.load_url}}{{else}}Load{{/if}}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <img id="imagePreview" src="#" alt="Image preview" style="max-width: 100%; height: auto; display: none; margin-top: 15px;">
-                <div id="imageDetails" class="image-details bg-white"></div>
-                
-                <!-- Sample Images Gallery -->
-                <div class="sample-images-section">
-                  <h5 class="mt-3">{{#if translations.or_choose_sample}}{{translations.or_choose_sample}}{{else}}Or choose from samples:{{/if}}</h5>
-                  <div class="sample-images-carousel">
-                    {{#each (range 1 11)}}
-                      <div class="sample-image" data-img-src="/img/sample/face-sample-{{this}}.png">
-                        <img src="/img/sample/face-sample-{{this}}.png" alt="Sample {{this}}">
-                      </div>
-                    {{/each}}
-                  </div>
-                </div>
-                
-                <!-- Saved Faces Gallery -->
-                <div class="saved-faces-section" style="display: none;">
-                  <h5 class="mt-3">{{#if translations.your_saved_faces}}{{translations.your_saved_faces}}{{else}}Your saved faces:{{/if}}</h5>
-                  <div id="savedFacesGallery" class="sample-images-carousel"></div>
-                </div>
-              </div>
-            </div>
-          <!-- Processing Section -->
-          <div class="payment-section"style="max-width: 80%; margin: 50px auto 0 auto;">
-            <input type="checkbox" id="skipPayment" name="skipPayment" checked />
-            <label for="skipPayment"><span>{{ translations.skip_payment }}</span></label>
-            <button id="payButton" class="btn btn-primary rounded d-block proceed-btn shadow border border-white position-relative">
-              <i class="bi bi-arrow-right-circle me-2"></i>
-              <span>{{ translations.proceed }}</span>
-              <span class="image-free-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success border border-white" style="display: none;">
-                {{#if translations.free_mode}}{{ translations.free_mode }}{{else}}Free!{{/if}}
-                <span class="visually-hidden">Free!</span>
-              </span>
-            </button>
+            <div id="status" class="status hidden"></div>
+          </section>
+       </div>
+      </div>
+      {{> features translations=translations}}
+      <!-- Image Modal -->
+      <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+          <h5 class="modal-title" id="imageModalLabel">{{ translations.processed_image }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-
-          <script>
-            if (window.location.hostname !== 'localhost') {
-              document.getElementById('skipPayment').style.display = 'none';
-              document.querySelector('label[for="skipPayment"]').style.display = 'none';
-            }
-          </script>
-
-          <div id="status" class="status hidden"></div>
-        </section>
-     </div>
-    </div>
-    {{> features translations=translations}}
-    <!-- Image Modal -->
-    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-        <h5 class="modal-title" id="imageModalLabel">{{ translations.processed_image }}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <div class="modal-body">
+          <img id="processedImage" src="" alt="Processed Image" style="width: 100%; max-height: 400px; object-fit: contain;display:none">
+          <div id="imageComparisonContainer" class="mb-3"></div>
+          </div>
+          <div class="modal-footer">
+            <a id="downloadLink" href="#" class="btn btn-primary" download="processed_image.jpg">
+              <i class="bi bi-download me-2"></i>
+              {{ translations.download }}
+            </a>
+          </div>
         </div>
-        <div class="modal-body">
-        <img id="processedImage" src="" alt="Processed Image" style="width: 100%; max-height: 400px; object-fit: contain;display:none">
-        <div id="imageComparisonContainer" class="mb-3"></div>
-        </div>
-        <div class="modal-footer">
-          <a id="downloadLink" href="#" class="btn btn-primary" download="processed_image.jpg">
-            <i class="bi bi-download me-2"></i>
-            {{ translations.download }}
-          </a>
         </div>
       </div>
-      </div>
+      {{> footer translations=translations}}
     </div>
-    </div>
-    {{> footer translations=translations}}
   </body>
 </html>

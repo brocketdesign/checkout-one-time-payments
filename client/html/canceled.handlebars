@@ -17,11 +17,14 @@
     {{> header translations=translations}}
     <div class="sr-root">
       <div class="sr-main">
-        <section class="container">
-          <h1>{{ translations.payment_canceled }}</h1>
-          <p>{{ translations.payment_canceled_message }}</p>
-          <a href="/">{{ translations.return_to_upload }}</a>
-        </section>
+        {{> sidebar}}
+        <div id="main-content">
+          <section class="container">
+            <h1>{{ translations.payment_canceled }}</h1>
+            <p>{{ translations.payment_canceled_message }}</p>
+            <a href="/">{{ translations.return_to_upload }}</a>
+          </section>
+        </div>
       </div>
     </div>
     {{> footer translations=translations}}

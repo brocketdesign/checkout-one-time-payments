@@ -2215,15 +2215,24 @@ document.addEventListener('DOMContentLoaded', () => {
   setupSampleImageSelection();
   setupSampleVideoSelection();
 
-  // Ensure we start in video mode
-  setVideoMode();
-  //setImageMode();
-  
+  // Check URL parameters for mode and video URL
   const urlParams = new URLSearchParams(window.location.search);
-  const videoUrl = urlParams.get('videoUrl');
-
-  if (videoUrl) {
+  const mode = urlParams.get('mode');
+  if (mode === 'image') {
+    setImageMode();
+  }
+  if (mode === 'video') {
+    setVideoMode();
+  }
+  if (!mode){
+    setVideoMode();
+  }
+  if (mode === 'video' && urlParams.has('videoUrl')) {
+    videoUrlValue = urlParams.get('videoUrl');
     loadVideoFromUrl(videoUrl);
+  }
+  if (mode === 'image' && urlParams.has('faceImageUrl')) {
+    faceImageUrlValue = urlParams.get('faceImageUrl');
   }
 });
 

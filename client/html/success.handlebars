@@ -24,7 +24,8 @@
   <body>
     {{> header translations=translations}}
     <div class="sr-root">
-      <div class="sr-main">
+      {{> sidebar}}
+      <div id="main-content">
         <section class="container mx-auto">
           <h1>{{ translations.processing_your_video }}</h1>
           <div id="status-message" class="processing">{{ translations.retrieving_upload }}</div>
@@ -64,8 +65,8 @@
             <pre id="debug-output"></pre>
           </div>
         </section>
+        {{> footer translations=translations}}
       </div>
     </div>
-    {{> footer translations=translations}}
   </body>
 </html>

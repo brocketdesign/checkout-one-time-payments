@@ -11,12 +11,21 @@ const { createHash } = require('crypto');
 const { v4: uuidv4 } = require('uuid');
 const handlebars = require('express-handlebars'); // Require Handlebars
 const cookieParser = require('cookie-parser'); // Add cookie-parser
+const imageToVideoRouter = require('./image-to-video-api'); // Import the image-to-video API router
 
 // Copy the .env.example in the root into a .env file in this folder
 require('dotenv').config({ path: './.env' });
 
 // Ensure environment variables are set.
 checkEnv();
+
+// Set STATIC_DIR to default if not set
+if (!process.env.STATIC_DIR) {
+  process.env.STATIC_DIR = resolve(__dirname, '../../client/html');
+  console.log('[server] STATIC_DIR not set, defaulting to:', process.env.STATIC_DIR);
+} else {
+  console.log('[server] STATIC_DIR:', process.env.STATIC_DIR);
+}
 
 // Initialize S3 client
 const s3 = new S3Client({
@@ -55,6 +64,8 @@ app.use((req, res, next) => {
 });
 
 app.use(express.static(process.env.STATIC_DIR));
+// Serve uploaded files statically (for development purposes only)
+app.use('/uploads', express.static(resolve(__dirname, 'uploads')));
 app.use(express.urlencoded({ extended: true }));
 app.use(
   express.json({
@@ -70,6 +81,9 @@ app.use(
 
 // Add cookie-parser middleware
 app.use(cookieParser());
+
+// Use the image-to-video API router
+app.use('/api', imageToVideoRouter);
 
 // S3 Upload Helper Functions
 const uploadToS3 = async (buffer, hash, filename) => {
@@ -165,6 +179,15 @@ const hbs = handlebars.create({
           return options.inverse(this);
       }
     },
+    // Translation helper
+    t: function(key, defaultValue) {
+      // 'this' contains the template context
+      const translations = this && this.data && this.data.root && this.data.root.translations;
+      if (translations && translations[key]) {
+        return translations[key];
+      }
+      return defaultValue || key;
+    },
     // Add the range helper function
     range: function(start, end) {
       const result = [];
@@ -182,6 +205,48 @@ hbs.handlebars.registerHelper('json', function(context) {
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 app.set('views', process.env.STATIC_DIR);
+
+// Add route for ai-tools page
+app.get(['/ai-tools', '/:lang/ai-tools'], (req, res) => {
+  const path = 'ai-tools'; // This will now correctly look for ai-tools.handlebars
+
+  // Determine language from URL parameter or headers, default to 'en'
+  let language = req.params.lang || (req.headers['accept-language']?.startsWith('ja') ? 'ja' : 'en');
+  if (language !== 'ja' && language !== 'en') {
+    language = 'en'; // Default to English if the language is not supported
+  }
+
+  // Set the preferred language cookie if not already set by the main route
+  if (!req.cookies?.preferredLanguage) {
+    res.cookie('preferredLanguage', language, { maxAge: 365 * 24 * 60 * 60 * 1000, httpOnly: false });
+    console.log(`[ai-tools] Set preferredLanguage cookie to: ${language}`);
+  }
+
+  // Load translation file
+  const translationPath = resolve(`${process.env.STATIC_DIR}/lang/${language}.json`);
+  let translations = {};
+  try {
+    const translationFile = fs.readFileSync(translationPath, 'utf-8');
+    translations = JSON.parse(translationFile);
+    console.log(`[ai-tools] Loaded translations for language: ${language}`);
+  } catch (error) {
+    console.error(`[ai-tools] Error loading translations for ${language}:`, error);
+    // Fallback to English translations if specific language file not found or fails to load
+    try {
+      const fallbackTranslationPath = resolve(`${process.env.STATIC_DIR}/lang/en.json`);
+      const fallbackTranslationFile = fs.readFileSync(fallbackTranslationPath, 'utf-8');
+      translations = JSON.parse(fallbackTranslationFile);
+      console.log('[ai-tools] Loaded fallback English translations');
+    } catch (fallbackError) {
+      console.error('[ai-tools] Error loading fallback English translations:', fallbackError);
+    }
+  }
+
+  // Send the translation data and language to the client
+  console.log(`[ai-tools] Rendering page with language: ${language}`);
+  res.render(path, { translations, language });
+});
+
 
 
 app.get(['/success', '/:lang/success'], (req, res) => {
@@ -202,6 +267,9 @@ app.get(['/success', '/:lang/success'], (req, res) => {
   } catch (error) {
     console.error(`Error loading translations from ${translationPath}:`, error);
   }
+
+  // Get current year for footer
+  const currentYear = new Date().getFullYear();
 
   // Send the translation data to the client
   res.render(path, { 
@@ -255,6 +323,37 @@ app.get(['/history', '/:lang/history'], (req, res) => {
   
   // Render the history page with translations
   res.render(path, { translations, language });
+});
+
+// Add route for image-to-video page
+app.get(['/image-to-video', '/:lang/image-to-video'], (req, res) => {
+  const path = 'image-to-video';
+
+  // Determine language from cookie, URL parameter, or headers, default to 'en'
+  let language = req.cookies?.preferredLanguage || req.params.lang || (req.headers['accept-language']?.startsWith('ja') ? 'ja' : 'en');
+  if (language !== 'ja' && language !== 'en') {
+    language = 'en'; // Default to English if the language is not supported
+  }
+
+  // Load translation file
+  const translationPath = resolve(`${process.env.STATIC_DIR}/lang/${language}.json`);
+  let translations = {};
+  try {
+    const translationFile = fs.readFileSync(translationPath, 'utf-8');
+    translations = JSON.parse(translationFile);
+  } catch (error) {
+    console.error('Error loading translations:', error);
+  }
+  
+  // Render the image-to-video page with translations and flag to mark this as the current page
+  res.render(path, { translations, language, isImageToVideoPage: true }, (err, html) => {
+    if (err) {
+      console.error('Error rendering image-to-video template:', err);
+      // Show a simple error page instead of redirecting
+      return res.status(500).send(`<h1>Template Error</h1><pre>${err.message}</pre>`);
+    }
+    res.send(html);
+  });
 });
 
 app.get(['/terms', '/:lang/terms'], (req, res) => {
@@ -360,33 +459,6 @@ app.get(['/contact', '/:lang/contact'], (req, res) => {
   // Render the contact page with translations
   res.render(path, { translations, language, currentYear });
 });
-
-app.get(['/', '/:lang/'], (req, res) => {
-  const path = 'index';
-
-  // Determine language from URL parameter or headers, default to 'en'
-  let language = req.params.lang || (req.headers['accept-language']?.startsWith('ja') ? 'ja' : 'en');
-  if (language !== 'ja' && language !== 'en') {
-    language = 'en'; // Default to English if the language is not supported
-  }
-
-  // Set the preferred language cookie
-  res.cookie('preferredLanguage', language, { maxAge: 365 * 24 * 60 * 60 * 1000, httpOnly: false }); // Expires in 1 year
-
-  // Load translation file
-  const translationPath = resolve(`${process.env.STATIC_DIR}/lang/${language}.json`);
-  let translations = {};
-  try {
-    const translationFile = fs.readFileSync(translationPath, 'utf-8');
-    translations = JSON.parse(translationFile);
-  } catch (error) {
-    console.error('Error loading translations:', error);
-  }
-
-  // Send the translation data to the client
-  res.render(path, { translations, language });
-});
-
 
 app.post('/api/create-checkout-session', async (req, res) => {
   try {
@@ -810,6 +882,243 @@ app.post('/api/temp-upload-from-url', async (req, res) => {
   }
 });
 
+// API endpoint for image-to-video creation
+app.post('/api/image-to-video', upload.single('image_file'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file provided' });
+    }
+
+    // Basic validation for params
+    const modelName = req.body.model_name || 'kling-v1.6-i2v';
+    const prompt = req.body.prompt || '';
+    const videoLengthSeconds = parseInt(req.body.video_length_seconds || '5', 10);
+    const motionBucketId = parseInt(req.body.motion_bucket_id || '127', 10);
+    
+    // Optional parameters with defaults
+    const cfgScale = parseFloat(req.body.cfg_scale || '3.5');
+    const fps = parseInt(req.body.fps || '24', 10);
+    const negativePrompt = req.body.negative_prompt || '';
+    
+    // Convert the image file to base64
+    const imageBase64 = imageToBase64(req.file.buffer);
+    
+    // Different API endpoints and parameters based on the selected model
+    let apiUrl, requestBody;
+    
+    if (modelName === 'kling-v1.6-i2v') {
+      apiUrl = 'https://api.novita.ai/v3/async/kling-v1.6-i2v';
+      requestBody = {
+        request: {
+          image_base64: imageBase64,
+          prompt: prompt,
+          motion_bucket_id: motionBucketId,
+          num_frames: videoLengthSeconds * fps, // Calculate frames from seconds and fps
+          fps: fps,
+          negative_prompt: negativePrompt,
+          guidance_scale: cfgScale,
+          seed: Math.floor(Math.random() * 2147483647) // Random seed
+        },
+        extra: {
+          response_video_type: 'mp4'
+        }
+      };
+    } else if (modelName === 'wan-i2v') {
+      apiUrl = 'https://api.novita.ai/v3/async/wan-i2v';
+      requestBody = {
+        request: {
+          image_base64: imageBase64,
+          prompt: prompt,
+          video_length_in_seconds: videoLengthSeconds,
+          motion_scale: motionBucketId / 100, // Convert to 0-2.55 range
+          guidance_scale: cfgScale,
+          seed: Math.floor(Math.random() * 2147483647) // Random seed
+        },
+        extra: {
+          response_video_type: 'mp4'
+        }
+      };
+    } else {
+      return res.status(400).json({ error: 'Unsupported model' });
+    }
+    
+    // Log the request (excluding the base64 image for brevity)
+    const logRequest = { ...requestBody };
+    if (logRequest.request && logRequest.request.image_base64) {
+      logRequest.request.image_base64 = `[base64 data length: ${imageBase64.length}]`;
+    }
+    console.log(`Making I2V request to ${apiUrl}:`, JSON.stringify(logRequest, null, 2));
+    
+    // Make API request to Novita
+    const response = await axios.post(
+      apiUrl, 
+      requestBody,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.NOVITA_API_KEY}`
+        },
+        timeout: 10000,
+      }
+    );
+
+    // Extract task_id from the response
+    const task_id = response.data.task_id;
+    
+    console.log('I2V API Response:', JSON.stringify(response.data, null, 2));
+    res.json({ task_id });
+
+  } catch (error) {
+    console.error('I2V API Error:', error);
+
+    if (error.response) {
+      // API returned an error
+      console.error('API Error Response:', error.response.data);
+      return res.status(error.response.status || 500).json({ 
+        error: error.response.data?.message || error.response.data?.error || 'Error starting video generation' 
+      });
+    } else if (error.request) {
+      // No response received
+      return res.status(504).json({ error: 'No response from video generation API. Please try again later.' });
+    } else {
+      // Request configuration error or other issues
+      return res.status(500).json({ error: error.message || 'Failed to start video generation' });
+    }
+  }
+});
+
+// API endpoint for checking image-to-video task status
+app.get('/api/image-to-video/status/:taskId', async (req, res) => {
+  try {
+    const taskId = req.params.taskId;
+    if (!taskId) {
+      return res.status(400).json({ error: 'Missing task ID' });
+    }
+    
+    console.log(`Checking I2V status for task: ${taskId}`);
+    
+    // Query Novita API for task status
+    const response = await axios.get(
+      `https://api.novita.ai/v3/async/task-result?task_id=${taskId}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${process.env.NOVITA_API_KEY}`
+        },
+        timeout: 5000,
+      }
+    );
+    
+    const result = response.data;
+    
+    // Handle different task statuses
+    if (result.task.status === 'TASK_STATUS_SUCCEED') {
+      // Task completed successfully
+      const videoUrl = result.videos && result.videos.length > 0 ? result.videos[0].video_url : null;
+      
+      if (!videoUrl) {
+        return res.status(500).json({ 
+          status: 'ERROR', 
+          error_message: 'Video URL not found in successful response' 
+        });
+      }
+      
+      return res.json({
+        status: 'SUCCESS',
+        video_url: videoUrl,
+        message: 'Video generation completed successfully'
+      });
+    } 
+    else if (result.task.status === 'TASK_STATUS_FAILED') {
+      // Task failed
+      return res.json({
+        status: 'FAILED',
+        error_message: result.reason || 'Video generation failed'
+      });
+    }
+    else if (result.task.status === 'TASK_STATUS_PENDING' || result.task.status === 'TASK_STATUS_QUEUED') {
+      // Task is waiting in queue
+      return res.json({
+        status: 'IN_QUEUE',
+        progress: { percentage: 0 },
+        message: 'Task is waiting in queue'
+      });
+    }
+    else if (result.task.status === 'TASK_STATUS_RUNNING') {
+      // Task is processing
+      // Parse progress percentage if available
+      let progressPercentage = 0;
+      try {
+        // Novita API may provide progress info in different formats
+        if (result.task.progress_percent !== undefined) {
+          progressPercentage = result.task.progress_percent;
+        } else if (result.task.progress && result.task.progress.percentage !== undefined) {
+          progressPercentage = result.task.progress.percentage;
+        } else {
+          // Default progress estimation
+          progressPercentage = 30; // Arbitrary midpoint if no actual progress info
+        }
+      } catch (e) {
+        progressPercentage = 30; // Fallback
+      }
+      
+      return res.json({
+        status: 'PROCESSING',
+        progress: { percentage: progressPercentage },
+        message: 'Video generation in progress'
+      });
+    }
+    else {
+      // Other status or unknown status
+      return res.json({
+        status: result.task.status || 'UNKNOWN',
+        progress: { percentage: result.task.progress_percent || 0 },
+        message: 'Checking task status'
+      });
+    }
+  } catch (error) {
+    console.error('Error checking I2V task status:', error);
+    
+    if (error.response) {
+      // API returned an error
+      return res.status(error.response.status || 500).json({ 
+        error: error.response.data?.message || error.response.data?.error || 'Error checking task status' 
+      });
+    } else if (error.request) {
+      // No response received
+      return res.status(504).json({ error: 'No response from status check API. Please try again.' });
+    } else {
+      // Request configuration error
+      return res.status(500).json({ error: error.message || 'Failed to check task status' });
+    }
+  }
+});
+
+app.get(['/', '/:lang/'], (req, res) => {
+  const path = 'index';
+
+  // Determine language from URL parameter or headers, default to 'en'
+  let language = req.params.lang || (req.headers['accept-language']?.startsWith('ja') ? 'ja' : 'en');
+  if (language !== 'ja' && language !== 'en') {
+    language = 'en'; // Default to English if the language is not supported
+  }
+
+  // Set the preferred language cookie
+  res.cookie('preferredLanguage', language, { maxAge: 365 * 24 * 60 * 60 * 1000, httpOnly: false }); // Expires in 1 year
+
+  // Load translation file
+  const translationPath = resolve(`${process.env.STATIC_DIR}/lang/${language}.json`);
+  let translations = {};
+  try {
+    const translationFile = fs.readFileSync(translationPath, 'utf-8');
+    translations = JSON.parse(translationFile);
+  } catch (error) {
+    console.error('Error loading translations:', error);
+  }
+
+  // Send the translation data to the client
+  res.render(path, { translations, language });
+});
+
 // Map to store WebSocket clients by task_id
 const clients = new Map();
 
@@ -1012,6 +1321,15 @@ wss.on('connection', (ws, req) => {
   ws.connectionId = ++connectionCounter;
   ws.isAlive = true;
   
+  // Check if this is an image-to-video WebSocket connection
+  const url = new URL(req.url, `http://${req.headers.host}`);
+  const path = url.pathname;
+  
+  if (path === '/image-to-video-ws') {
+    // Handle image-to-video WebSocket connection
+    imageToVideoRouter.handleWebSocketConnection(ws, req, wss);
+    return;
+  }
 
   // Handle pong response
   ws.on('pong', () => {
@@ -1106,3 +1424,12 @@ function checkEnv() {
     process.exit(0);
   }
 }
+
+// Create a utility module for shared functions
+// This helps avoid circular dependencies
+const utilsModule = {
+  uploadToS3
+};
+
+// Export utils module for other modules to use
+module.exports.utils = utilsModule;

@@ -118,43 +118,32 @@
 </head>
 <body>
     {{> header translations=translations}}
-  <div class="page-header">
-    <div class="container">
-      <h1 class="text-center">{{translations.history_title}}</h1>
-      <p class="text-center mb-0">{{translations.history_subtitle}}</p>
+    {{> sidebar}}
+    <div id="main-content">
+      <div class="container">
+        <!-- Completed Processes Section -->
+        <section class="section-container" id="completed-processes">
+          <div class="section-header">
+            <i class="bi bi-check-circle-fill"></i>
+            <h2 class="mb-0">{{translations.completed_processes}}</h2>
+          </div>
+          <div id="completed-container" class="row g-4">
+            <!-- Completed items will be populated here by JavaScript -->
+          </div>
+        </section>
+        <!-- Pending/Failed Processes Section -->
+        <section class="section-container" id="pending-processes">
+          <div class="section-header">
+            <i class="bi bi-hourglass-split"></i>
+            <h2 class="mb-0">{{translations.pending_processes}}</h2>
+          </div>
+          <div id="pending-container" class="row g-4">
+            <!-- Pending items will be populated here by JavaScript -->
+          </div>
+        </section>
+      </div>
+      {{> footer translations=translations}}
     </div>
-  </div>
-  
-  <div class="container mb-4">
-    <a href="{{#ifCond language '==' 'en'}}/{{else}}/{{language}}/{{/ifCond}}" class="btn btn-outline-secondary home-btn">
-      <i class="bi bi-arrow-left me-2"></i></i>{{translations.back_to_home}}
-    </a>
-  </div>
-
-  <div class="container">
-    <!-- Pending/Failed Processes Section -->
-    <section class="section-container" id="pending-processes">
-      <div class="section-header">
-        <i class="bi bi-hourglass-split"></i>
-        <h2 class="mb-0">{{translations.pending_processes}}</h2>
-      </div>
-      <div id="pending-container" class="row g-4">
-        <!-- Pending items will be populated here by JavaScript -->
-      </div>
-    </section>
-    
-    <!-- Completed Processes Section -->
-    <section class="section-container" id="completed-processes">
-      <div class="section-header">
-        <i class="bi bi-check-circle-fill"></i>
-        <h2 class="mb-0">{{translations.completed_processes}}</h2>
-      </div>
-      <div id="completed-container" class="row g-4">
-        <!-- Completed items will be populated here by JavaScript -->
-      </div>
-    </section>
-  </div>
-    {{> footer translations=translations}}
   <script src="/history.js"></script>
 </body>
 </html>
