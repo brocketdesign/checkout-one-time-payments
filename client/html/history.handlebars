@@ -116,10 +116,10 @@
     }
   </style>
 </head>
-<body>
-    {{> header translations=translations}}
+<body style="display: flex; flex-direction: column; min-height: 100vh; margin: 0;">
     {{> sidebar}}
-    <div id="main-content">
+    <div id="main-content" style="flex: 1 0 auto; display: flex; flex-direction: column;">
+      {{> header translations=translations}}
       <div class="container">
         <!-- Completed Processes Section -->
         <section class="section-container" id="completed-processes">
