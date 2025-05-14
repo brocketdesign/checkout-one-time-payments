@@ -16,7 +16,21 @@ dotenv.config({ path: path.join(__dirname, '../../.env') });
 // Import utilities from server.js
 const server = require('./server'); // This avoids loading the server module before it's ready
 
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+// Check if required environment variables are set
+if (!process.env.STRIPE_SECRET_KEY_TEST || !process.env.STRIPE_SECRET_KEY_LIVE) {
+  console.error('Error: STRIPE_SECRET_KEY is not set in the environment variables.');
+  process.exit(1);
+}
+const StripeApiKey = process.env.MODE == 'local' ? process.env.STRIPE_SECRET_KEY_TEST : process.env.STRIPE_SECRET_KEY_LIVE;
+
+const stripe = require('stripe')(StripeApiKey , {
+  apiVersion: '2020-08-27',
+  appInfo: { // For sample support and debugging, not required for production:
+    name: "stripe-samples/checkout-one-time-payments",
+    version: "0.0.1",
+    url: "https://github.com/stripe-samples/checkout-one-time-payments"
+  }
+});
 
 // Novita.ai API configuration
 const NOVITA_API_KEY = process.env.NOVITA_API_KEY;
@@ -571,7 +585,7 @@ router.post('/image-to-video', upload.fields([
       success: true,
       message: 'Task created successfully',
       task_id: taskId,
-      require_payment: !skipPayment && process.env.NODE_ENV === 'production'
+      require_payment: !skipPayment
     });
   } catch (error) {
     console.error('Error processing image-to-video request:', error);
@@ -608,7 +622,7 @@ router.get('/image-to-video/status/:taskId', async (req, res) => {
   
   if (task.status === 'PROCESSING') {
     // Return real progress from Novita.ai polling
-    const progress = task.progress || 20; // Default to 20% if no progress info yet
+    const progress = task.progress_percent || 20; // Default to 20% if no progress info yet
     
     return res.json({
       status: 'PROCESSING',
@@ -719,6 +733,69 @@ router.post('/image-to-video/mark-paid/:taskId', async (req, res) => {
   }
 });
 
+// Create Stripe checkout session
+async function createCheckoutSession(price, currency, successUrl, cancelUrl) {
+  try {
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: currency,
+            product_data: {
+              name: 'Image to Video Conversion',
+              description: 'Convert your image into a dynamic video',
+            },
+            unit_amount: price, // Amount in cents/yen
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+    });
+    
+    return session;
+  } catch (error) {
+    console.error('Error creating checkout session:', error);
+    throw error;
+  }
+}
+
+// POST endpoint to create a Stripe checkout session
+router.post('/i2v-create-checkout-session', async (req, res) => {
+  try {
+    console.log('[i2v-create-checkout-session] Request body:', req.body);
+
+    const { task_id } = req.body;
+    if (!task_id) {
+      console.warn('[i2v-create-checkout-session] Missing task_id in request body');
+      return res.status(400).json({ error: 'Missing task_id in request body' });
+    }
+    
+    // Price is $2 in cents, or 200 yen
+    const price = req.body.currency === 'jpy' ? 200 : 200; // 200 cents = $2, 200 yen = ~$1.50
+    const currency = req.body.currency || 'usd';
+    console.log('[i2v-create-checkout-session] Using price:', price, 'currency:', currency);
+
+    // URLs for redirect after payment success or cancel - direct back to image-to-video page
+    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    const successUrl = `${baseUrl}/image-to-video?task_id=${task_id}&payment_status=success`;
+    const cancelUrl = `${baseUrl}/image-to-video?task_id=${task_id}&payment_status=canceled`;
+    console.log('[i2v-create-checkout-session] successUrl:', successUrl);
+    console.log('[i2v-create-checkout-session] cancelUrl:', cancelUrl);
+
+    const session = await createCheckoutSession(price, currency, successUrl, cancelUrl);
+    console.log('[i2v-create-checkout-session] Stripe session created:', session.id);
+
+    res.json({ sessionId: session.id });
+  } catch (error) {
+    console.error('Error creating checkout session:', error);
+    res.status(500).json({ error: 'Failed to create checkout session' });
+  }
+});
+
 module.exports = router;
 
 // WebSocket connection handler for real-time updates
@@ -749,7 +826,7 @@ module.exports.handleWebSocketConnection = (ws, request, wss) => {
   // Send initial status if task exists
   if (global.imageToVideoTasks && global.imageToVideoTasks[taskId]) {
     const task = global.imageToVideoTasks[taskId];
-    const progress = task.progress || 0;
+    const progress = task.progress_percent || 0;
     
     ws.send(JSON.stringify({
       task_id: taskId,
@@ -802,7 +879,7 @@ module.exports.handleWebSocketConnection = (ws, request, wss) => {
         // Send current status if task exists
         if (global.imageToVideoTasks && global.imageToVideoTasks[taskId]) {
           const task = global.imageToVideoTasks[taskId];
-          const progress = task.progress || 0;
+          const progress = task.progress_percent || 0;
           
           ws.send(JSON.stringify({
             task_id: taskId,

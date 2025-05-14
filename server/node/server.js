@@ -14,17 +14,12 @@ const cookieParser = require('cookie-parser'); // Add cookie-parser
 const imageToVideoRouter = require('./image-to-video-api'); // Import the image-to-video API router
 
 // Copy the .env.example in the root into a .env file in this folder
-require('dotenv').config({ path: './.env' });
-
-// Ensure environment variables are set.
-checkEnv();
+require('dotenv').config({ path: '../../.env' });
 
 // Set STATIC_DIR to default if not set
 if (!process.env.STATIC_DIR) {
   process.env.STATIC_DIR = resolve(__dirname, '../../client/html');
   console.log('[server] STATIC_DIR not set, defaulting to:', process.env.STATIC_DIR);
-} else {
-  console.log('[server] STATIC_DIR:', process.env.STATIC_DIR);
 }
 
 // Initialize S3 client
@@ -39,7 +34,14 @@ const s3 = new S3Client({
 // Store temporary file mapping
 const tempFiles = new Map();
 
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY, {
+// Check if required environment variables are set
+if (!process.env.STRIPE_SECRET_KEY_TEST || !process.env.STRIPE_SECRET_KEY_LIVE) {
+  console.error('Error: STRIPE_SECRET_KEY is not set in the environment variables.');
+  process.exit(1);
+}
+const StripeApiKey = process.env.MODE == 'local' ? process.env.STRIPE_SECRET_KEY_TEST : process.env.STRIPE_SECRET_KEY_LIVE;
+
+const stripe = require('stripe')(StripeApiKey , {
   apiVersion: '2020-08-27',
   appInfo: { // For sample support and debugging, not required for production:
     name: "stripe-samples/checkout-one-time-payments",
@@ -460,6 +462,7 @@ app.get(['/contact', '/:lang/contact'], (req, res) => {
   res.render(path, { translations, language, currentYear });
 });
 
+
 app.post('/api/create-checkout-session', async (req, res) => {
   try {
     // on localhost, use http://localhost:4242 but on production use the domain
@@ -467,13 +470,17 @@ app.post('/api/create-checkout-session', async (req, res) => {
     const domainURL = process.env.MODE === 'local' ? 'http://localhost:4242' : currentURL;
     const { tempId, roundedSellingPrice, currency, fileName, duration, resolution, fileSize, frameCount } = req.body;
     
+    console.log('[create-checkout-session] Request body:', req.body);
+
     if (!tempId || !tempFiles.has(tempId)) {
+      console.warn('[create-checkout-session] Invalid tempId or files have expired:', tempId);
       return res.status(400).json({ error: 'Invalid tempId or files have expired' });
     }
 
     // Determine currency based on the language
     // Default to USD if currency not specified
     const checkoutCurrency = currency || 'usd';
+    console.log('[create-checkout-session] Using currency:', checkoutCurrency);
     
     // Adjust unit_amount calculation based on currency
     // For JPY: amount is in whole yen (no decimal)
@@ -498,12 +505,14 @@ app.post('/api/create-checkout-session', async (req, res) => {
       quantity: 1
       }
     ];
+    console.log('[create-checkout-session] Stripe line_items:', JSON.stringify(line_items, null, 2));
     
     // Determine language from cookie, URL parameter, or headers, default to 'en'
     let language = req.cookies?.preferredLanguage || req.params.lang || (req.headers['accept-language']?.startsWith('ja') ? 'ja' : 'en');
     if (language !== 'ja' && language !== 'en') {
       language = 'en'; // Default to English if the language is not supported
     }
+    console.log('[create-checkout-session] Using language:', language);
     
     // Create new Checkout Session for the order
     const session = await stripe.checkout.sessions.create({
@@ -515,12 +524,15 @@ app.post('/api/create-checkout-session', async (req, res) => {
       // automatic_tax: {enabled: true},
     });
 
+    console.log('[create-checkout-session] Stripe session created:', session.id);
+
     return res.json(session);
   } catch (error) {
     console.error('Error creating checkout session:', error);
     return res.status(500).json({ error: error.message });
   }
 });
+
 
 // Webhook handler for asynchronous events.
 app.post('/webhook', async (req, res) => {
@@ -1404,26 +1416,6 @@ wss.on('close', () => {
 
 // Start server listening on the specified port
 server.listen(port, '0.0.0.0', () => console.log(`Server listening on port ${port}!`));
-
-function checkEnv() {
-  const price = process.env.PRICE;
-  if (price === "price_12345" || !price) {
-    console.log("You must set a Price ID in the environment variables. Please see the README.");
-    process.exit(0);
-  }
-
-  if (!process.env.NOVITA_API_KEY) {
-    console.log("You must set NOVITA_API_KEY in the environment variables.");
-    process.exit(0);
-  }
-  
-  // Check for required AWS environment variables
-  if (!process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY || 
-      !process.env.AWS_REGION || !process.env.AWS_S3_BUCKET_NAME) {
-    console.log("You must set AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, and AWS_S3_BUCKET_NAME in the environment variables.");
-    process.exit(0);
-  }
-}
 
 // Create a utility module for shared functions
 // This helps avoid circular dependencies

@@ -3,6 +3,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const sidebarToggle = document.getElementById('sidebar-toggle');
     const mainContent = document.getElementById('main-content');
     const navBarWrapper = document.getElementById('navbar-wrapper');
+    
+    // Mobile elements
+    const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+    const mobileSidebar = document.getElementById('mobile-sidebar');
+    const mobileSidebarClose = document.getElementById('mobile-sidebar-close');
+    const mobileSidebarOverlay = document.getElementById('mobile-sidebar-overlay');
+    
     // Function to toggle sidebar minimization
     function toggleSidebar() {
         sidebar.classList.toggle('minimized');
@@ -48,8 +55,44 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Mobile sidebar toggle functionality
+    if (mobileMenuToggle && mobileSidebar) {
+        mobileMenuToggle.addEventListener('click', function() {
+            mobileSidebar.style.display = 'block';
+            if (mobileSidebarOverlay) {
+                mobileSidebarOverlay.style.display = 'block';
+                mobileSidebarOverlay.style.opacity = '1';
+            }
+            setTimeout(() => {
+                mobileSidebar.style.top = '0';
+            }, 10);
+        });
+        
+        // Function to close mobile sidebar
+        const closeMobileSidebar = function() {
+            mobileSidebar.style.top = '-100%';
+            if (mobileSidebarOverlay) {
+                mobileSidebarOverlay.style.opacity = '0';
+            }
+            setTimeout(() => {
+                mobileSidebar.style.display = 'none';
+                if (mobileSidebarOverlay) {
+                    mobileSidebarOverlay.style.display = 'none';
+                }
+            }, 300);
+        };
+        
+        // Add close event listeners
+        if (mobileSidebarClose) {
+            mobileSidebarClose.addEventListener('click', closeMobileSidebar);
+        }
+        
+        if (mobileSidebarOverlay) {
+            mobileSidebarOverlay.addEventListener('click', closeMobileSidebar);
+        }
+    }
+
     // Optional: Add tooltips for icons when sidebar is minimized
-    // This is a basic example; you might use a library for more robust tooltips
     const navLinks = sidebar.querySelectorAll('.sidebar-nav a');
     navLinks.forEach(link => {
         const icon = link.querySelector('.icon');

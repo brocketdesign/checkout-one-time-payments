@@ -53,6 +53,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize drag zones with modern styling
     initializeDragAndDrop();
 
+    // Check URL parameters for payment status and task ID
+    checkUrlParameters();
+
     const MAX_IMAGE_SIZE_I2V = 10 * 1024 * 1024; // 10MB
 
     // Handle end frame toggle
@@ -551,7 +554,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (result.task_id) {
                     if (result.require_payment) {
                         try {
-                            const paymentResponse = await fetch('/api/create-checkout-session', {
+                            const paymentResponse = await fetch('/api/i2v-create-checkout-session', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -620,6 +623,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function pollForI2VResult(taskId) {
+        // Disable the generate button during processing
+        if (generateImageToVideoButton) {
+            generateImageToVideoButton.disabled = true;
+        }
+        
+        // Hide any result that might be showing
+        if (i2vResultSection) {
+            i2vResultSection.style.display = 'none';
+        }
+        
+        // Show the placeholder
+        if (i2vSampleVideoPlaceholder) {
+            i2vSampleVideoPlaceholder.style.display = 'block';
+        }
+        
+        // Reset video source
+        if (i2vGeneratedVideo) {
+            i2vGeneratedVideo.src = '';
+        }
+        
+        // Hide download link
+        if (downloadVideoLink) {
+            downloadVideoLink.style.display = 'none';
+        }
+
         const tempId = 'temp_' + Math.random().toString(36).substring(2, 15);
 
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -787,6 +815,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
             setTimeout(checkStatus, 1000);
         };
+    }
+
+    function checkUrlParameters() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const taskId = urlParams.get('task_id');
+        const paymentStatus = urlParams.get('payment_status');
+        
+        if (!taskId) return;
+        
+        // Handle payment status
+        if (paymentStatus === 'success') {
+            showStatus(t('payment_successful', 'Payment successful! Processing your video...'), 'success', true);
+            
+            // Mark task as paid and start processing
+            setTimeout(async () => {
+                try {
+                    // First mark as paid
+                    const markPaidResponse = await fetch(`/api/image-to-video/mark-paid/${taskId}`, {
+                        method: 'POST'
+                    });
+                    
+                    if (!markPaidResponse.ok) {
+                        const error = await markPaidResponse.json();
+                        throw new Error(error.message || 'Failed to record payment');
+                    }
+                    
+                    // Then start processing
+                    const processResponse = await fetch(`/api/image-to-video/process/${taskId}`, {
+                        method: 'POST'
+                    });
+                    
+                    if (!processResponse.ok) {
+                        const error = await processResponse.json();
+                        throw new Error(error.message || 'Failed to start processing');
+                    }
+                    
+                    // Start polling for results
+                    pollForI2VResult(taskId);
+                } catch (error) {
+                    console.error('Error processing task after payment:', error);
+                    showStatus(`${t('error_processing_task', 'Error processing task:')} ${error.message}`, 'danger');
+                }
+            }, 1000);
+            
+        } else if (paymentStatus === 'canceled') {
+            showStatus(t('payment_canceled', 'Payment was canceled. You can try again or select a different payment method.'), 'warning');
+            if (generateImageToVideoButton) {
+                generateImageToVideoButton.disabled = false;
+            }
+        }
     }
 
     const samples = [

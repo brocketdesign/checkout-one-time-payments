@@ -1,6 +1,6 @@
 <div class="app-layout d-flex" style="display: flex;">
     <!-- Sidebar -->
-    <aside id="app-sidebar" style="height: 100vh; overflow-y: auto; background-color: #1e1e24; flex-shrink: 0; position: fixed; left: 0; top: 0; z-index: 1000;">
+    <aside id="app-sidebar" class="sidebar-desktop d-none d-md-block" style="height: 100vh; overflow-y: auto; background-color: #1e1e24; flex-shrink: 0; position: fixed; left: 0; top: 0; z-index: 1000;">
         <div class="sidebar-header">
             <button id="sidebar-toggle" class="sidebar-toggle-btn w-auto ms-0"><i class="bi bi-list"></i></button>
             <h1 class="sidebar-title mb-0 w-auto">TwiixAI</h1>
@@ -31,9 +31,84 @@
     <!-- Navbar - positioned to the right of sidebar -->
     <div id="navbar-wrapper" style="position: fixed; top: 0; right: 0; z-index: 900;">
         <nav class="navbar text-white" style="height: 60px; padding: 0 20px; width: 100%;">
+            <!-- Mobile hamburger menu -->
+            <button id="mobile-menu-toggle" class="d-md-none navbar-toggle-btn my-0 bg-transparent w-auto">
+                <i class="bi bi-list"></i>
+            </button>
+            <div class="mobile-logo d-md-none">
+                <h3 class="my-0 text-white">TwiixAI</h3>
+            </div>
         </nav>
     </div>
 
     <!-- This empty div creates space for the content below the navbar -->
     <div style="width: 100%; height: 60px;"></div>
 </div>
+
+<!-- Mobile sidebar overlay - slides from top -->
+<div id="mobile-sidebar-overlay" class="d-md-none" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1001;"></div>
+
+<!-- Mobile sidebar - slides from top -->
+<aside id="mobile-sidebar" class="d-md-none" style="display: none; position: fixed; top: -100%; left: 0; width: 100%; height: 100%; background-color: #1e1e24; z-index: 1002; transition: top 0.3s ease; overflow-y: auto;">
+    <div class="sidebar-header d-flex justify-content-between align-items-center p-3 position-fixed w-100" style="background-color: #1e1e24; top: 0; z-index: 1003;">
+        <h1 class="sidebar-title mb-0">TwiixAI</h1>
+        <button id="mobile-sidebar-close" class="btn-close btn-close-white"></button>
+    </div>
+    <nav class="sidebar-nav rounded" style="margin-top:80px">
+        <ul>
+            <li><a href="/"><span class="icon"><i class="bi bi-house-door"></i></span><span class="text">Home</span></a></li>
+            <li><a href="#" class="beta-link"><span class="icon"><i class="bi bi-compass"></i></span><span class="text">Explore</span><span class="beta-tag">BETA</span></a></li>
+            <li><span class="nav-section-title">Video AI</span></li>
+            <li><a href="/image-to-video" class="{{#if isImageToVideoPage}}active{{/if}}"><span class="icon"><i class="bi bi-image-alt"></i></span><span class="text">{{t "image_to_video" "Image to Video"}}</span></a></li>
+            <li><a href="#"><span class="icon"><i class="bi bi-chat-text"></i></span><span class="text">{{t "text_to_video" "Text to Video"}}</span></a></li>
+            <li><a href="#"><span class="icon"><i class="bi bi-person-video3"></i></span><span class="text">{{t "consistent_character_video" "Consistent Character Video"}}</span></a></li>
+            <li><a href="/?mode=video" class="{{#if isFaceSwapVideoPage}}active{{/if}}"><span class="icon"><i class="bi bi-camera-video"></i></span><span class="text">{{t "video_face_swap" "Video Face Swap"}}</span></a></li>
+            <li><a href="#"><span class="icon"><i class="bi bi-music-note-beamed"></i></span><span class="text">{{t "ai_animation" "AI Animation"}}</span></a></li>
+            <li><a href="#"><span class="icon"><i class="bi bi-magic"></i></span><span class="text">{{t "ai_video_effects" "AI Video Effects"}}</span></a></li>
+            <li><span class="nav-section-title">Image AI</span></li>
+            <li><a href="/?mode=image" class="{{#if isFaceSwapImagePage}}active{{/if}}"><span class="icon"><i class="bi bi-image"></i></span><span class="text">{{t "image_face_swap" "Image Face Swap"}}</span></a></li>
+            <li><a href="#"><span class="icon"><i class="bi bi-brush"></i></span><span class="text">{{t "ai_image_generator" "AI Image Generator"}}</span></a></li>
+            <li><a href="#"><span class="icon"><i class="bi bi-sliders"></i></span><span class="text">{{t "ai_photo_effects" "AI Photo Effects"}}</span></a></li>
+            <li><span class="nav-section-title">AI Tools</span></li>
+            <li><a href="/{{#ifCond language '==' 'en'}}ai-tools{{else}}{{language}}/ai-tools{{/ifCond}}"><span class="icon"><i class="bi bi-tools"></i></span><span class="text">AI Tools</span></a></li>
+            <li><a href="#"><span class="icon"><i class="bi bi-stars"></i></span><span class="text">My Creations</span></a></li>
+            <li><a href="#"><span class="icon"><i class="bi bi-download"></i></span><span class="text">Download App</span></a></li>
+        </ul>
+    </nav>
+</aside>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Mobile sidebar toggle
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileSidebar = document.getElementById('mobile-sidebar');
+        const mobileSidebarClose = document.getElementById('mobile-sidebar-close');
+        const mobileSidebarOverlay = document.getElementById('mobile-sidebar-overlay');
+        
+        if (mobileMenuToggle && mobileSidebar) {
+            mobileMenuToggle.addEventListener('click', function() {
+                mobileSidebar.style.display = 'block';
+                mobileSidebarOverlay.style.display = 'block';
+                setTimeout(() => {
+                    mobileSidebar.style.top = '0';
+                }, 10);
+            });
+            
+            const closeMobileSidebar = function() {
+                mobileSidebar.style.top = '-100%';
+                setTimeout(() => {
+                    mobileSidebar.style.display = 'none';
+                    mobileSidebarOverlay.style.display = 'none';
+                }, 300);
+            };
+            
+            if (mobileSidebarClose) {
+                mobileSidebarClose.addEventListener('click', closeMobileSidebar);
+            }
+            
+            if (mobileSidebarOverlay) {
+                mobileSidebarOverlay.addEventListener('click', closeMobileSidebar);
+            }
+        }
+    });
+</script>
