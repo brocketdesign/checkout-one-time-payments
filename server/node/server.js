@@ -12,6 +12,7 @@ const { v4: uuidv4 } = require('uuid');
 const handlebars = require('express-handlebars'); // Require Handlebars
 const cookieParser = require('cookie-parser'); // Add cookie-parser
 const imageToVideoRouter = require('./image-to-video-api'); // Import the image-to-video API router
+const sharp = require('sharp'); // Add sharp for image processing
 
 // Copy the .env.example in the root into a .env file in this folder
 require('dotenv').config({ path: '../../.env' });
@@ -765,12 +766,24 @@ app.post('/api/process-image-swap', upload.fields([
       try {
         // Download image from URL
         const response = await axios.get(sourceImageUrl, { responseType: 'arraybuffer' });
-        sourceImageBase64 = imageToBase64(Buffer.from(response.data));
+        const imageBuffer = Buffer.from(response.data);
+        
+        // Convert image format if needed
+        const convertedBuffer = await convertImageToJpeg(imageBuffer, 'source_image');
+        sourceImageBase64 = imageToBase64(convertedBuffer);
       } catch (error) {
-        return res.status(400).json({ error: 'Failed to download source image from URL' });
+        console.error('Error processing source image from URL:', error);
+        return res.status(400).json({ error: 'Failed to download or process source image from URL' });
       }
     } else if (req.files && req.files['image_file']) {
-      sourceImageBase64 = imageToBase64(req.files['image_file'][0].buffer);
+      try {
+        // Convert uploaded file format if needed
+        const convertedBuffer = await convertImageToJpeg(req.files['image_file'][0].buffer, req.files['image_file'][0].originalname);
+        sourceImageBase64 = imageToBase64(convertedBuffer);
+      } catch (error) {
+        console.error('Error processing uploaded source image:', error);
+        return res.status(400).json({ error: 'Failed to process source image file' });
+      }
     } else {
       return res.status(400).json({ error: 'No source image provided (file or URL)' });
     }
@@ -780,12 +793,24 @@ app.post('/api/process-image-swap', upload.fields([
       try {
         // Download image from URL
         const response = await axios.get(faceImageUrl, { responseType: 'arraybuffer' });
-        faceImageBase64 = imageToBase64(Buffer.from(response.data));
+        const imageBuffer = Buffer.from(response.data);
+        
+        // Convert image format if needed
+        const convertedBuffer = await convertImageToJpeg(imageBuffer, 'face_image');
+        faceImageBase64 = imageToBase64(convertedBuffer);
       } catch (error) {
-        return res.status(400).json({ error: 'Failed to download face image from URL' });
+        console.error('Error processing face image from URL:', error);
+        return res.status(400).json({ error: 'Failed to download or process face image from URL' });
       }
     } else if (req.files && req.files['face_image_file']) {
-      faceImageBase64 = imageToBase64(req.files['face_image_file'][0].buffer);
+      try {
+        // Convert uploaded file format if needed
+        const convertedBuffer = await convertImageToJpeg(req.files['face_image_file'][0].buffer, req.files['face_image_file'][0].originalname);
+        faceImageBase64 = imageToBase64(convertedBuffer);
+      } catch (error) {
+        console.error('Error processing uploaded face image:', error);
+        return res.status(400).json({ error: 'Failed to process face image file' });
+      }
     } else {
       return res.status(400).json({ error: 'No face image provided (file or URL)' });
     }
@@ -1286,6 +1311,44 @@ async function pollTaskResult(task_id) {
   }, 5000);
 
   taskPolls.set(task_id, pollInterval);
+}
+
+// Add utility function to detect and convert image format
+async function convertImageToJpeg(buffer, filename = 'image') {
+  try {
+    // Get image metadata to check format
+    const metadata = await sharp(buffer).metadata();
+    const format = metadata.format;
+    
+    console.log(`Image format detected: ${format}`);
+    
+    // Check if format is supported (jpg, jpeg, png)
+    const supportedFormats = ['jpeg', 'jpg', 'png'];
+    
+    if (supportedFormats.includes(format.toLowerCase())) {
+      // Format is already supported, return as is
+      return buffer;
+    } else {
+      // Convert to JPEG
+      console.log(`Converting ${format} to JPEG`);
+      const convertedBuffer = await sharp(buffer)
+        .jpeg({ quality: 90 })
+        .toBuffer();
+      
+      return convertedBuffer;
+    }
+  } catch (error) {
+    console.error('Error processing image:', error);
+    // If sharp fails, try to convert anyway assuming it's a valid image
+    try {
+      const convertedBuffer = await sharp(buffer)
+        .jpeg({ quality: 90 })
+        .toBuffer();
+      return convertedBuffer;
+    } catch (conversionError) {
+      throw new Error('Unable to process image. Please ensure it\'s a valid image file.');
+    }
+  }
 }
 
 const port = process.env.PORT || 4242;
