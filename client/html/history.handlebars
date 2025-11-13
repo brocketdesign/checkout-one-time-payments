@@ -167,14 +167,369 @@
       margin-top: var(--space-2xl);
       margin-bottom: var(--space-2xl);
     }
+
+    /* Container-fluid responsive adjustments */
+    .container-fluid {
+      padding-top: 0 !important;
+    }
+
+    #main-content {
+      margin-left: 240px;
+      width: calc(100% - 240px);
+      flex: 1 0 auto;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* ============================================
+       RESPONSIVE DESIGN - MOBILE FIRST
+       ============================================ */
+
+    /* ============================================
+       TABLET - 1024px and below
+       ============================================ */
+    @media (max-width: 1024px) {
+      #main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+      }
+
+      .section-container {
+        padding: var(--space-xl);
+      }
+
+      .section-header {
+        flex-wrap: wrap;
+        gap: var(--space-md);
+      }
+
+      .container-fluid {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+    }
+
+    /* ============================================
+       MOBILE - 768px and below
+       ============================================ */
+    @media (max-width: 768px) {
+      body {
+        overflow-x: hidden;
+      }
+
+      #main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        overflow-x: hidden;
+        margin-top: 60px;
+      }
+
+      .container-fluid {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+        margin-top: 0 !important;
+        margin-bottom: var(--space-lg) !important;
+        max-width: 100%;
+      }
+
+      .section-container {
+        padding: var(--space-lg);
+        margin-bottom: var(--space-lg);
+        border-radius: 10px;
+      }
+
+      .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-sm);
+        padding-bottom: var(--space-md);
+        margin-bottom: var(--space-lg);
+      }
+
+      .section-header i {
+        font-size: 20px;
+        margin-right: var(--space-md);
+      }
+
+      .section-header h2 {
+        font-size: 18px;
+        margin: 0;
+      }
+
+      .row {
+        gap: 12px !important;
+        margin-right: 0 !important;
+        margin-left: 0 !important;
+      }
+
+      .col-md-6,
+      .col-lg-4 {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+      }
+
+      .card {
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      .card-header {
+        padding: 12px 16px;
+        font-size: 14px;
+      }
+
+      .card-body {
+        padding: 12px 16px;
+        font-size: 13px;
+      }
+
+      .card-footer {
+        padding: 12px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .btn-action,
+      .btn-secondary {
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 13px;
+        border-radius: 6px;
+      }
+
+      .video-container {
+        padding-top: 56.25%;
+      }
+
+      .card-title {
+        font-size: 16px;
+        margin-bottom: var(--space-md);
+      }
+
+      .empty-state {
+        padding: var(--space-2xl) var(--space-lg);
+      }
+
+      .empty-state i {
+        font-size: 40px;
+      }
+
+      .empty-state p {
+        font-size: 14px;
+      }
+    }
+
+    /* ============================================
+       SMALL MOBILE - 480px and below
+       ============================================ */
+    @media (max-width: 480px) {
+      body {
+        overflow-x: hidden;
+        width: 100%;
+        max-width: 100vw;
+      }
+
+      #main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        max-width: 100%;
+        overflow-x: hidden;
+        margin-top: 60px;
+      }
+
+      .container-fluid {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+        margin-top: 0 !important;
+        margin-bottom: 12px !important;
+        max-width: 100%;
+        overflow-x: hidden;
+      }
+
+      .section-container {
+        padding: 12px;
+        margin-bottom: 12px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      }
+
+      .section-header {
+        gap: 8px;
+        padding-bottom: 12px;
+        margin-bottom: 12px;
+      }
+
+      .section-header i {
+        font-size: 18px;
+        margin-right: 8px;
+      }
+
+      .section-header h2 {
+        font-size: 16px;
+        margin: 0;
+        font-weight: 600;
+      }
+
+      .row {
+        gap: 8px !important;
+        margin-right: 0 !important;
+        margin-left: 0 !important;
+      }
+
+      .g-4 {
+        gap: 8px !important;
+      }
+
+      .col-md-6,
+      .col-lg-4 {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+      }
+
+      .card {
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+        overflow: hidden;
+      }
+
+      .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      }
+
+      .pending-card .card-header {
+        padding: 10px 12px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .completed-card .card-header {
+        padding: 10px 12px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .card-header {
+        padding: 10px 12px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .card-body {
+        padding: 10px 12px;
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
+      .card-footer {
+        padding: 10px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        background-color: var(--color-bg-secondary);
+        border-top: 1px solid var(--color-border);
+      }
+
+      .btn-action,
+      .btn-secondary {
+        width: 100%;
+        padding: 9px 11px;
+        font-size: 12px;
+        border-radius: 6px;
+        border: none;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all var(--transition-base);
+      }
+
+      .btn-action {
+        background: var(--color-accent-gradient);
+        color: #fff;
+      }
+
+      .btn-action:hover {
+        transform: translateY(-1px);
+      }
+
+      .btn-secondary {
+        background-color: var(--color-bg-tertiary);
+        color: var(--color-text-primary);
+        border: 1px solid var(--color-border);
+      }
+
+      .btn-secondary:hover {
+        background-color: var(--color-accent-purple);
+        color: #fff;
+      }
+
+      .video-container {
+        padding-top: 56.25%;
+        background-color: var(--color-bg-primary);
+        border-radius: 6px;
+        margin-bottom: 8px;
+      }
+
+      .video-container video {
+        border-radius: 6px;
+      }
+
+      .card-title {
+        font-size: 14px;
+        margin-bottom: 8px;
+        color: var(--color-text-primary);
+        font-weight: 600;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 32px 16px;
+        color: var(--color-text-muted);
+        min-height: 200px;
+      }
+
+      .empty-state i {
+        font-size: 36px;
+        margin-bottom: 12px;
+        opacity: 0.4;
+      }
+
+      .empty-state p {
+        font-size: 13px;
+        margin: 0;
+        line-height: 1.4;
+      }
+
+      /* Prevent horizontal scroll */
+      * {
+        max-width: 100%;
+      }
+
+      img,
+      video,
+      iframe {
+        max-width: 100%;
+        height: auto;
+      }
+    }
   </style>
 </head>
-<body style="display: flex; flex-direction: column; min-height: 100vh; margin: 0;">
+<body style="display: flex; flex-direction: column; min-height: 100vh; margin: 0; overflow-x: hidden;">
     {{> sidebar}}
-    <div id="main-content" style="flex: 1 0 auto; display: flex; flex-direction: column; margin-left: 240px;">
+    <div id="main-content" style="flex: 1 0 auto; display: flex; flex-direction: column; overflow-x: hidden;">
       {{> header translations=translations}}
-      <div style="width: 100%; height: 60px;"></div>
-      <div class="container-fluid mt-3">
+      <div class="container-fluid mt-3" style="overflow-x: hidden; max-width: 100%; padding-top: 0;">
+
         <!-- Completed Processes Section -->
         <section class="section-container" id="completed-processes">
           <div class="section-header">
