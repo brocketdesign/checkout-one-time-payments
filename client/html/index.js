@@ -52,7 +52,6 @@ const videoModeBtn = document.getElementById('videoModeBtn');
 const imageModeBtn = document.getElementById('imageModeBtn');
 const videoSourceSection = document.getElementById('videoSourceSection');
 const imageSourceSection = document.getElementById('imageSourceSection');
-const imageFreeBadge = document.querySelector('.image-free-badge');
 
 const payButton = document.getElementById('payButton');
 const status = document.getElementById('status');
@@ -63,52 +62,104 @@ const imagePreview = document.getElementById('imagePreview');
 const videoDetails = document.getElementById('videoDetails');
 
 // Hide videoDetails by default
-videoDetails.style.display = 'none';
+if (videoDetails) videoDetails.style.display = 'none';
 
-// Mode toggle functionality
-videoModeBtn.addEventListener('click', () => {
-  if (isImageMode) {
-    setVideoMode();
-  }
-});
+// Mode toggle functionality with new UI classes
+if (videoModeBtn) {
+  videoModeBtn.addEventListener('click', () => {
+    if (isImageMode) {
+      setVideoMode();
+    }
+    videoModeBtn.classList.add('mode-btn-active');
+    imageModeBtn.classList.remove('mode-btn-active');
+    videoModeBtn.setAttribute('aria-selected', 'true');
+    imageModeBtn.setAttribute('aria-selected', 'false');
+  });
+}
 
-imageModeBtn.addEventListener('click', () => {
-  if (!isImageMode) {
-    setImageMode();
-  }
+if (imageModeBtn) {
+  imageModeBtn.addEventListener('click', () => {
+    if (!isImageMode) {
+      setImageMode();
+    }
+    imageModeBtn.classList.add('mode-btn-active');
+    videoModeBtn.classList.remove('mode-btn-active');
+    imageModeBtn.setAttribute('aria-selected', 'true');
+    videoModeBtn.setAttribute('aria-selected', 'false');
+  });
+}
+
+// Initialize upload tabs functionality
+function initUploadTabs() {
+  const tabButtons = document.querySelectorAll('.upload-tab-btn');
+  const tabContents = document.querySelectorAll('.upload-tab-content');
+
+  tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const tabName = button.getAttribute('data-tab');
+      
+      // Remove active class from all buttons and contents in the same parent
+      const parent = button.closest('.upload-step');
+      if (parent) {
+        const parentButtons = parent.querySelectorAll('.upload-tab-btn');
+        const parentContents = parent.querySelectorAll('.upload-tab-content');
+        
+        parentButtons.forEach(btn => btn.classList.remove('active'));
+        parentContents.forEach(content => content.classList.remove('active'));
+      }
+      
+      // Add active class to clicked button and corresponding content
+      button.classList.add('active');
+      const activeContent = document.getElementById(tabName);
+      if (activeContent) {
+        activeContent.classList.add('active');
+      }
+    });
+  });
+}
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  initUploadTabs();
 });
 
 // Source Image Drag and Drop
-sourceImageDropZone.addEventListener('dragover', (event) => {
-  event.preventDefault();
-  sourceImageDropZone.classList.add('hover');
-});
+if (sourceImageDropZone) {
+  sourceImageDropZone.addEventListener('dragover', (event) => {
+    event.preventDefault();
+    sourceImageDropZone.classList.add('hover');
+  });
 
-sourceImageDropZone.addEventListener('dragleave', () => {
-  sourceImageDropZone.classList.remove('hover');
-});
+  sourceImageDropZone.addEventListener('dragleave', () => {
+    sourceImageDropZone.classList.remove('hover');
+  });
 
-// Update Source Image Drag and Drop
-sourceImageDropZone.addEventListener('drop', async (event) => {
-  event.preventDefault();
-  sourceImageDropZone.classList.remove('hover');
-  const files = event.dataTransfer.files;
-  const file = files[0];
-  
-  const newFile = await handleSourceImageSelection(file);
-  getSourceImageDetails(newFile);
-});
+  // Update Source Image Drag and Drop
+  sourceImageDropZone.addEventListener('drop', async (event) => {
+    event.preventDefault();
+    sourceImageDropZone.classList.remove('hover');
+    const files = event.dataTransfer.files;
+    const file = files[0];
+    
+    const newFile = await handleSourceImageSelection(file);
+    getSourceImageDetails(newFile);
+  });
+}
 
-sourceImageUploadBtn.addEventListener('click', () => {
-  sourceImageInput.click();
-});
+if (sourceImageUploadBtn) {
+  sourceImageUploadBtn.addEventListener('click', () => {
+    sourceImageInput.click();
+  });
+}
 
 // Update sourceImageInput event listener
-sourceImageInput.addEventListener('change', async (event) => {
-  const file = sourceImageInput.files[0];
-  const newFile = await handleSourceImageSelection(file);
-  getSourceImageDetails(newFile);
-});
+if (sourceImageInput) {
+  sourceImageInput.addEventListener('change', async (event) => {
+    const file = sourceImageInput.files[0];
+    const newFile = await handleSourceImageSelection(file);
+    getSourceImageDetails(newFile);
+  });
+}
 
 // Function to get source image details
 async function getSourceImageDetails(imageFile) {
@@ -150,73 +201,85 @@ async function getSourceImageDetails(imageFile) {
 }
 
 // Video Drag and Drop
-videoDropZone.addEventListener('dragover', (event) => {
-  event.preventDefault();
-  videoDropZone.classList.add('hover');
-});
+if (videoDropZone) {
+  videoDropZone.addEventListener('dragover', (event) => {
+    event.preventDefault();
+    videoDropZone.classList.add('hover');
+  });
 
-videoDropZone.addEventListener('dragleave', () => {
-  videoDropZone.classList.remove('hover');
-});
+  videoDropZone.addEventListener('dragleave', () => {
+    videoDropZone.classList.remove('hover');
+  });
 
-videoDropZone.addEventListener('drop', (event) => {
-  event.preventDefault();
-  videoDropZone.classList.remove('hover');
-  const files = event.dataTransfer.files;
-  videoInput.files = files;
-  handleVideoSelection(files[0]);
-  getVideoDetails(files[0]);
-});
+  videoDropZone.addEventListener('drop', (event) => {
+    event.preventDefault();
+    videoDropZone.classList.remove('hover');
+    const files = event.dataTransfer.files;
+    videoInput.files = files;
+    handleVideoSelection(files[0]);
+    getVideoDetails(files[0]);
+  });
+}
 
-videoUploadBtn.addEventListener('click', () => {
-  videoInput.click();
-});
+if (videoUploadBtn) {
+  videoUploadBtn.addEventListener('click', () => {
+    videoInput.click();
+  });
+}
 
-videoInput.addEventListener('change', (event) => {
-  handleVideoSelection(videoInput.files[0]);
-  getVideoDetails(videoInput.files[0]);
-});
+if (videoInput) {
+  videoInput.addEventListener('change', (event) => {
+    handleVideoSelection(videoInput.files[0]);
+    getVideoDetails(videoInput.files[0]);
+  });
+}
 
 // Image Drag and Drop
-imageDropZone.addEventListener('dragover', (event) => {
-  event.preventDefault();
-  imageDropZone.classList.add('hover');
-});
+if (imageDropZone) {
+  imageDropZone.addEventListener('dragover', (event) => {
+    event.preventDefault();
+    imageDropZone.classList.add('hover');
+  });
 
-imageDropZone.addEventListener('dragleave', () => {
-  imageDropZone.classList.remove('hover');
-});
+  imageDropZone.addEventListener('dragleave', () => {
+    imageDropZone.classList.remove('hover');
+  });
 
-// Update Image Drag and Drop
-imageDropZone.addEventListener('drop', async (event) => {
-  event.preventDefault();
-  imageDropZone.classList.remove('hover');
-  const files = event.dataTransfer.files;
-  const file = files[0];
-  
-  const newFile = await handleImageSelection(file);
-  getImageDetails(newFile);
-  saveFaceToLocalStorage(newFile);
-});
+  // Update Image Drag and Drop
+  imageDropZone.addEventListener('drop', async (event) => {
+    event.preventDefault();
+    imageDropZone.classList.remove('hover');
+    const files = event.dataTransfer.files;
+    const file = files[0];
+    
+    const newFile = await handleImageSelection(file);
+    getImageDetails(newFile);
+    saveFaceToLocalStorage(newFile);
+  });
+}
 
-imageUploadBtn.addEventListener('click', () => {
-  imageInput.click();
-});
+if (imageUploadBtn) {
+  imageUploadBtn.addEventListener('click', () => {
+    imageInput.click();
+  });
+}
 
 // Update imageInput event listener
-imageInput.addEventListener('change', async (event) => {
-  // Check if this is a programmatic event from a saved face
-  const fromSavedFace = event.isTrusted === false;
-  const file = imageInput.files[0];
-  
-  const newFile = await handleImageSelection(file);
-  getImageDetails(newFile);
-  
-  // Only save to localStorage if not from a saved face selection
-  if (!fromSavedFace && newFile) {
-    saveFaceToLocalStorage(newFile);
-  }
-});
+if (imageInput) {
+  imageInput.addEventListener('change', async (event) => {
+    // Check if this is a programmatic event from a saved face
+    const fromSavedFace = event.isTrusted === false;
+    const file = imageInput.files[0];
+    
+    const newFile = await handleImageSelection(file);
+    getImageDetails(newFile);
+    
+    // Only save to localStorage if not from a saved face selection
+    if (!fromSavedFace && newFile) {
+      saveFaceToLocalStorage(newFile);
+    }
+  });
+}
 
 // Function to handle video selection and display preview
 function handleVideoSelection(videoFile) {
@@ -686,7 +749,7 @@ function resetForm() {
 
 // Function to handle sample video selection
 function setupSampleVideoSelection() {
-  const sampleVideos = document.querySelectorAll('.sample-video');
+  const sampleVideos = document.querySelectorAll('.video-template');
   const videoPreview = document.getElementById('videoPreview');
   const videoDetails = document.getElementById('videoDetails');
   const status = document.getElementById('status');
@@ -810,15 +873,16 @@ function setupSampleVideoSelection() {
 
 // Function to handle sample image selection
 function setupSampleImageSelection() { 
-  const sampleImages = document.querySelectorAll('.sample-image');
+  // Handle image templates (source images)
+  const imageTemplates = document.querySelectorAll('.image-template');
   const status = document.getElementById('status');
   
-  sampleImages.forEach(imgContainer => {
+  imageTemplates.forEach(imgContainer => {
     imgContainer.addEventListener('click', async () => {
-      // Remove selected class from all images
-      sampleImages.forEach(img => img.classList.remove('selected'));
+      // Remove selected class from all templates
+      imageTemplates.forEach(img => img.classList.remove('selected'));
       
-      // Add selected class to clicked image
+      // Add selected class to clicked template
       imgContainer.classList.add('selected');
       
       const imgSrc = imgContainer.getAttribute('data-img-src');
@@ -832,37 +896,68 @@ function setupSampleImageSelection() {
         const filename = imgSrc.split('/').pop();
         
         // Create a File object from the blob
-        const imageFile = new File([blob], filename, { type: 'image/webp' });
+        const imageFile = new File([blob], filename, { type: 'image/png' });
         
         // Create a DataTransfer to set the files property
         const dataTransfer = new DataTransfer();
         dataTransfer.items.add(imageFile);
         
-        // For source image templates, set the file to sourceImageInput
-        if (filename.startsWith('image-template')) {
-          const sourceImageInput = document.getElementById('sourceImageInput');
-          sourceImageInput.files = dataTransfer.files;
-          
-          // Trigger change event to update image preview and details
-          const event = new Event('change', { bubbles: true });
-          sourceImageInput.dispatchEvent(event);
-          return;
-        }
+        // Set the file to sourceImageInput for image templates
+        const sourceImageInput = document.getElementById('sourceImageInput');
+        sourceImageInput.files = dataTransfer.files;
         
-        // For face samples (existing code)
-        // Set the files property of the imageInput
+        // Trigger change event to update image preview and details
+        const event = new Event('change', { bubbles: true });
+        sourceImageInput.dispatchEvent(event);
+        
+      } catch (error) {
+        console.error('Error selecting image template:', error);
+        status.textContent = translationsObj.error_loading_sample_image || 'Error loading image template';
+        status.classList.remove('hidden');
+        status.className = 'alert alert-danger';
+      }
+    });
+  });
+  
+  // Handle sample faces
+  const sampleFaces = document.querySelectorAll('.sample-face');
+  
+  sampleFaces.forEach(imgContainer => {
+    imgContainer.addEventListener('click', async () => {
+      // Remove selected class from all faces
+      sampleFaces.forEach(img => img.classList.remove('selected'));
+      
+      // Add selected class to clicked face
+      imgContainer.classList.add('selected');
+      
+      const imgSrc = imgContainer.getAttribute('data-img-src');
+      
+      try {
+        // Fetch the image file
+        const response = await fetch(imgSrc);
+        const blob = await response.blob();
+        
+        // Get the filename from the path
+        const filename = imgSrc.split('/').pop();
+        
+        // Create a File object from the blob
+        const imageFile = new File([blob], filename, { type: 'image/jpeg' });
+        
+        // Create a DataTransfer to set the files property
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(imageFile);
+        
+        // Set the files property of the imageInput for face samples
         const imageInput = document.getElementById('imageInput');
         imageInput.files = dataTransfer.files; 
 
-        // Trigger the change event to update image preview and details only for face-sample images
-        if (imageInput.files[0].name.startsWith('face-sample')) {
-          const event = new Event('change', { bubbles: true });
-          imageInput.dispatchEvent(event);
-        }
+        // Trigger the change event to update image preview and details
+        const event = new Event('change', { bubbles: true });
+        imageInput.dispatchEvent(event);
         
       } catch (error) {
-        console.error('Error selecting sample image:', error);
-        status.textContent = translationsObj.error_loading_sample_image || 'Error loading sample image';
+        console.error('Error selecting sample face:', error);
+        status.textContent = translationsObj.error_loading_sample_image || 'Error loading sample face';
         status.classList.remove('hidden');
         status.className = 'alert alert-danger';
       }
@@ -1068,52 +1163,6 @@ function removeSavedFace(faceId) {
   displaySavedFaces();
 }
 
-async function loadVideoFromUrl(videoUrl) {
-
-  if (!url) {
-    status.textContent = translationsObj.no_url_provided || 'Please enter a URL';
-    status.classList.remove('hidden');
-    status.className = 'alert alert-danger';
-    return;
-  }
-  
-  if (!isValidUrl(url)) {
-    status.textContent = translationsObj.invalid_url || 'Please enter a valid URL';
-    status.classList.remove('hidden');
-    status.className = 'alert alert-danger';
-    return;
-  }
-  
-  // Clear the file input when loading from URL
-  videoInput.value = '';
-  
-  status.textContent = translationsObj.loading_from_url || 'Loading video from URL...';
-  status.classList.remove('hidden');
-  status.className = 'alert alert-info';
-
-  try {
-    const response = await fetch(videoUrl);
-    const blob = await response.blob();
-    const videoFile = new File([blob], 'video.mp4', { type: 'video/mp4' });
-
-    // Create a new DataTransfer object to simulate file selection
-    const dataTransfer = new DataTransfer();
-    dataTransfer.items.add(videoFile);
-
-    // Set the files property of the videoInput
-    videoInput.files = dataTransfer.files;
-
-    // Trigger the change event to update video details
-    const event = new Event('change', { bubbles: true });
-    videoInput.dispatchEvent(event);
-  } catch (error) {
-    console.error('Error loading video from URL:', error);
-    status.textContent = translationsObj.error_loading_url;
-    status.classList.remove('hidden');
-    status.className = 'alert alert-danger'; // Use Bootstrap alert-danger class
-  }
-}
-
 // Function to hide the skip payment option if not on localhost
 function checkAndHideSkipPayment() {
   if (window.location.hostname !== 'localhost' && !window.location.hostname.includes('192.168.') ) {
@@ -1127,13 +1176,19 @@ function checkAndHideSkipPayment() {
 // Function to set up the image comparison slider
 function setupComparisonSlider(originalImageUrl, processedImageUrl) {
   const comparisonContainer = document.getElementById('imageComparisonContainer');
+  const processedImageElement = document.getElementById('processedImage');
 
   // Clear previous content
   comparisonContainer.innerHTML = '';
 
+  // Hide the standalone processedImage element
+  if (processedImageElement) {
+    processedImageElement.style.display = 'none';
+  }
+
   // Create the structure for the comparison slider
   comparisonContainer.innerHTML = `
-    <div class="img-comp-container dynamic-slider mx-auto">
+    <div class="img-comp-container dynamic-slider">
       <div class="img-comp-after">
         <img src="${processedImageUrl}" alt="Processed Image">
       </div>
@@ -1152,34 +1207,31 @@ function setupComparisonSlider(originalImageUrl, processedImageUrl) {
 
   // Wait for images to load before initializing comparison
   const images = comparisonContainer.querySelectorAll('img');
-  let loadedCount = 0;
-  let errorOccurred = false; // Flag to track if any image fails to load
-
   const imagePromises = Array.from(images).map(img => {
     return new Promise((resolve, reject) => {
+      // Handle already cached images
+      if (img.complete && img.naturalWidth && img.naturalHeight) {
+        resolve();
+        return;
+      }
+
       img.onload = () => {
         // Check for natural dimensions after load
-        if (!img.naturalWidth || !img.naturalHeight) {
-          console.warn('Image dimensions not available yet, delaying initSlider');
-          setTimeout(() => {
-            img.onload(); // Re-trigger onload after a delay
-          }, 200);
-          reject('Image dimensions not available');
-          return;
+        if (img.naturalWidth && img.naturalHeight) {
+          resolve();
+        } else {
+          console.warn('Image dimensions not available, retrying...');
+          setTimeout(() => resolve(), 200);
         }
-        resolve();
       };
+
       img.onerror = () => {
-        errorOccurred = true;
+        console.error('Image failed to load:', img.src);
         status.textContent = translationsObj.error_loading_images || 'Error loading images for comparison.';
         status.classList.remove('hidden');
         status.className = 'alert alert-danger';
         reject('Error loading image');
       };
-      // Handle already cached images
-      if (img.complete) {
-        img.onload();
-      }
     });
   });
 
@@ -1187,15 +1239,15 @@ function setupComparisonSlider(originalImageUrl, processedImageUrl) {
     .then(() => {
       // Delay initSlider to ensure images are rendered
       setTimeout(() => {
-        initSlider(comparisonContainer.querySelector('.img-comp-container'));
+        const container = comparisonContainer.querySelector('.img-comp-container');
+        if (container) {
+          initSlider(container);
+        }
       }, 100);
     })
     .catch(error => {
       console.error('Image loading failed:', error);
     });
-
-  // Also update the processedImage element for backward compatibility
-  document.getElementById('processedImage').src = processedImageUrl;
 }
 
 // Unified function to initialize all comparison sliders
@@ -1205,47 +1257,19 @@ function initSlider(container) {
   const slider = container.querySelector('.img-comp-slider');
   const before = container.querySelector('.img-comp-before');
   const after = container.querySelector('.img-comp-after');
-  const beforeImg = before.querySelector('img');
-  const afterImg = after.querySelector('img');
+  const beforeImg = before ? before.querySelector('img') : null;
+  const afterImg = after ? after.querySelector('img') : null;
 
   // Check if images have loaded properly
-  if (beforeImg && afterImg) {
-    // Set initial slider position (center)
-    const initialPosition = 50;
-    slider.style.left = initialPosition + '%';
-    updateClipPath(before, initialPosition);
-    
-    // Add event listeners for slider interaction
-    slider.addEventListener('mousedown', startSliding);
-    slider.addEventListener('touchstart', startSliding, { passive: true });
-    
-    // Add click functionality to container
-    container.addEventListener('click', handleContainerClick);
-  }
+  if (!beforeImg || !afterImg) return;
+  
+  // Set initial slider position (center)
+  const initialPosition = 50;
+  slider.style.left = initialPosition + '%';
+  updateClipPath(before, initialPosition);
 
-  function startSliding(e) {
-    e.preventDefault();
-    
-    // Add event listeners for moving and stopping
-    document.addEventListener('mousemove', slide);
-    document.addEventListener('touchmove', slide, { passive: false });
-    document.addEventListener('mouseup', stopSliding);
-    document.addEventListener('touchend', stopSliding);
-  }
-
-  function handleContainerClick(e) {
-    // Ignore clicks on the slider itself
-    if (e.target === slider || slider.contains(e.target)) return;
-    
-    const rect = container.getBoundingClientRect();
-    const position = ((e.clientX - rect.left) / rect.width) * 100;
-    
-    // Update slider position and clip path
-    slider.style.left = position + '%';
-    updateClipPath(before, position);
-  }
-
-  function slide(e) {
+  // Define slide handler to be used in both mouse and touch events
+  const slide = (e) => {
     const rect = container.getBoundingClientRect();
     let position;
     
@@ -1262,15 +1286,44 @@ function initSlider(container) {
     // Update slider position and clip path
     slider.style.left = position + '%';
     updateClipPath(before, position);
-  }
+  };
 
-  function stopSliding() {
+  const startSliding = (e) => {
+    e.preventDefault();
+    
+    // Add event listeners for moving and stopping
+    document.addEventListener('mousemove', slide);
+    document.addEventListener('touchmove', slide, { passive: false });
+    document.addEventListener('mouseup', stopSliding);
+    document.addEventListener('touchend', stopSliding);
+  };
+
+  const stopSliding = () => {
     // Remove event listeners
     document.removeEventListener('mousemove', slide);
     document.removeEventListener('touchmove', slide);
     document.removeEventListener('mouseup', stopSliding);
     document.removeEventListener('touchend', stopSliding);
-  }
+  };
+
+  const handleContainerClick = (e) => {
+    // Ignore clicks on the slider itself
+    if (e.target === slider || slider.contains(e.target)) return;
+    
+    const rect = container.getBoundingClientRect();
+    const position = ((e.clientX - rect.left) / rect.width) * 100;
+    
+    // Update slider position and clip path
+    slider.style.left = position + '%';
+    updateClipPath(before, position);
+  };
+  
+  // Add event listeners for slider interaction
+  slider.addEventListener('mousedown', startSliding);
+  slider.addEventListener('touchstart', startSliding, { passive: true });
+  
+  // Add click functionality to container
+  container.addEventListener('click', handleContainerClick);
 }
 
 // Helper function to update clip path based on position percentage
@@ -1309,10 +1362,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const loadVideoUrlBtn = document.getElementById('loadVideoUrlBtn');
   const sourceImageUrlInput = document.getElementById('sourceImageUrlInput');
   const loadSourceImageUrlBtn = document.getElementById('loadSourceImageUrlBtn');
-  const faceImageUrlInput = document.getElementById('faceImageUrlInput');
-  const loadFaceImageUrlBtn = document.getElementById('loadFaceImageUrlBtn');
+  const imageUrlInput = document.getElementById('imageUrlInput');
+  const loadImageUrlBtn = document.getElementById('loadImageUrlBtn');
   
-  if (loadVideoUrlBtn) {
+  if (loadVideoUrlBtn && videoUrlInput) {
     loadVideoUrlBtn.addEventListener('click', () => {
       loadVideoFromUrl(videoUrlInput.value);
     });
@@ -1325,7 +1378,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
    
-  if (loadSourceImageUrlBtn) {
+  if (loadSourceImageUrlBtn && sourceImageUrlInput) {
     loadSourceImageUrlBtn.addEventListener('click', () => {
       loadSourceImageFromUrl(sourceImageUrlInput.value);
     });
@@ -1338,15 +1391,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   
-  if (loadFaceImageUrlBtn) {
-    loadFaceImageUrlBtn.addEventListener('click', () => {
-      loadFaceImageFromUrl(faceImageUrlInput.value);
+  if (loadImageUrlBtn && imageUrlInput) {
+    loadImageUrlBtn.addEventListener('click', () => {
+      loadFaceImageFromUrl(imageUrlInput.value);
     });
     
     // Also load on Enter key
-    faceImageUrlInput.addEventListener('keypress', (e) => {
+    imageUrlInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
-        loadFaceImageFromUrl(faceImageUrlInput.value);
+        loadFaceImageFromUrl(imageUrlInput.value);
       }
     });
   }
@@ -1696,9 +1749,23 @@ payButton.addEventListener('click', async () => {
           document.getElementById('downloadLink').href = result.image_url;
           document.getElementById('downloadLink').download = 'processed_image.jpg';
           
-          // Show the modal
-          const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
-          imageModal.show();
+          // Also update the main result section with the processed image in the placeholder
+          const resultPlaceholder = document.getElementById('resultPlaceholder');
+          const resultPreviewImage = document.getElementById('resultPreviewImage');
+          const placeholderContent = resultPlaceholder.querySelector('.output-placeholder-content');
+          
+          if (resultPreviewImage && resultPlaceholder) {
+            resultPreviewImage.src = result.image_url;
+            resultPreviewImage.style.display = 'block';
+            if (placeholderContent) {
+              placeholderContent.style.display = 'none';
+            }
+          }
+          
+          // Show the modal using custom ResultModal
+          if (resultModal) {
+            resultModal.show();
+          }
         } else {
           throw new Error('No image URL in response');
         }
@@ -1742,9 +1809,23 @@ payButton.addEventListener('click', async () => {
           document.getElementById('downloadLink').href = result.image_url;
           document.getElementById('downloadLink').download = 'processed_image.jpg';
           
-          // Show the modal
-          const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
-          imageModal.show();
+          // Also update the main result section with the processed image in the placeholder
+          const resultPlaceholder = document.getElementById('resultPlaceholder');
+          const resultPreviewImage = document.getElementById('resultPreviewImage');
+          const placeholderContent = resultPlaceholder.querySelector('.output-placeholder-content');
+          
+          if (resultPreviewImage && resultPlaceholder) {
+            resultPreviewImage.src = result.image_url;
+            resultPreviewImage.style.display = 'block';
+            if (placeholderContent) {
+              placeholderContent.style.display = 'none';
+            }
+          }
+          
+          // Show the modal using custom ResultModal
+          if (resultModal) {
+            resultModal.show();
+          }
         } else {
           throw new Error('No image URL in response');
         }
@@ -1988,59 +2069,6 @@ function saveFaceImageFromUrl(url, imgElement) {
   }
 }
 
-// Function to load face image from URL
-function loadFaceImageFromUrl(url) {
-  if (!url) {
-    status.textContent = translationsObj.no_url_provided || 'Please enter a URL';
-    status.classList.remove('hidden');
-    status.className = 'alert alert-danger';
-    return;
-  }
-  
-  if (!isValidUrl(url)) {
-    status.textContent = translationsObj.invalid_url || 'Please enter a valid URL';
-    status.classList.remove('hidden');
-    status.className = 'alert alert-danger';
-    return;
-  }
-  
-  status.textContent = translationsObj.loading_from_url || 'Loading image from URL...';
-  status.classList.remove('hidden');
-  status.className = 'alert alert-info';
-  
-  // Create a new image element
-  const img = new Image();
-  img.crossOrigin = 'anonymous';
-  
-  img.onload = function() {
-    // Store the URL value for later use
-    faceImageUrlValue = url;
-    
-    // Update the UI
-    imagePreview.style.display = 'block';
-    imagePreview.src = url;
-    imagePreview.crossOrigin = 'anonymous';
-    
-    // Display image details
-    getImageDetailsFromElement(img, url);
-    
-    // Save face image URL to localStorage for future use
-    saveFaceImageFromUrl(url, img);
-    
-    status.textContent = '';
-    status.className = 'hidden';
-  };
-  
-  img.onerror = function() {
-    console.error('Error loading image from URL');
-    status.textContent = translationsObj.error_loading_image || 'Error loading image from URL. The image might be restricted or the format is not supported.';
-    status.classList.remove('hidden');
-    status.className = 'alert alert-danger';
-  };
-  
-  img.src = url;
-}
-
 // Update the displaySavedFaces function to handle URL-based faces
 function displaySavedFaces() {
   // Get the saved faces gallery container
@@ -2157,14 +2185,15 @@ function displaySavedFaces() {
 // Ensure the mode toggle works correctly and consistently
 function setVideoMode() {
   isImageMode = false;
-  videoModeBtn.classList.add('active');
-  videoModeBtn.classList.remove('btn-outline-primary');
-  videoModeBtn.classList.add('btn-primary');
-  imageModeBtn.classList.remove('active');
-  imageModeBtn.classList.add('btn-outline-primary');
-  imageModeBtn.classList.remove('btn-primary');
+  videoModeBtn.classList.add('mode-btn-active');
+  imageModeBtn.classList.remove('mode-btn-active');
+  videoModeBtn.setAttribute('aria-selected', 'true');
+  imageModeBtn.setAttribute('aria-selected', 'false');
 
-  imageFreeBadge.style.display = 'none';
+  // Hide the free badge in video mode
+  const freeBadge = document.querySelector('.badge-free-indicator');
+  if (freeBadge) freeBadge.style.display = 'none';
+  
   videoSourceSection.style.display = 'block';
   imageSourceSection.style.display = 'none';
   
@@ -2182,14 +2211,15 @@ function setVideoMode() {
 
 function setImageMode() {
   isImageMode = true;
-  imageModeBtn.classList.add('active');
-  imageModeBtn.classList.remove('btn-outline-primary');
-  imageModeBtn.classList.add('btn-primary');
-  videoModeBtn.classList.remove('active');
-  videoModeBtn.classList.add('btn-outline-primary');
-  videoModeBtn.classList.remove('btn-primary');
+  imageModeBtn.classList.add('mode-btn-active');
+  videoModeBtn.classList.remove('mode-btn-active');
+  imageModeBtn.setAttribute('aria-selected', 'true');
+  videoModeBtn.setAttribute('aria-selected', 'false');
 
-  imageFreeBadge.style.display = 'block';
+  // Show the free badge in image mode
+  const freeBadge = document.querySelector('.badge-free-indicator');
+  if (freeBadge) freeBadge.style.display = 'block';
+  
   videoSourceSection.style.display = 'none';
   imageSourceSection.style.display = 'block';
   
@@ -2365,3 +2395,91 @@ function updateCountdown(element, endTime, interval) {
   element.textContent =
     `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(2, '0')}`;
 }
+
+// ============================================
+// MODAL CONTROL - Result Image Display
+// ============================================
+
+// Custom modal control (not using Bootstrap modals)
+class ResultModal {
+  constructor() {
+    this.modal = document.getElementById('imageModal');
+    this.closeBtn = document.querySelector('.modal-close');
+    this.backBtn = document.getElementById('backButton');
+    this.init();
+  }
+
+  init() {
+    // Handle close button click
+    if (this.closeBtn) {
+      this.closeBtn.addEventListener('click', () => this.hide());
+    }
+
+    // Handle back button click
+    if (this.backBtn) {
+      this.backBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.hide();
+      });
+    }
+
+    // Handle backdrop click to close
+    if (this.modal) {
+      this.modal.addEventListener('click', (e) => {
+        if (e.target === this.modal) {
+          this.hide();
+        }
+      });
+    }
+
+    // Handle escape key to close
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && this.modal?.classList.contains('show')) {
+        this.hide();
+      }
+    });
+  }
+
+  show() {
+    if (this.modal) {
+      this.modal.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  hide() {
+    if (this.modal) {
+      this.modal.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+  }
+}
+
+// Initialize result modal
+let resultModal;
+document.addEventListener('DOMContentLoaded', () => {
+  resultModal = new ResultModal();
+});
+
+// Override the imageModal initialization in the pay button logic
+// This replaces the Bootstrap modal usage with our custom modal
+Object.defineProperty(window, 'bootstrap', {
+  value: {
+    Modal: class {
+      constructor(element) {
+        this.element = element;
+      }
+      show() {
+        if (resultModal) {
+          resultModal.show();
+        }
+      }
+      hide() {
+        if (resultModal) {
+          resultModal.hide();
+        }
+      }
+    }
+  },
+  writable: true
+});

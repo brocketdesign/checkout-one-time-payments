@@ -5,69 +5,89 @@
   <title>{{translations.history_title}} - {{translations.ai_video_face_swap}}</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script>const translations = `{{{json translations}}}`;</script> 
+  <link rel="stylesheet" href="/css/normalize.css" />
+  <link rel="stylesheet" href="/css/variables.css" />
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="/css/bootstrap-icons.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <script src="/js/jquery-3.6.0.min.js"></script>
+  <script src="/js/bootstrap.bundle.min.js"></script>
+  <script>const translations = `{{{json translations}}}`;</script>
   <style>
     body {
-      background-color: #f8f9fa;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--color-bg-primary);
+      font-family: var(--font-family-primary);
     }
-    .page-header {
-      background-color: #4a6bdf;
-      color: white;
-      padding: 2rem 0;
-      margin-bottom: 2rem;
-      margin-top: -40px;
-      border-radius: 0 0 4rem 4rem;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
+    
     .section-container {
-      background-color: white;
-      border-radius: 1rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      padding: 2rem;
-      margin-bottom: 2rem;
+      background-color: var(--color-bg-tertiary);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      padding: var(--space-2xl);
+      margin-bottom: var(--space-2xl);
+      border: 1px solid var(--color-border);
     }
+    
     .section-header {
-      border-bottom: 1px solid #e9ecef;
-      padding-bottom: 1rem;
-      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: var(--space-lg);
+      margin-bottom: var(--space-xl);
       display: flex;
       align-items: center;
     }
+    
     .section-header i {
-      margin-right: 0.75rem;
-      font-size: 1.5rem;
-      color: #4a6bdf;
+      margin-right: var(--space-md);
+      font-size: var(--font-size-2xl);
+      color: var(--color-accent-purple);
     }
+    
+    .section-header h2 {
+      color: var(--color-text-primary);
+      font-size: var(--font-size-2xl);
+      font-weight: 600;
+    }
+    
     .card {
-      border: none;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-      transition: transform 0.3s, box-shadow 0.3s;
+      border: 1px solid var(--color-border);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transition: transform var(--transition-base), box-shadow var(--transition-base);
       height: 100%;
-      border-radius: 0.75rem;
+      border-radius: var(--radius-lg);
       overflow: hidden;
+      background-color: var(--color-bg-secondary);
     }
+    
     .card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
     }
+    
     .card-header {
       font-weight: 600;
-      padding: 1rem;
+      padding: var(--space-lg);
+      border-bottom: 1px solid var(--color-border);
     }
+    
     .pending-card .card-header {
-      background-color: #f8d7da;
-      color: #842029;
+      background: linear-gradient(135deg, rgba(255, 193, 7, 0.2), rgba(255, 152, 0, 0.2));
+      color: #ffa500;
+      border-bottom: 2px solid #ffa500;
     }
+    
     .completed-card .card-header {
-      background-color: #d1e7dd;
-      color: #0f5132;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(20, 200, 140, 0.2));
+      color: var(--color-success);
+      border-bottom: 2px solid var(--color-success);
     }
+    
     .video-container {
       position: relative;
       padding-top: 56.25%; /* 16:9 aspect ratio */
-      background-color: #000;
+      background-color: var(--color-bg-primary);
     }
+    
     .video-container video {
       position: absolute;
       top: 0;
@@ -76,51 +96,85 @@
       height: 100%;
       object-fit: contain;
     }
+    
     .card-footer {
-      background-color: white;
-      border-top: 1px solid #e9ecef;
+      background-color: var(--color-bg-secondary);
+      border-top: 1px solid var(--color-border);
+      padding: var(--space-lg);
     }
+    
+    .card-body {
+      padding: var(--space-lg);
+      color: var(--color-text-secondary);
+    }
+    
+    .card-title {
+      color: var(--color-text-primary);
+      font-size: var(--font-size-lg);
+      font-weight: 600;
+      margin-bottom: var(--space-md);
+    }
+    
     .empty-state {
       text-align: center;
-      padding: 3rem 1rem;
-      color: #6c757d;
+      padding: var(--space-3xl) var(--space-lg);
+      color: var(--color-text-muted);
     }
+    
     .empty-state i {
-      font-size: 3rem;
-      margin-bottom: 1rem;
+      font-size: var(--font-size-4xl);
+      margin-bottom: var(--space-lg);
+      color: var(--color-text-muted);
       opacity: 0.5;
     }
-    .navbar {
-      margin-bottom: 2rem;
+    
+    .empty-state p {
+      font-size: var(--font-size-base);
     }
-    .nav-link {
-      color: #495057;
-      font-weight: 500;
-    }
-    .nav-link.active {
-      color: #4a6bdf;
-      border-bottom: 2px solid #4a6bdf;
-    }
+    
     .btn-action {
-      background-color: #4a6bdf;
-      color: white;
+      background: var(--color-accent-gradient);
+      color: var(--color-text-primary);
       border: none;
       font-weight: 500;
+      border-radius: var(--radius-md);
+      padding: var(--space-md) var(--space-lg);
+      transition: all var(--transition-base);
     }
+    
     .btn-action:hover {
-      background-color: #3a59c7;
-      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+      color: var(--color-text-primary);
     }
-    .home-btn {
-      margin-bottom: 1rem;
+    
+    .btn-secondary {
+      background-color: var(--color-bg-tertiary);
+      color: var(--color-text-primary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-md) var(--space-lg);
+      transition: all var(--transition-base);
+    }
+    
+    .btn-secondary:hover {
+      background-color: var(--color-accent-purple);
+      color: var(--color-text-primary);
+      border-color: var(--color-accent-purple);
+    }
+    
+    .container {
+      margin-top: var(--space-2xl);
+      margin-bottom: var(--space-2xl);
     }
   </style>
 </head>
 <body style="display: flex; flex-direction: column; min-height: 100vh; margin: 0;">
     {{> sidebar}}
-    <div id="main-content" style="flex: 1 0 auto; display: flex; flex-direction: column;">
+    <div id="main-content" style="flex: 1 0 auto; display: flex; flex-direction: column; margin-left: 240px;">
       {{> header translations=translations}}
-      <div class="container">
+      <div style="width: 100%; height: 60px;"></div>
+      <div class="container-fluid mt-3">
         <!-- Completed Processes Section -->
         <section class="section-container" id="completed-processes">
           <div class="section-header">

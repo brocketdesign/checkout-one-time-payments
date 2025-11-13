@@ -1,47 +1,47 @@
-<footer class="text-dark py-4"></footer>
+<footer class="text-dark py-4" style="background-color: var(--color-bg-secondary); border-top: 1px solid var(--color-border); margin-top: var(--space-3xl);">
   <div class="container bg-transparent border-0 shadow-none w-100 mx-auto">
     <div class="row">
       <div class="col-md-4">
-        <h5>{{ translations.footer_links }}</h5>
+        <h5 style="color: var(--color-text-primary); font-weight: 600; margin-bottom: var(--space-lg);">{{ translations.footer_links }}</h5>
         <ul class="list-unstyled">
-          <li><a href="/{{language}}/#demo" class="text-dark">{{ translations.demo_heading }}</a></li>
-          <li><a href="/{{language}}/#pricing" class="text-dark">{{ translations.pricing_heading }}</a></li>
-          <li><a href="/{{language}}/#faq" class="text-dark">{{ translations.faq_heading }}</a></li>
+          <li><a href="/{{language}}/#demo" style="color: var(--color-text-secondary); text-decoration: none; transition: all var(--transition-base);" onmouseover="this.style.color='var(--color-accent-purple)'" onmouseout="this.style.color='var(--color-text-secondary)'">{{ translations.demo_heading }}</a></li>
+          <li><a href="/{{language}}/#pricing" style="color: var(--color-text-secondary); text-decoration: none; transition: all var(--transition-base);" onmouseover="this.style.color='var(--color-accent-purple)'" onmouseout="this.style.color='var(--color-text-secondary)'">{{ translations.pricing_heading }}</a></li>
+          <li><a href="/{{language}}/#faq" style="color: var(--color-text-secondary); text-decoration: none; transition: all var(--transition-base);" onmouseover="this.style.color='var(--color-accent-purple)'" onmouseout="this.style.color='var(--color-text-secondary)'">{{ translations.faq_heading }}</a></li>
         </ul>
       </div>
       <div class="col-md-6">
-        <h5>{{ translations.footer_legal }}</h5>
+        <h5 style="color: var(--color-text-primary); font-weight: 600; margin-bottom: var(--space-lg);">{{ translations.footer_legal }}</h5>
         <ul class="list-unstyled">
-          <li><a href="/{{language}}/terms" class="text-dark">{{ translations.terms_of_service }}</a></li>
-          <li><a href="/{{language}}/privacy" class="text-dark">{{ translations.privacy_policy }}</a></li>
-          <li><a href="/{{language}}/service-complaint" class="text-dark">{{ translations.service_complaint_policy }}</a></li>
-          <li><a href="/{{language}}/contact" class="text-dark">{{ translations.contact }}</a></li>
+          <li><a href="/{{language}}/terms" style="color: var(--color-text-secondary); text-decoration: none; transition: all var(--transition-base);" onmouseover="this.style.color='var(--color-accent-purple)'" onmouseout="this.style.color='var(--color-text-secondary)'">{{ translations.terms_of_service }}</a></li>
+          <li><a href="/{{language}}/privacy" style="color: var(--color-text-secondary); text-decoration: none; transition: all var(--transition-base);" onmouseover="this.style.color='var(--color-accent-purple)'" onmouseout="this.style.color='var(--color-text-secondary)'">{{ translations.privacy_policy }}</a></li>
+          <li><a href="/{{language}}/service-complaint" style="color: var(--color-text-secondary); text-decoration: none; transition: all var(--transition-base);" onmouseover="this.style.color='var(--color-accent-purple)'" onmouseout="this.style.color='var(--color-text-secondary)'">{{ translations.service_complaint_policy }}</a></li>
+          <li><a href="/{{language}}/contact" style="color: var(--color-text-secondary); text-decoration: none; transition: all var(--transition-base);" onmouseover="this.style.color='var(--color-accent-purple)'" onmouseout="this.style.color='var(--color-text-secondary)'">{{ translations.contact }}</a></li>
         </ul>
       </div>
     </div>
-    <hr class="bg-secondary">
+    <hr style="color: var(--color-border);">
     <div class="row">
       <div class="col-md-12 text-center">
         <ul class="list-inline">
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: var(--color-text-secondary);">
               <i class="bi bi-globe"></i>
             </a>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown" style="background-color: var(--color-bg-tertiary); border: 1px solid var(--color-border);">
               <li>
-                <a class="dropdown-item" href="#" data-lang="en">
-            <span class="language-option"> English</span>
+                <a class="dropdown-item" href="#" data-lang="en" style="color: var(--color-text-primary);">
+                  <span class="language-option">English</span>
                 </a>
               </li>
               <li>
-                <a class="dropdown-item" href="#" data-lang="ja">
-            <span class="language-option">日本語</span>
+                <a class="dropdown-item" href="#" data-lang="ja" style="color: var(--color-text-primary);">
+                  <span class="language-option">日本語</span>
                 </a>
               </li>
             </ul>
           </li>
         </ul>
-        <p>&copy; {{ currentYear }} {{translations.footer_company_name}}. {{translations.footer_rights_reserved}}</p>
+        <p style="color: var(--color-text-secondary); margin-top: var(--space-lg);">&copy; {{ currentYear }} {{translations.footer_company_name}}. {{translations.footer_rights_reserved}}</p>
       </div>
     </div>
   </div>

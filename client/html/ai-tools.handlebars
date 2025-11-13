@@ -3,222 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{#ifCond language '==' 'en'}}AI Tools{{else}}Outils IA{{/ifCond}} - My App</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <title>{{#ifCond language '==' 'en'}}AI Tools{{else}}Outils IA{{/ifCond}} - TwiixAI</title>
+    <link rel="icon" href="/img/logo.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/normalize.css" />
+    <link rel="stylesheet" href="/css/variables.css" />
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/css/sidebar.css"> 
     <link rel="stylesheet" href="/css/ai-tools.css">
-    <link rel="stylesheet" href="/css/global.css">
-    <link rel="icon" href="/img/logo.ico" type="image/x-icon">
+    <script>const translations = `{{{json translations}}}`;</script>
 </head>
 <body>
     {{> sidebar translations=translations language=language}} 
 
-    <div id="main-content" class="container-fluid mt-4">
-        <header class="mb-4 text-center">
-            <h1 class="display-5 fw-bold">{{#ifCond language '==' 'en'}}Explore Our AI Tools{{else}}Découvrez nos outils IA{{/ifCond}}</h1>
-            <p class="lead">{{#ifCond language '==' 'en'}}Discover a variety of AI-powered tools to enhance your creative projects.{{else}}Découvrez une variété d'outils basés sur l'IA pour améliorer vos projets créatifs.{{/ifCond}}</p>
+    <div id="main-content">
+        {{> header translations=translations}}
+        
+        <header>
+            <h1>{{#ifCond language '==' 'en'}}Explore Our AI Tools{{else}}Découvrez nos outils IA{{/ifCond}}</h1>
+            <p>{{#ifCond language '==' 'en'}}Powerful AI-powered tools to enhance your creative projects{{else}}Des outils puissants alimentés par l'IA pour améliorer vos projets créatifs{{/ifCond}}</p>
         </header>
         
-        <div class="tool-tabs mb-4">
-            <button class="tool-tab active" data-tab="video">{{#ifCond language '==' 'en'}}Video Tools{{else}}Outils Vidéo{{/ifCond}}</button>
-            <button class="tool-tab" data-tab="image">{{#ifCond language '==' 'en'}}Image Tools{{else}}Outils Image{{/ifCond}}</button>
-        </div>
-
-        <section id="video-tools-section">
+        <section class="tools-section">
             <div class="tools-grid">
-                <!-- First Row of Tools -->
-                <div class="tool-card">
-                    <div class="tool-comparison-image">
-                        <img src="/img/examples/main-1.jpg" alt="Video Upscaler Example">
-                        <button class="use-tool-btn">{{#ifCond language '==' 'en'}}Use This Tool{{else}}Utiliser cet outil{{/ifCond}}</button>
-                    </div>
-                    <div class="tool-card-content">
-                        <h3>{{#ifCond language '==' 'en'}}Video Upscaler{{else}}Amélioration Vidéo{{/ifCond}}</h3>
-                        <p>{{#ifCond language '==' 'en'}}Increase the resolution and quality of your videos.{{else}}Augmentez la résolution et la qualité de vos vidéos.{{/ifCond}}</p>
-                        {{!-- <a href="#" class="btn btn-primary">{{#ifCond language '==' 'en'}}Start{{else}}Commencer{{/ifCond}}</a> --}}
-                    </div>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-comparison-image">
-                        <div class="comparison-label">Original</div>
-                        <div class="comparison-label">Lip Sync</div>
-                        <img src="/img/examples/main-2.jpg" alt="Lip Sync AI Example">
-                        <button class="use-tool-btn">{{#ifCond language '==' 'en'}}Use This Tool{{else}}Utiliser cet outil{{/ifCond}}</button>
-                    </div>
-                    <div class="tool-card-content">
-                        <h3>{{#ifCond language '==' 'en'}}Lip Sync AI{{else}}AI Synchronisation Labiale{{/ifCond}}</h3>
-                        <p>{{#ifCond language '==' 'en'}}Synchronize lip movements in videos with audio.{{else}}Synchronisez les mouvements des lèvres dans les vidéos avec l'audio.{{/ifCond}}</p>
-                        {{!-- <a href="#" class="btn btn-primary">{{#ifCond language '==' 'en'}}Start{{else}}Commencer{{/ifCond}}</a> --}}
-                    </div>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-comparison-image">
-                        <img src="/img/examples/main-3.jpg" alt="Video Enhancer Example">
-                        <button class="use-tool-btn">{{#ifCond language '==' 'en'}}Use This Tool{{else}}Utiliser cet outil{{/ifCond}}</button>
-                    </div>
-                    <div class="tool-card-content">
-                        <h3>{{#ifCond language '==' 'en'}}Video Enhancer{{else}}Améliorateur Vidéo{{/ifCond}}</h3>
-                        <p>{{#ifCond language '==' 'en'}}Automatically enhance the visual quality of videos.{{else}}Améliorez automatiquement la qualité visuelle des vidéos.{{/ifCond}}</p>
-                        {{!-- <a href="#" class="btn btn-primary">{{#ifCond language '==' 'en'}}Start{{else}}Commencer{{/ifCond}}</a> --}}
-                    </div>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-comparison-image">
-                        <img src="/img/examples/swap-1.jpg" alt="Video to Anime Example">
-                        <button class="use-tool-btn">{{#ifCond language '==' 'en'}}Use This Tool{{else}}Utiliser cet outil{{/ifCond}}</button>
-                    </div>
-                    <div class="tool-card-content">
-                        <h3>{{#ifCond language '==' 'en'}}Video to Anime{{else}}Vidéo en Anime{{/ifCond}}</h3>
-                        <p>{{#ifCond language '==' 'en'}}Convert your videos into anime style.{{else}}Convertissez vos vidéos en style anime.{{/ifCond}}</p>
-                        {{!-- <a href="#" class="btn btn-primary">{{#ifCond language '==' 'en'}}Start{{else}}Commencer{{/ifCond}}</a> --}}
-                    </div>
-                </div>
-
-                <!-- Second Row of Tools -->
-                <div class="tool-card">
-                    <div class="tool-comparison-image">
-                        <img src="/img/examples/swap-2.jpg" alt="AI Video Filters Example">
-                        <button class="use-tool-btn">{{#ifCond language '==' 'en'}}Use This Tool{{else}}Utiliser cet outil{{/ifCond}}</button>
-                    </div>
-                    <div class="tool-card-content">
-                        <h3>{{#ifCond language '==' 'en'}}AI Video Filters{{else}}Filtres Vidéo IA{{/ifCond}}</h3>
-                        <p>{{#ifCond language '==' 'en'}}Apply intelligent filters to transform your videos.{{else}}Appliquez des filtres intelligents pour transformer vos vidéos.{{/ifCond}}</p>
-                        {{!-- <a href="#" class="btn btn-primary">{{#ifCond language '==' 'en'}}Start{{else}}Commencer{{/ifCond}}</a> --}}
-                    </div>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-comparison-image">
-                        <img src="/img/examples/swap-3.jpg" alt="AI Dance Generator Example">
-                        <button class="use-tool-btn">{{#ifCond language '==' 'en'}}Use This Tool{{else}}Utiliser cet outil{{/ifCond}}</button>
-                    </div>
-                    <div class="tool-card-content">
-                        <h3>{{#ifCond language '==' 'en'}}AI Dance Generator{{else}}Générateur de Danse IA{{/ifCond}}</h3>
-                        <p>{{#ifCond language '==' 'en'}}Generate dancing movements from still images.{{else}}Générez des mouvements de danse à partir d'images fixes.{{/ifCond}}</p>
-                        {{!-- <a href="#" class="btn btn-primary">{{#ifCond language '==' 'en'}}Start{{else}}Commencer{{/ifCond}}</a> --}}
-                    </div>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-comparison-image">
-                        <img src="/img/examples/main-1.jpg" alt="Face Swap Video Example">
-                        <button class="use-tool-btn">{{#ifCond language '==' 'en'}}Use This Tool{{else}}Utiliser cet outil{{/ifCond}}</button>
-                    </div>
-                    <div class="tool-card-content">
-                        <h3>{{#ifCond language '==' 'en'}}Face Swap Video{{else}}Échange de Visage Vidéo{{/ifCond}}</h3>
-                        <p>{{#ifCond language '==' 'en'}}Swap faces in videos with professional results.{{else}}Échangez des visages dans des vidéos avec des résultats professionnels.{{/ifCond}}</p>
-                        {{!-- <a href="#" class="btn btn-primary">{{#ifCond language '==' 'en'}}Start{{else}}Commencer{{/ifCond}}</a> --}}
-                    </div>
-                </div>
-
-                <div class="tool-card">
-                    <div class="tool-comparison-image">
-                        <img src="/img/examples/main-3.jpg" alt="AI Face Enhancer Example">
-                        <button class="use-tool-btn">{{#ifCond language '==' 'en'}}Use This Tool{{else}}Utiliser cet outil{{/ifCond}}</button>
-                    </div>
-                    <div class="tool-card-content">
-                        <h3>{{#ifCond language '==' 'en'}}AI Face Enhancer{{else}}Améliorateur de Visage IA{{/ifCond}}</h3>
-                        <p>{{#ifCond language '==' 'en'}}Enhance facial features in your videos.{{else}}Améliorez les caractéristiques faciales dans vos vidéos.{{/ifCond}}</p>
-                        {{!-- <a href="#" class="btn btn-primary">{{#ifCond language '==' 'en'}}Start{{else}}Commencer{{/ifCond}}</a> --}}
-                    </div>
-                </div>
+                <!-- Video AI Tools -->
                 
-                <!-- Coming Soon Tool -->
+                <!-- 1. Video Face Swap -->
                 <div class="tool-card">
-                    <div class="tool-comparison-image">
-                        <img src="/img/examples/main-2.jpg" alt="Coming Soon Feature">
-                        <div class="coming-soon-badge">Coming Soon</div>
+                    <div class="tool-card-image">
+                        <img src="/img/examples/main-1.jpg" alt="Video Face Swap - Replace faces in videos">
+                        <a href="/?mode=video" class="tool-action-btn">
+                            <i class="bi bi-arrow-right"></i> Launch Tool
+                        </a>
                     </div>
                     <div class="tool-card-content">
-                        <h3>{{#ifCond language '==' 'en'}}Advanced Editor{{else}}Éditeur Avancé{{/ifCond}}</h3>
-                        <p>{{#ifCond language '==' 'en'}}Advanced video editing features powered by AI.{{else}}Fonctionnalités avancées d'édition vidéo alimentées par l'IA.{{/ifCond}}</p>
-                        {{!-- <a href="#" class="btn btn-secondary disabled">{{#ifCond language '==' 'en'}}Coming Soon{{else}}Bientôt Disponible{{/ifCond}}</a> --}}
+                        <h3 class="tool-card-title">{{#ifCond language '==' 'en'}}Video Face Swap{{else}}Échange de Visage Vidéo{{/ifCond}}</h3>
+                        <p class="tool-card-description">{{#ifCond language '==' 'en'}}Replace faces in videos with professional results. Free mode for image-to-image, premium for video-to-video.{{else}}Remplacez les visages dans les vidéos avec des résultats professionnels. Mode gratuit pour image-vers-image, premium pour vidéo-vers-vidéo.{{/ifCond}}</p>
+                        <div class="feature-badges">
+                            <span class="feature-badge free">{{#ifCond language '==' 'en'}}Free{{else}}Gratuit{{/ifCond}}</span>
+                            <span class="feature-badge premium">{{#ifCond language '==' 'en'}}Premium{{else}}Premium{{/ifCond}}</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
 
-        <section id="image-tools-section" style="display:none;">
-            <div class="tools-grid">
+                <!-- 2. Image to Video -->
                 <div class="tool-card">
-                    <div class="tool-comparison-image">
-                        <img src="/img/examples/main-1.jpg" alt="Image Upscaler Example">
-                        <button class="use-tool-btn">{{#ifCond language '==' 'en'}}Use This Tool{{else}}Utiliser cet outil{{/ifCond}}</button>
+                    <div class="tool-card-image">
+                        <img src="/img/examples/main-2.jpg" alt="Image to Video - Generate videos from images">
+                        <a href="/image-to-video" class="tool-action-btn">
+                            <i class="bi bi-arrow-right"></i> Launch Tool
+                        </a>
                     </div>
                     <div class="tool-card-content">
-                        <h3>{{#ifCond language '==' 'en'}}Image Upscaler{{else}}Amélioration d'Image{{/ifCond}}</h3>
-                        <p>{{#ifCond language '==' 'en'}}Increase the resolution and quality of your images.{{else}}Augmentez la résolution et la qualité de vos images.{{/ifCond}}</p>
-                        {{!-- <a href="#" class="btn btn-primary">{{#ifCond language '==' 'en'}}Start{{else}}Commencer{{/ifCond}}</a> --}}
+                        <h3 class="tool-card-title">{{#ifCond language '==' 'en'}}Image to Video{{else}}Image vers Vidéo{{/ifCond}}</h3>
+                        <p class="tool-card-description">{{#ifCond language '==' 'en'}}Generate dynamic videos from static images using AI. Multiple models and customization options available.{{else}}Générez des vidéos dynamiques à partir d'images statiques en utilisant l'IA. Plusieurs modèles et options de personnalisation disponibles.{{/ifCond}}</p>
+                        <div class="feature-badges">
+                            <span class="feature-badge premium">{{#ifCond language '==' 'en'}}Premium{{else}}Premium{{/ifCond}}</span>
+                        </div>
                     </div>
                 </div>
+
+                <!-- 3. Image Face Swap -->
                 <div class="tool-card">
-                    <div class="tool-comparison-image">
-                        <img src="/img/examples/swap-2.jpg" alt="AI Photo Effects Example">
-                        <button class="use-tool-btn">{{#ifCond language '==' 'en'}}Use This Tool{{else}}Utiliser cet outil{{/ifCond}}</button>
+                    <div class="tool-card-image">
+                        <img src="/img/examples/swap-1.jpg" alt="Image Face Swap - Replace faces in images">
+                        <a href="/?mode=image" class="tool-action-btn">
+                            <i class="bi bi-arrow-right"></i> Launch Tool
+                        </a>
                     </div>
                     <div class="tool-card-content">
-                        <h3>{{#ifCond language '==' 'en'}}AI Photo Effects{{else}}Effets Photo IA{{/ifCond}}</h3>
-                        <p>{{#ifCond language '==' 'en'}}Apply creative AI-powered effects to your photos.{{else}}Appliquez des effets créatifs alimentés par l'IA à vos photos.{{/ifCond}}</p>
-                        {{!-- <a href="#" class="btn btn-primary">{{#ifCond language '==' 'en'}}Start{{else}}Commencer{{/ifCond}}</a> --}}
+                        <h3 class="tool-card-title">{{#ifCond language '==' 'en'}}Image Face Swap{{else}}Échange de Visage Image{{/ifCond}}</h3>
+                        <p class="tool-card-description">{{#ifCond language '==' 'en'}}Swap faces in static images with ease. Perfect for fun photos and creative projects.{{else}}Échangez les visages dans les images statiques facilement. Parfait pour les photos amusantes et les projets créatifs.{{/ifCond}}</p>
+                        <div class="feature-badges">
+                            <span class="feature-badge free">{{#ifCond language '==' 'en'}}Free{{else}}Gratuit{{/ifCond}}</span>
+                        </div>
                     </div>
                 </div>
+
+                <!-- 4. My Creations -->
                 <div class="tool-card">
-                    <div class="tool-comparison-image">
-                        <img src="/img/examples/swap-3.jpg" alt="AI Image Generator Example">
-                        <button class="use-tool-btn">{{#ifCond language '==' 'en'}}Use This Tool{{else}}Utiliser cet outil{{/ifCond}}</button>
+                    <div class="tool-card-image">
+                        <img src="/img/examples/swap-2.jpg" alt="My Creations - View your processing history">
+                        <a href="/history" class="tool-action-btn">
+                            <i class="bi bi-arrow-right"></i> View
+                        </a>
                     </div>
                     <div class="tool-card-content">
-                        <h3>{{#ifCond language '==' 'en'}}AI Image Generator{{else}}Générateur d'Images IA{{/ifCond}}</h3>
-                        <p>{{#ifCond language '==' 'en'}}Generate new images from text prompts.{{else}}Générez de nouvelles images à partir de descriptions textuelles.{{/ifCond}}</p>
-                        {{!-- <a href="#" class="btn btn-primary">{{#ifCond language '==' 'en'}}Start{{else}}Commencer{{/ifCond}}</a> --}}
+                        <h3 class="tool-card-title">{{#ifCond language '==' 'en'}}My Creations{{else}}Mes Créations{{/ifCond}}</h3>
+                        <p class="tool-card-description">{{#ifCond language '==' 'en'}}Access your processing history and download generated content. Track all your AI-powered creations in one place.{{else}}Accédez à votre historique de traitement et téléchargez le contenu généré. Suivez toutes vos créations alimentées par l'IA au même endroit.{{/ifCond}}</p>
+                        <div class="feature-badges">
+                            <span class="feature-badge free">{{#ifCond language '==' 'en'}}Free{{else}}Gratuit{{/ifCond}}</span>
+                        </div>
                     </div>
                 </div>
+
+                <!-- 5. AI Tools Showcase -->
                 <div class="tool-card">
-                    <div class="tool-comparison-image">
-                        <img src="/img/examples/main-2.jpg" alt="Artistic Filter Example">
-                        <button class="use-tool-btn">{{#ifCond language '==' 'en'}}Use This Tool{{else}}Utiliser cet outil{{/ifCond}}</button>
+                    <div class="tool-card-image">
+                        <img src="/img/examples/swap-3.jpg" alt="AI Tools Showcase - Browse all tools">
+                        <a href="/ai-tools" class="tool-action-btn">
+                            <i class="bi bi-arrow-right"></i> Explore
+                        </a>
                     </div>
                     <div class="tool-card-content">
-                        <h3>{{#ifCond language '==' 'en'}}Artistic Filter{{else}}Filtre Artistique{{/ifCond}}</h3>
-                        <p>{{#ifCond language '==' 'en'}}Transform your images with unique artistic styles.{{else}}Transformez vos images avec des styles artistiques uniques.{{/ifCond}}</p>
-                        {{!-- <a href="#" class="btn btn-primary">{{#ifCond language '==' 'en'}}Start{{else}}Commencer{{/ifCond}}</a> --}}
+                        <h3 class="tool-card-title">{{#ifCond language '==' 'en'}}AI Tools Showcase{{else}}Vitrine des Outils IA{{/ifCond}}</h3>
+                        <p class="tool-card-description">{{#ifCond language '==' 'en'}}Discover all available AI tools and features. Browse, compare, and launch tools directly from the showcase.{{else}}Découvrez tous les outils et fonctionnalités d'IA disponibles. Parcourez, comparez et lancez les outils directement depuis la vitrine.{{/ifCond}}</p>
+                        <div class="feature-badges">
+                            <span class="feature-badge free">{{#ifCond language '==' 'en'}}Free{{else}}Gratuit{{/ifCond}}</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {{> footer translations=translations}}
+    
     <script src="/sidebar.js"></script>
-    <script>
-        const translations = {{{json translations}}};
-        const language = "{{language}}";
-        
-        // Tool tabs functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const toolTabs = document.querySelectorAll('.tool-tab');
-            const videoSection = document.getElementById('video-tools-section');
-            const imageSection = document.getElementById('image-tools-section');
-            
-            toolTabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    toolTabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    if (this.dataset.tab === 'video') {
-                        videoSection.style.display = '';
-                        imageSection.style.display = 'none';
-                    } else {
-                        videoSection.style.display = 'none';
-                        imageSection.style.display = '';
-                    }
-                });
-            });
-        });
-    </script>
 </body>
 </html>

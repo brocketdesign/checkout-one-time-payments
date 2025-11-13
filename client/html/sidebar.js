@@ -1,88 +1,149 @@
+/**
+ * Sidebar Navigation Module
+ * Handles desktop and mobile sidebar toggling, state persistence, and accessibility
+ */
+
 document.addEventListener('DOMContentLoaded', function () {
+    // Desktop sidebar elements
     const sidebar = document.getElementById('app-sidebar');
     const sidebarToggle = document.getElementById('sidebar-toggle');
     const mainContent = document.getElementById('main-content');
     const navBarWrapper = document.getElementById('navbar-wrapper');
     
-    // Mobile elements
+    // Mobile sidebar elements
     const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
     const mobileSidebar = document.getElementById('mobile-sidebar');
     const mobileSidebarClose = document.getElementById('mobile-sidebar-close');
     const mobileSidebarOverlay = document.getElementById('mobile-sidebar-overlay');
     
-    // Function to toggle sidebar minimization
+    const SIDEBAR_MINIMIZED_KEY = 'app_sidebar_minimized';
+    const TRANSITION_DURATION = 300;
+    
+    /**
+     * Toggle desktop sidebar minimization
+     */
     function toggleSidebar() {
-        sidebar.classList.toggle('minimized');
-        if (mainContent) { // Check if mainContent exists
-            mainContent.classList.toggle('sidebar-minimized');
-        }
-        if(navBarWrapper) { // Check if navBarWrapper exists
-            navBarWrapper.classList.toggle('sidebar-minimized');
-        }
-        // Change toggle button icon based on sidebar state
+        if (!sidebar || !sidebarToggle) return;
+        
+        const isMinimized = sidebar.classList.toggle('minimized');
         const toggleIcon = sidebarToggle.querySelector('i');
-        if (sidebar.classList.contains('minimized')) {
-            toggleIcon.classList.remove('bi-list');
-            toggleIcon.classList.add('bi-chevron-right');
-            localStorage.setItem('sidebarMinimized', 'true');
+        
+        if (toggleIcon) {
+            if (isMinimized) {
+                toggleIcon.classList.replace('bi-chevron-left', 'bi-chevron-right');
+                localStorage.setItem(SIDEBAR_MINIMIZED_KEY, 'true');
+            } else {
+                toggleIcon.classList.replace('bi-chevron-right', 'bi-chevron-left');
+                localStorage.setItem(SIDEBAR_MINIMIZED_KEY, 'false');
+            }
+        }
+        
+        // Update main content and navbar
+        if (mainContent) mainContent.classList.toggle('sidebar-minimized');
+        if (navBarWrapper) navBarWrapper.classList.toggle('sidebar-minimized');
+        
+        // Update ARIA attribute
+        sidebarToggle.setAttribute('aria-expanded', !isMinimized);
+    }
+    
+    /**
+     * Set sidebar state from localStorage
+     */
+    function initSidebarState() {
+        if (!sidebar || !sidebarToggle) return;
+        
+        const wasMinimized = localStorage.getItem(SIDEBAR_MINIMIZED_KEY) === 'true';
+        const toggleIcon = sidebarToggle.querySelector('i');
+        
+        if (wasMinimized) {
+            sidebar.classList.add('minimized');
+            if (mainContent) mainContent.classList.add('sidebar-minimized');
+            if (navBarWrapper) navBarWrapper.classList.add('sidebar-minimized');
+            
+            if (toggleIcon) {
+                toggleIcon.classList.replace('bi-chevron-left', 'bi-chevron-right');
+            }
+            sidebarToggle.setAttribute('aria-expanded', 'false');
         } else {
-            toggleIcon.classList.remove('bi-chevron-right');
-            toggleIcon.classList.add('bi-list');
-            localStorage.setItem('sidebarMinimized', 'false');
+            if (toggleIcon) {
+                toggleIcon.classList.replace('bi-chevron-right', 'bi-chevron-left');
+            }
+            sidebarToggle.setAttribute('aria-expanded', 'true');
         }
     }
-
-    // Event listener for the toggle button
+    
+    /**
+     * Close mobile sidebar with animation
+     */
+    function closeMobileSidebar() {
+        if (!mobileSidebar || !mobileSidebarOverlay) return;
+        
+        mobileSidebar.style.top = '-100%';
+        mobileSidebarOverlay.style.opacity = '0';
+        
+        setTimeout(() => {
+            mobileSidebar.classList.remove('show');
+            mobileSidebarOverlay.classList.remove('show');
+            mobileSidebar.style.display = '';
+            mobileSidebarOverlay.style.display = '';
+        }, TRANSITION_DURATION);
+        
+        mobileMenuToggle?.setAttribute('aria-expanded', 'false');
+    }
+    
+    /**
+     * Open mobile sidebar with animation
+     */
+    function openMobileSidebar() {
+        if (!mobileSidebar || !mobileSidebarOverlay) return;
+        
+        // Remove inline display styles to allow CSS to control visibility
+        mobileSidebar.style.display = '';
+        mobileSidebarOverlay.style.display = '';
+        
+        // Add show class which triggers CSS display: block
+        mobileSidebar.classList.add('show');
+        mobileSidebarOverlay.classList.add('show');
+        
+        // Trigger animation
+        setTimeout(() => {
+            mobileSidebar.style.top = '0';
+            mobileSidebarOverlay.style.opacity = '1';
+        }, 10);
+        
+        mobileMenuToggle?.setAttribute('aria-expanded', 'true');
+    }
+    
+    /**
+     * Set active navigation link based on current URL
+     */
+    function setActiveNavLink() {
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll('.sidebar-nav a');
+        
+        navLinks.forEach(link => {
+            const href = link.getAttribute('href');
+            // Remove active class from all links
+            link.classList.remove('active');
+            
+            // Add active class if path matches
+            // Exact match or match with proper path segments
+            if (href && (href === currentPath || (href !== '/' && currentPath.startsWith(href)))) {
+                link.classList.add('active');
+            }
+        });
+    }
+    
+    // Initialize desktop sidebar
     if (sidebarToggle) {
+        initSidebarState();
         sidebarToggle.addEventListener('click', toggleSidebar);
     }
-
-    // Optional: Check localStorage for saved preference on page load
-    if (localStorage.getItem('sidebarMinimized') === 'true') {
-        sidebar.classList.add('minimized');
-        if (mainContent) { // Check if mainContent exists
-            mainContent.classList.add('sidebar-minimized');
-        }
-        if(navBarWrapper) { // Check if navBarWrapper exists
-            navBarWrapper.classList.add('sidebar-minimized');
-        }
-        
-        // Update toggle button icon
-        const toggleIcon = sidebarToggle.querySelector('i');
-        if (toggleIcon) {
-            toggleIcon.classList.remove('bi-list');
-            toggleIcon.classList.add('bi-chevron-right');
-        }
-    }
-
-    // Mobile sidebar toggle functionality
+    
+    // Initialize mobile sidebar
     if (mobileMenuToggle && mobileSidebar) {
-        mobileMenuToggle.addEventListener('click', function() {
-            mobileSidebar.style.display = 'block';
-            if (mobileSidebarOverlay) {
-                mobileSidebarOverlay.style.display = 'block';
-                mobileSidebarOverlay.style.opacity = '1';
-            }
-            setTimeout(() => {
-                mobileSidebar.style.top = '0';
-            }, 10);
-        });
+        mobileMenuToggle.addEventListener('click', openMobileSidebar);
         
-        // Function to close mobile sidebar
-        const closeMobileSidebar = function() {
-            mobileSidebar.style.top = '-100%';
-            if (mobileSidebarOverlay) {
-                mobileSidebarOverlay.style.opacity = '0';
-            }
-            setTimeout(() => {
-                mobileSidebar.style.display = 'none';
-                if (mobileSidebarOverlay) {
-                    mobileSidebarOverlay.style.display = 'none';
-                }
-            }, 300);
-        };
-        
-        // Add close event listeners
         if (mobileSidebarClose) {
             mobileSidebarClose.addEventListener('click', closeMobileSidebar);
         }
@@ -90,41 +151,21 @@ document.addEventListener('DOMContentLoaded', function () {
         if (mobileSidebarOverlay) {
             mobileSidebarOverlay.addEventListener('click', closeMobileSidebar);
         }
+        
+        // Close mobile sidebar when clicking on a link
+        const mobileNavLinks = mobileSidebar.querySelectorAll('a');
+        mobileNavLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (!link.classList.contains('beta-link')) {
+                    closeMobileSidebar();
+                }
+            });
+        });
     }
-
-    // Optional: Add tooltips for icons when sidebar is minimized
-    const navLinks = sidebar.querySelectorAll('.sidebar-nav a');
-    navLinks.forEach(link => {
-        const icon = link.querySelector('.icon');
-        const text = link.querySelector('.text');
-        if (icon && text) {
-            link.addEventListener('mouseenter', () => {
-                if (sidebar.classList.contains('minimized')) {
-                    const tooltip = document.createElement('span');
-                    tooltip.className = 'icon-tooltip'; // Style this class in CSS
-                    tooltip.textContent = text.textContent;
-                    link.appendChild(tooltip);
-                    // Position tooltip (basic example)
-                    const linkRect = link.getBoundingClientRect();
-                    tooltip.style.position = 'fixed'; // Use fixed to position relative to viewport
-                    tooltip.style.left = `${linkRect.right + 5}px`;
-                    tooltip.style.top = `${linkRect.top + (linkRect.height / 2) - (tooltip.offsetHeight / 2)}px`;
-                    tooltip.style.backgroundColor = '#333333'; // Dark tooltip
-                    tooltip.style.color = '#ffffff';
-                    tooltip.style.padding = '5px 10px';
-                    tooltip.style.borderRadius = '4px';
-                    tooltip.style.fontSize = '0.9em';
-                    tooltip.style.zIndex = '1001'; // Above sidebar
-                    tooltip.style.whiteSpace = 'nowrap';
-                    tooltip.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
-                }
-            });
-            link.addEventListener('mouseleave', () => {
-                const tooltip = link.querySelector('.icon-tooltip');
-                if (tooltip) {
-                    tooltip.remove();
-                }
-            });
-        }
-    });
+    
+    // Set active nav links on page load
+    setActiveNavLink();
+    
+    // Listen for navigation changes
+    window.addEventListener('popstate', setActiveNavLink);
 });

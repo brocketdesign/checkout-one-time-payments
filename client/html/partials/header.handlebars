@@ -1,6 +1,7 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<link rel="stylesheet" href="../css/variables.css">
 <link rel="stylesheet" href="../css/global.css">
 <link rel="stylesheet" href="../css/sidebar.css">
 <link rel="stylesheet" href="../css/style.css">
@@ -37,26 +38,87 @@
 </script>
 
 <style>
-  /* Style the language switcher */
+  /* Navbar styling */
+  nav {
+    background-color: var(--color-bg-secondary);
+    border-bottom: 1px solid var(--color-border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  
+  .navbar-brand {
+    color: var(--color-text-primary) !important;
+    font-weight: 700;
+    font-size: var(--font-size-lg);
+  }
+  
+  .navbar-brand img {
+    max-height: 40px;
+    margin-right: var(--space-md);
+  }
+  
+  .nav-link {
+    color: var(--color-text-secondary) !important;
+    font-weight: 500;
+    margin: 0 var(--space-md);
+    transition: color var(--transition-base);
+  }
+  
+  .nav-link:hover {
+    color: var(--color-accent-purple) !important;
+  }
+  
+  .nav-link.active {
+    color: var(--color-accent-gradient) !important;
+  }
+  
+  .dropdown-menu {
+    background-color: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border);
+  }
+  
+  .dropdown-item {
+    color: var(--color-text-primary);
+    transition: background-color var(--transition-base);
+  }
+  
+  .dropdown-item:hover {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-accent-purple);
+  }
+  
+  /* Language switcher */
   #language-switch {
     border: none;
-    padding: 0.5rem;
+    padding: var(--space-md);
     cursor: pointer;
-    appearance: none; /* Remove default arrow */
-    -webkit-appearance: none; /* Remove default arrow for safari */
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-base);
+  }
+
+  #language-switch:hover {
+    background-color: var(--color-accent-purple);
   }
 
   #language-switch:focus {
     outline: none;
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
   }
 
   .language-option {
     display: flex;
     align-items: center;
+    color: var(--color-text-primary);
   }
 
   .language-option i {
-    margin-right: 0.5rem; /* Add spacing between icon and text */
+    margin-right: var(--space-md);
   }
 
   /* Responsive adjustments */
@@ -67,9 +129,13 @@
     }
 
     .nav-links {
-      margin-top: 1rem;
+      margin-top: var(--space-lg);
       flex-direction: column;
       align-items: flex-start;
+    }
+    
+    .nav-link {
+      margin: var(--space-md) 0;
     }
   }
 </style>

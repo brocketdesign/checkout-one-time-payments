@@ -1,319 +1,420 @@
-/* AI Tools Page Specific Styles */
+/* ============================================
+   AI Tools Page - Native App Design
+   Based on DESIGN_GUIDELINES.md
+   ============================================ */
+
+@import url('variables.css');
+
+/* ============================================
+   MAIN CONTENT LAYOUT
+   ============================================ */
 
 #main-content {
-    transition: margin-left 0.3s ease-in-out;
-    padding-top: 20px; /* Add some padding at the top */
-    padding-bottom: 20px;
-    background-color: #f8f9fa;
+    margin-left: 240px;
+    width: calc(100% - 240px);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: var(--color-bg-primary);
+    transition: margin-left 300ms ease-in-out;
 }
 
-header.mb-4 {
-    background-color: #ffffff;
-    padding: 30px 0;
-    margin-bottom: 0 !important;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+/* ============================================
+   HEADER SECTION
+   ============================================ */
+
+header {
+    text-align: center;
+    padding: var(--space-3xl) var(--space-lg);
+    margin-bottom: var(--space-2xl);
+    border-bottom: 1px solid var(--color-border);
 }
+
+header h1 {
+    color: var(--color-text-primary);
+    font-size: 48px;
+    font-weight: 700;
+    margin: 0 0 var(--space-md) 0;
+    letter-spacing: -0.5px;
+}
+
+header p {
+    color: var(--color-text-secondary);
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0;
+}
+a:hover{
+    color: #fff !important;
+}
+/* ============================================
+   TOOLS SECTION CONTAINER
+   ============================================ */
+
+.tools-section {
+    flex: 1;
+    padding-bottom: var(--space-2xl);
+}
+
+/* ============================================
+   TOOLS GRID - NATIVE APP CARD SYSTEM
+   ============================================ */
 
 .tools-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive grid */
-    gap: 25px; /* Spacing between cards */
-    padding: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-lg);
+    padding: var(--space-2xl) var(--space-lg);
     max-width: 1400px;
-    margin: 0 auto; /* Center the grid */
+    margin: 0 auto;
 }
 
+/* ============================================
+   TOOL CARD - PREMIUM NATIVE STYLE
+   ============================================ */
+
 .tool-card {
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    padding: 0;
-    text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    transition: all var(--transition-base);
     display: flex;
     flex-direction: column;
-    overflow: visible; /* Changed from hidden for outset border */
-    position: relative;
+    height: 100%;
+    box-shadow: var(--shadow-md);
 }
 
 .tool-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12); /* Adjusted subtle shadow */
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-accent-purple);
+    background-color: #1f1f1f;
 }
 
-/* Gradient border effect */
-.tool-card::before {
-    content: '';
-    position: absolute;
-    top: -3px;
-    left: -3px;
-    right: -3px;
-    bottom: -3px;
-    border-radius: 15px; /* card's radius (12px) + border thickness (3px) */
-    background: linear-gradient(90deg, #ff4d4f, #ffb300, #00e0d3, #0d6efd, #ff4d4f);
-    background-size: 300% 300%;
-    z-index: 0; /* Behind card content */
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    animation: borderGradient 4s linear infinite;
-    filter: blur(4px);
-}
+/* ============================================
+   TOOL CARD IMAGE SECTION
+   ============================================ */
 
-.tool-card:hover::before {
-    opacity: 1;
-}
-
-@keyframes borderGradient {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-/* Tool card content area */
-.tool-card-content {
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    justify-content: space-between;
-    position: relative; /* Ensure it's above ::before */
-    z-index: 1;
-    background-color: #ffffff; /* Keep content background opaque */
-    border-radius: 0 0 12px 12px; /* Match card's bottom radius */
-}
-
-/* Tool comparison images */
-.tool-comparison-image {
+.tool-card-image {
     position: relative;
     width: 100%;
-    height: 200px;
-    margin-bottom: 0;
-    border-radius: 12px 12px 0 0; /* Match card's top radius */
+    aspect-ratio: 16 / 9;
     overflow: hidden;
-    z-index: 1; /* Ensure it's above ::before */
-    background-color: #ffffff; /* Keep content background opaque */
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, rgba(236, 72, 153, 0.08) 100%);
 }
 
-.tool-comparison-image img {
+.tool-card-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s ease;
+    transition: transform var(--transition-base);
 }
 
-.tool-card:hover .tool-comparison-image img {
+.tool-card:hover .tool-card-image img {
     transform: scale(1.05);
-    filter: brightness(0.7);
 }
 
-/* Comparison labels */
-.comparison-label {
+/* ============================================
+   TOOL ACTION BUTTON
+   ============================================ */
+
+.tool-action-btn {
     position: absolute;
-    background-color: rgba(0,0,0,0.7);
-    color: white;
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-size: 0.8em;
-    z-index: 1;
-}
-
-.comparison-label:first-of-type {
-    top: 10px;
-    left: 10px;
-}
-
-.comparison-label:last-of-type {
-    top: 10px;
-    right: 10px;
-}
-
-/* Coming Soon Badge */
-.coming-soon-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: #ff4d4f;
-    color: white;
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-size: 0.8em;
-}
-
-.tool-card-icon {
-    font-size: 2.5em; /* Larger icons */
-    color: #007bff; /* Bootstrap primary blue, or your theme color */
-    margin-bottom: 15px;
-    text-align: center;
-}
-
-/* Tool Tabs */
-.tool-tabs {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-bottom: 30px;
-}
-
-.tool-tab {
-    padding: 10px 25px;
-    background-color: transparent;
+    bottom: var(--space-lg);
+    right: var(--space-lg);
+    background: var(--color-accent-gradient);
+    color: #ffffff;
     border: none;
-    border-radius: 20px;
-    font-size: 16px;
-    font-weight: 600;
-    color: #555;
+    padding: 10px 20px;
+    border-radius: var(--radius-md);
     cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.tool-tab.active {
-    background: linear-gradient(90deg, #FF47B7 0%, #FF84E0 100%);
-    color: white;
-    box-shadow: 0 4px 8px rgba(255, 71, 183, 0.3);
-}
-
-.tool-tab:hover:not(.active) {
-    background: linear-gradient(90deg, #FF47B7 0%, #FF84E0 100%);
-    color: white;
-    box-shadow: 0 2px 6px rgba(255, 71, 183, 0.2);
-}
-
-.tool-card h3 {
-    font-size: 1.4em;
-    color: #333;
-    margin-bottom: 10px;
-}
-
-.tool-card p {
-    font-size: 0.95em;
-    color: #555;
-    line-height: 1.6;
-    margin-bottom: 20px; /* Space before the button */
-    flex-grow: 1; /* Allows paragraph to take available space */
-}
-
-/* Update button styles */
-.btn-primary {
-    background-color: #0d6efd;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 20px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    width: 100%;
-}
-
-.btn-primary:hover {
-    background-color: #0b5ed7;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3);
-}
-
-.btn-secondary.disabled {
-    background-color: #6c757d;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 20px;
-    font-weight: 600;
-    opacity: 0.7;
-    width: 100%;
-    cursor: not-allowed;
-}
-
-.btn-launch-tool {
-    display: inline-block;
-    background-color: #007bff;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-    text-align: center;
-}
-
-.btn-launch-tool:hover {
-    background-color: #0056b3;
-    color: white;
-}
-
-/* Adjustments for when sidebar is minimized */
-body:has(#app-sidebar.minimized) #main-content.container {
-    margin-left: 90px; /* Adjust based on your minimized sidebar width + some padding */
-    width: calc(100% - 90px);
-}
-
-/* Ensure main content takes full width if sidebar is not present or in a different layout */
-#main-content.container:not(:has(~ #app-sidebar)) {
-    margin-left: auto; /* Or your default margin */
-    margin-right: auto;
-}
-
-/* Section Headers */
-#image-tools-section h2,
-#video-tools-section h2 {
-    font-size: 1.75rem;
-    color: #1B263B; /* Dark blue from sidebar for consistency */
-    border-bottom: 2px solid #415A77; /* Accent color from sidebar */
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-}
-
-#image-tools-section h2 .bi,
-#video-tools-section h2 .bi {
-    margin-right: 10px;
-}
-
-/* Styles for the AI Tools page */
-.ai-tools-container {
-    padding: 20px;
-    text-align: center;
-}
-
-.ai-tools-container h1 {
-    color: #333;
-    margin-bottom: 10px;
-}
-
-.ai-tools-container p {
-    color: #666;
-    margin-bottom: 30px;
-    font-size: 1.1em;
-}
-
-/* Adjustments for when sidebar is collapsed */
-body.sidebar-collapsed #main-content {
-    margin-left: 80px; /* Width of collapsed sidebar */
-}
-
-/* Tool button hover effect */
-.tool-card .use-tool-btn {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    font-size: 13px;
+    font-weight: 700;
     opacity: 0;
-    z-index: 10; /* Ensure it's above the image */
-    background: linear-gradient(90deg, #FF47B7 0%, #FF84E0 100%); /* Gradient from screenshot */
-    color: white;
-    border: none;
-    border-radius: 24px;
-    padding: 8px 24px; /* Adjusted padding from previous step, can be fine-tuned */
-    font-weight: 600; /* Adjusted from 700 to match screenshot better */
-    font-size: 0.9rem; /* Reduced font size to match screenshot */
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    transition: opacity 0.25s ease, transform 0.25s ease;
-    cursor: pointer;
-    outline: none;
+    transform: translateY(4px);
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-md);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    z-index: 10;
 }
 
-.tool-card:hover .use-tool-btn {
+.tool-action-btn:hover {
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
+.tool-action-btn:focus {
+    outline: 2px solid transparent;
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
+}
+
+.tool-card:hover .tool-action-btn {
     opacity: 1;
+    transform: translateY(0);
 }
 
-/* Always show the bottom button on mobile */
-@media (max-width: 768px) {
-    .tool-card .use-tool-btn { /* Keep this if "Use this tool" should be hidden on mobile */
-        display: none !important;
+.tool-action-btn i {
+    font-size: 14px;
+}
+
+/* ============================================
+   TOOL CARD CONTENT
+   ============================================ */
+
+.tool-card-content {
+    padding: var(--space-lg);
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.tool-card-title {
+    color: var(--color-text-primary);
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 var(--space-md) 0;
+}
+
+.tool-card-description {
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0;
+    flex: 1;
+}
+
+/* ============================================
+   FEATURE BADGES
+   ============================================ */
+
+.feature-badges {
+    display: flex;
+    gap: 8px;
+    margin-top: var(--space-md);
+    flex-wrap: wrap;
+}
+
+.feature-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(236, 72, 153, 0.15));
+    color: var(--color-accent-purple);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    transition: all var(--transition-base);
+}
+
+.feature-badge.free {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.1));
+    color: var(--color-success);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.feature-badge.premium {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(236, 72, 153, 0.15));
+    color: var(--color-accent-pink);
+    border-color: rgba(236, 72, 153, 0.3);
+}
+
+.feature-badge:hover {
+    transform: translateY(-1px);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+/* Tablet - 1200px and below */
+@media (max-width: 1200px) {
+    #main-content {
+        margin-left: 240px;
+        width: calc(100% - 240px);
+    }
+    
+    .tools-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: var(--space-lg);
+        padding: var(--space-xl) var(--space-md);
     }
 }
+
+/* Tablet - 1024px and below */
+@media (max-width: 1024px) {
+    #main-content {
+        margin-left: 0;
+        width: 100%;
+    }
+    
+    header {
+        padding: var(--space-2xl) var(--space-lg);
+    }
+    
+    header h1 {
+        font-size: 36px;
+    }
+    
+    .tools-grid {
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: var(--space-lg);
+        padding: var(--space-xl) var(--space-lg);
+    }
+}
+
+/* Mobile - 768px and below */
+@media (max-width: 768px) {
+    header {
+        padding: var(--space-xl) var(--space-md);
+        margin-bottom: var(--space-xl);
+    }
+    
+    header h1 {
+        font-size: 28px;
+        margin-bottom: var(--space-sm);
+    }
+
+    header p {
+        font-size: 14px;
+    }
+    
+    .tools-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: var(--space-md);
+        padding: var(--space-lg) var(--space-md);
+    }
+
+    .tool-card-image {
+        aspect-ratio: 16 / 10;
+    }
+
+    .tool-action-btn {
+        padding: 8px 16px;
+        font-size: 12px;
+        bottom: var(--space-md);
+        right: var(--space-md);
+    }
+}
+
+/* Small Mobile - 480px and below */
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 24px;
+    }
+
+    header p {
+        font-size: 13px;
+    }
+    
+    .tools-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+        padding: var(--space-lg) var(--space-md);
+    }
+
+    .tool-card-content {
+        padding: var(--space-md);
+    }
+
+    .tool-card-title {
+        font-size: 16px;
+    }
+
+    .tool-card-description {
+        font-size: 13px;
+    }
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+
+/* Only apply scrollbar styling to main content, not body */
+#main-content {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) var(--color-bg-secondary);
+}
+
+#main-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+#main-content::-webkit-scrollbar-track {
+    background: var(--color-bg-secondary);
+}
+
+#main-content::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 4px;
+    transition: all var(--transition-base);
+}
+
+#main-content::-webkit-scrollbar-thumb:hover {
+    background: var(--color-accent-purple);
+    box-shadow: var(--shadow-glow);
+}
+
+/* ============================================
+   FOCUS STATES (ACCESSIBILITY)
+   ============================================ */
+
+.tool-card:focus-within {
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-accent-purple);
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tool-card {
+    animation: fadeInUp 300ms ease-out;
+}
+
+.tool-card:nth-child(1) {
+    animation-delay: 50ms;
+}
+
+.tool-card:nth-child(2) {
+    animation-delay: 100ms;
+}
+
+.tool-card:nth-child(3) {
+    animation-delay: 150ms;
+}
+
+.tool-card:nth-child(4) {
+    animation-delay: 200ms;
+}
+
+.tool-card:nth-child(5) {
+    animation-delay: 250ms;
+}
+
+/* ============================================
+   DARK MODE (Already applied via variables)
+   ============================================ */
+
+/* The dark theme is implemented through CSS custom properties
+   in variables.css and is always active for this application */
