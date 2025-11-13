@@ -48,6 +48,22 @@ body {
 }
 
 /* =================================
+   FOOTER STYLES
+   ================================= */
+
+footer {
+    margin-left: 240px;
+    width: calc(100% - 240px);
+    transition: margin-left var(--transition-base), width var(--transition-base);
+    box-sizing: border-box;
+}
+
+footer.sidebar-minimized {
+    margin-left: 80px;
+    width: calc(100% - 80px);
+}
+
+/* =================================
    GRID & LAYOUT
    ================================= */
 

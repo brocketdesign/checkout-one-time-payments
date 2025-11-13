@@ -21,6 +21,22 @@
 }
 
 /* ============================================
+   FOOTER STYLES
+   ============================================ */
+
+footer {
+    margin-left: 240px;
+    width: calc(100% - 240px);
+    transition: margin-left 300ms ease-in-out, width 300ms ease-in-out;
+    box-sizing: border-box;
+}
+
+footer.sidebar-minimized {
+    margin-left: 80px;
+    width: calc(100% - 80px);
+}
+
+/* ============================================
    HEADER SECTION
    ============================================ */
 
