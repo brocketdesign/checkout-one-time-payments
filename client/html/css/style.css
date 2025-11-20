@@ -680,12 +680,7 @@ h3 {
   gap: var(--space-md);
   cursor: pointer;
   user-select: none;
-}
-
-.payment-checkbox input {
-  cursor: pointer;
-  width: 20px;
-  height: 20px;
+  position: relative;
 }
 
 .checkbox-label {

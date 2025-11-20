@@ -1927,28 +1927,40 @@ payButton.addEventListener('click', async () => {
         window.location.href = `${baseUrl}success?tempId=${tempId}`;
       } else {
         // Extract video details for checkout session
+        const checkoutSessionPayload = { 
+          tempId: tempId, 
+          roundedSellingPrice,
+          currency: currency,
+          fileName: hasVideoFile ? videoInput.files[0].name : videoUrlValue.split('/').pop().split('?')[0] || 'video.mp4',
+          duration: videoPreview.duration,
+          resolution: `${videoPreview.videoWidth}x${videoPreview.videoHeight}`,
+          fileSize: hasVideoFile ? videoInput.files[0].size : 0, // We don't know the file size for URLs
+          frameCount: Math.round(videoPreview.duration * (videoPreview.frameRate || 30))
+        };
+        
+        console.log('[Video Mode] tempId:', tempId);
+        console.log('[Video Mode] roundedSellingPrice:', roundedSellingPrice);
+        console.log('[Video Mode] currency:', currency);
+        console.log('[Video Mode] Checkout session payload:', JSON.stringify(checkoutSessionPayload, null, 2));
+        
         const sessionResponse = await fetch('/api/create-checkout-session', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ 
-            tempId: tempId, 
-            roundedSellingPrice,
-            currency: currency,
-            fileName: hasVideoFile ? videoInput.files[0].name : videoUrlValue.split('/').pop().split('?')[0] || 'video.mp4',
-            duration: videoPreview.duration,
-            resolution: `${videoPreview.videoWidth}x${videoPreview.videoHeight}`,
-            fileSize: hasVideoFile ? videoInput.files[0].size : 0, // We don't know the file size for URLs
-            frameCount: Math.round(videoPreview.duration * (videoPreview.frameRate || 30))
-          }),
+          body: JSON.stringify(checkoutSessionPayload),
         });
         
+        console.log('[Video Mode] Checkout session response status:', sessionResponse.status);
+        
         if (!sessionResponse.ok) {
-          throw new Error('Failed to create checkout session');
+          const errorData = await sessionResponse.json();
+          console.error('[Video Mode] Checkout session error response:', errorData);
+          throw new Error(`Failed to create checkout session: ${sessionResponse.status} - ${sessionResponse.statusText}`);
         }
         
         const sessionData = await sessionResponse.json();
+        console.log('[Video Mode] Checkout session created:', sessionData.id);
         const sessionId = sessionData.id;
         
         const result = await stripe.redirectToCheckout({
