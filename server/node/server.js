@@ -359,6 +359,52 @@ app.get(['/image-to-video', '/:lang/image-to-video'], (req, res) => {
   });
 });
 
+app.get(['/video-faceswap', '/:lang/video-faceswap'], (req, res) => {
+  const path = 'index';
+
+  // Determine language from cookie, URL parameter, or headers, default to 'en'
+  let language = req.cookies?.preferredLanguage || req.params.lang || (req.headers['accept-language']?.startsWith('ja') ? 'ja' : 'en');
+  if (language !== 'ja' && language !== 'en') {
+    language = 'en'; // Default to English if the language is not supported
+  }
+
+  // Load translation file
+  const translationPath = resolve(`${process.env.STATIC_DIR}/lang/${language}.json`);
+  let translations = {};
+  try {
+    const translationFile = fs.readFileSync(translationPath, 'utf-8');
+    translations = JSON.parse(translationFile);
+  } catch (error) {
+    console.error('Error loading translations:', error);
+  }
+
+  // Send the translation data to the client
+  res.render(path, { translations, language, isFaceSwapVideoPage: true });
+});
+
+app.get(['/image-faceswap', '/:lang/image-faceswap'], (req, res) => {
+  const path = 'index';
+
+  // Determine language from cookie, URL parameter, or headers, default to 'en'
+  let language = req.cookies?.preferredLanguage || req.params.lang || (req.headers['accept-language']?.startsWith('ja') ? 'ja' : 'en');
+  if (language !== 'ja' && language !== 'en') {
+    language = 'en'; // Default to English if the language is not supported
+  }
+
+  // Load translation file
+  const translationPath = resolve(`${process.env.STATIC_DIR}/lang/${language}.json`);
+  let translations = {};
+  try {
+    const translationFile = fs.readFileSync(translationPath, 'utf-8');
+    translations = JSON.parse(translationFile);
+  } catch (error) {
+    console.error('Error loading translations:', error);
+  }
+
+  // Send the translation data to the client
+  res.render(path, { translations, language, isFaceSwapImagePage: true });
+});
+
 app.get(['/terms', '/:lang/terms'], (req, res) => {
   const path = 'legal/terms';
 

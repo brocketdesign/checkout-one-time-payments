@@ -21,6 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const i2vNegativePrompt = document.getElementById('i2vNegativePrompt');
     const i2vNegativePromptCharCount = document.getElementById('i2vNegativePromptCharCount');
     const i2vSkipPayment = document.getElementById('i2vSkipPayment');
+    const i2vPaymentStatus = document.getElementById('i2vPaymentStatus');
+    const i2vSkipPaymentContainer = document.getElementById('i2vSkipPaymentContainer');
     const i2vKlingOptions = document.getElementById('i2vKlingOptions');
     const i2vGuidanceScale = document.getElementById('i2vGuidanceScale');
     const i2vGuidanceScaleValue = document.getElementById('i2vGuidanceScaleValue');
@@ -55,6 +57,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Check URL parameters for payment status and task ID
     checkUrlParameters();
+
+    // Handle payment skip checkbox
+    const urlParams = new URLSearchParams(window.location.search);
+    const forceSkipPayment = urlParams.get('skip_payment') === 'true';
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname.includes('192.168.');
+    
+    if ((isLocal || forceSkipPayment) && i2vSkipPaymentContainer && i2vSkipPayment && i2vPaymentStatus) {
+        i2vSkipPaymentContainer.style.display = 'block';
+        
+        // Default to checked on localhost or if URL parameter is set
+        i2vSkipPayment.checked = isLocal || forceSkipPayment;
+
+        const updatePaymentStatus = () => {
+            if (i2vSkipPayment.checked) {
+                i2vPaymentStatus.classList.remove('warning');
+                i2vPaymentStatus.innerHTML = '<i class="bi bi-check-circle-fill"></i><span>' + t('payment_skipped_local', 'Payment skipped (local)') + '</span>';
+            } else {
+                i2vPaymentStatus.classList.add('warning');
+                i2vPaymentStatus.innerHTML = '<i class="bi bi-info-circle-fill"></i><span>' + t('payment_required', 'Payment required') + '</span>';
+            }
+        };
+
+        i2vSkipPayment.addEventListener('change', updatePaymentStatus);
+        updatePaymentStatus();
+    } else {
+        if (i2vSkipPaymentContainer) {
+            i2vSkipPaymentContainer.style.display = 'none';
+        }
+        if (i2vPaymentStatus) {
+            i2vPaymentStatus.classList.add('warning');
+            i2vPaymentStatus.innerHTML = '<i class="bi bi-info-circle-fill"></i><span>' + t('payment_required', 'Payment required') + '</span>';
+        }
+    }
 
     const MAX_IMAGE_SIZE_I2V = 10 * 1024 * 1024; // 10MB
 
@@ -501,7 +536,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const motionIntensity = i2vMotionIntensity ? i2vMotionIntensity.value : '127';
             const model = i2vModelSelect ? i2vModelSelect.value : 'kling-v1.6-i2v';
             const negativePrompt = i2vNegativePrompt ? i2vNegativePrompt.value.trim() : '';
-            const skipPayment = i2vSkipPayment ? i2vSkipPayment.checked : false;
+            let skipPayment = false;
+            const urlParams = new URLSearchParams(window.location.search);
+            const forceSkipPayment = urlParams.get('skip_payment') === 'true';
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname.includes('192.168.');
+            
+            if (isLocal || forceSkipPayment) {
+                skipPayment = i2vSkipPayment ? i2vSkipPayment.checked : false;
+            }
 
             showStatus(t('generating_video_i2v', 'Generating video, please wait... This may take a few minutes.'), 'info', true);
             if (i2vResultSection) i2vResultSection.style.display = 'none';
@@ -575,8 +617,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                             const stripe = Stripe(
                                 window.location.hostname !== 'localhost' && !window.location.hostname.includes('192.168.')
-                                ? 'pk_live_51PjtRbE5sP7DA1XvCkdmezori9qPGoO21y7yKSVvgkQVyrhWZfHAUkNsjPMnbwpPlp4zzoYsRjn79Ad7XN7HTHcc00UjBA9adF'
-                                : 'pk_test_51PjtRbE5sP7DA1XvD68v7X7Qj7pG6ZJpQmvuNodJjxc7MbH1ss2Te2gahFAS9nms4pbmEdMYdfCPxFDWHBbu9CxR003ikTnRES'
+                                ? 'pk_live_nsU0sDUA4jQEn0c0qOz0XYHl00QYsONl8G'
+                                : 'pk_test_51Grb83C8xKGwQm6J0yFqNpWwgFu8MF582uq74ktVViobsBzM2hjVT2fXFvW5JQwLQnoaAmXBWtGevNodYi0bT5uv00sjuMNw1n'
                             );
 
                             const { error } = await stripe.redirectToCheckout({

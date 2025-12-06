@@ -37,7 +37,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="/?mode=video" 
+                    <a href="/video-faceswap" 
                        class="{{#if isFaceSwapVideoPage}}active{{/if}}"
                        aria-label="Video Face Swap - Replace faces in videos">
                         <span class="icon"><i class="bi bi-camera-video"></i></span>
@@ -48,7 +48,7 @@
                 <!-- Image AI Section -->
                 <li><span class="nav-section-title">Image AI</span></li>
                 <li>
-                    <a href="/?mode=image" 
+                    <a href="/image-faceswap" 
                        class="{{#if isFaceSwapImagePage}}active{{/if}}"
                        aria-label="Image Face Swap - Replace faces in images">
                         <span class="icon"><i class="bi bi-image"></i></span>
@@ -118,9 +118,9 @@
             <li><a href="/"><span class="icon"><i class="bi bi-house-door"></i></span><span class="text">Home</span></a></li>
             <li><span class="nav-section-title">Video AI</span></li>
             <li><a href="/image-to-video" class="{{#if isImageToVideoPage}}active{{/if}}"><span class="icon"><i class="bi bi-image-alt"></i></span><span class="text">{{t "image_to_video" "Image to Video"}}</span></a></li>
-            <li><a href="/?mode=video" class="{{#if isFaceSwapVideoPage}}active{{/if}}"><span class="icon"><i class="bi bi-camera-video"></i></span><span class="text">{{t "video_face_swap" "Video Face Swap"}}</span></a></li>
+            <li><a href="/video-faceswap" class="{{#if isFaceSwapVideoPage}}active{{/if}}"><span class="icon"><i class="bi bi-camera-video"></i></span><span class="text">{{t "video_face_swap" "Video Face Swap"}}</span></a></li>
             <li><span class="nav-section-title">Image AI</span></li>
-            <li><a href="/?mode=image" class="{{#if isFaceSwapImagePage}}active{{/if}}"><span class="icon"><i class="bi bi-image"></i></span><span class="text">{{t "image_face_swap" "Image Face Swap"}}</span></a></li>
+            <li><a href="/image-faceswap" class="{{#if isFaceSwapImagePage}}active{{/if}}"><span class="icon"><i class="bi bi-image"></i></span><span class="text">{{t "image_face_swap" "Image Face Swap"}}</span></a></li>
             <li><span class="nav-section-title">Tools & More</span></li>
             <li><a href="/{{#ifCond language '==' 'en'}}ai-tools{{else}}{{language}}/ai-tools{{/ifCond}}"><span class="icon"><i class="bi bi-tools"></i></span><span class="text">AI Tools</span></a></li>
             <li><a href="/history"><span class="icon"><i class="bi bi-stars"></i></span><span class="text">My Creations</span></a></li>

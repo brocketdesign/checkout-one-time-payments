@@ -1,5 +1,9 @@
 {
   "title": "AI Face Swap",
+  "image_to_video_hero_title": "Image to Video Generator",
+  "image_to_video_subtitle": "Transform your images into stunning videos with AI technology.",
+  "video_face_swap_title": "Video Face Swap",
+  "image_face_swap_title": "Image Face Swap",
   "subtitle": "Easily swap faces in your videos with AI technology.",
   "instruction_video": "Upload your video",
   "instruction_image": "Upload a photo of the face to swap",
@@ -9,6 +13,7 @@
   "drop_photo": "or drop a photo file here",
   "proceed": "Proceed",
   "skip_payment": "Skip payment (for testing purposes)",
+  "skip_payment_local": "Skip Payment (Local Testing)",
   "please_upload_both": "Please upload both a video and a photo.",
   "uploading_files": "Uploading files...",
   "creating_checkout": "Creating checkout session...",

@@ -1,5 +1,5 @@
 const stripe = Stripe(
-  window.location.hostname !== 'localhost' && !window.location.hostname.includes('192.168.') ? 'pk_live_51PjtRbE5sP7DA1XvCkdmezori9qPGoO21y7yKSVvgkQVyrhWZfHAUkNsjPMnbwpPlp4zzoYsRjn79Ad7XN7HTHcc00UjBA9adF' : 'pk_test_51PjtRbE5sP7DA1XvD68v7X7Qj7pG6ZJpQmvuNodJjxc7MbH1ss2Te2gahFAS9nms4pbmEdMYdfCPxFDWHBbu9CxR003ikTnRES'
+  window.location.hostname !== 'localhost' && !window.location.hostname.includes('192.168.') ? 'pk_live_nsU0sDUA4jQEn0c0qOz0XYHl00QYsONl8G' : 'pk_test_51Grb83C8xKGwQm6J0yFqNpWwgFu8MF582uq74ktVViobsBzM2hjVT2fXFvW5JQwLQnoaAmXBWtGevNodYi0bT5uv00sjuMNw1n'
 ); // Replace with your actual publishable key
 
 // Parse the translations JSON string into an object
@@ -1928,7 +1928,7 @@ payButton.addEventListener('click', async () => {
       } else {
         // Extract video details for checkout session
         const checkoutSessionPayload = { 
-          tempId: tempId, 
+          task_id: tempId, 
           roundedSellingPrice,
           currency: currency,
           fileName: hasVideoFile ? videoInput.files[0].name : videoUrlValue.split('/').pop().split('?')[0] || 'video.mp4',
@@ -1960,8 +1960,14 @@ payButton.addEventListener('click', async () => {
         }
         
         const sessionData = await sessionResponse.json();
-        console.log('[Video Mode] Checkout session created:', sessionData.id);
-        const sessionId = sessionData.id;
+        
+        if (!sessionData.sessionId) {
+          console.error('[Video Mode] No session id in response:', sessionData);
+          throw new Error('Failed to create checkout session: no session id returned');
+        }
+        
+        console.log('[Video Mode] Checkout session created:', sessionData.sessionId);
+        const sessionId = sessionData.sessionId;
         
         const result = await stripe.redirectToCheckout({
           sessionId: sessionId,
@@ -2257,24 +2263,14 @@ document.addEventListener('DOMContentLoaded', () => {
   setupSampleImageSelection();
   setupSampleVideoSelection();
 
-  // Check URL parameters for mode and video URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const mode = urlParams.get('mode');
-  if (mode === 'image') {
+  // Check URL path for mode
+  const pathname = window.location.pathname;
+  if (pathname.includes('/image-faceswap')) {
     setImageMode();
-  }
-  if (mode === 'video') {
+  } else if (pathname.includes('/video-faceswap')) {
     setVideoMode();
-  }
-  if (!mode){
+  } else {
     setVideoMode();
-  }
-  if (mode === 'video' && urlParams.has('videoUrl')) {
-    videoUrlValue = urlParams.get('videoUrl');
-    loadVideoFromUrl(videoUrl);
-  }
-  if (mode === 'image' && urlParams.has('faceImageUrl')) {
-    faceImageUrlValue = urlParams.get('faceImageUrl');
   }
 });
 

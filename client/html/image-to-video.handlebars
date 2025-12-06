@@ -36,10 +36,18 @@
 <body>
     {{> sidebar}}
     <div id="main-content">
-        {{> header}}
+            {{> header}}
+        <section id="top" class="app-hero-section">
+          <div class=" mb-3">
+            <div class="hero-content">
+              <h1 id="title" class="hero-title">{{t "image_to_video_hero_title" "Image to Video Generator"}}</h1>
+              <p id="subtitle" class="hero-subtitle">{{t "image_to_video_subtitle" "Transform your images into stunning videos with AI technology."}}</p>
+            </div>
+          </div>
+        </section>
         
-        <div class="i2v-container">
-        <div class="i2v-grid">
+        <div class="i2v-container pt-0">
+        <div class="i2v-grid mt-0">
                 <!-- Left Column: Controls -->
                 <div>
                     <div class="i2v-card">
@@ -246,18 +254,11 @@
                                     <i class="bi bi-info-circle-fill"></i>
                                     <span>{{t "payment_required" "Payment required"}}</span>
                                 </div>
-                                <input class="form-check-input" type="checkbox" role="switch" id="i2vSkipPayment" style="display: none;">
+                                <div class="form-check form-switch" id="i2vSkipPaymentContainer" style="display: none;">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="i2vSkipPayment">
+                                    <label class="form-check-label" for="i2vSkipPayment">{{t "skip_payment_local" "Skip Payment (Local Testing)"}}</label>
+                                </div>
                             </div>
-
-                            <script>
-                                // Only show skip payment checkbox on localhost
-                                if (window.location.hostname === 'localhost' || window.location.hostname.includes('192.168.')) {
-                                    document.getElementById('i2vSkipPayment').style.display = 'block';
-                                    document.getElementById('i2vSkipPayment').checked = true;
-                                    document.getElementById('i2vPaymentStatus').classList.remove('warning');
-                                    document.getElementById('i2vPaymentStatus').innerHTML = '<i class="bi bi-check-circle-fill"></i><span>{{t "payment_skipped_local" "Payment skipped (local)"}}</span>';
-                                }
-                            </script>
                         </div>
                         <div class="i2v-card-footer">
                             <button id="generateImageToVideoButton" class="btn btn-primary btn-lg">

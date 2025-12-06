@@ -1,5 +1,9 @@
 {
   "title": "AI顔交換",
+  "image_to_video_hero_title": "画像から動画生成器",
+  "image_to_video_subtitle": "画像をAI技術で素晴らしい動画に変換します。",
+  "video_face_swap_title": "ビデオ顔交換",
+  "image_face_swap_title": "画像顔交換",
   "subtitle": "ビデオの顔を簡単に交換",
   "instruction_video": "ビデオをアップロード",
   "instruction_image": "顔写真をアップロード",
@@ -8,6 +12,7 @@
   "drop_video": "ここにビデオをドロップ",
   "drop_photo": "ここに写真をドロップ",
   "skip_payment": "支払いをスキップ",
+  "skip_payment_local": "支払いをスキップ (ローカルテスト)",
   "proceed": "続行",
   "please_upload_both": "ビデオと写真の両方をアップロードしてください。",
   "uploading_files": "ファイルをアップロード中...",

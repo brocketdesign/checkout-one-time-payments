@@ -57,7 +57,15 @@
         <section id="top" class="app-hero-section">
           <div class=" mb-3">
             <div class="hero-content">
-              <h1 id="title" class="hero-title">{{ translations.title }}</h1>
+              <h1 id="title" class="hero-title">
+                {{#if isFaceSwapVideoPage}}
+                  {{t "video_face_swap_title" "Video Face Swap"}}
+                {{else if isFaceSwapImagePage}}
+                  {{t "image_face_swap_title" "Image Face Swap"}}
+                {{else}}
+                  {{ translations.title }}
+                {{/if}}
+              </h1>
               <p id="subtitle" class="hero-subtitle">{{ translations.subtitle }}</p>
             </div>
           </div>
