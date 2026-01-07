@@ -359,6 +359,37 @@ app.get(['/image-to-video', '/:lang/image-to-video'], (req, res) => {
   });
 });
 
+// Add route for text-to-video page
+app.get(['/text-to-video', '/:lang/text-to-video'], (req, res) => {
+  const path = 'text-to-video';
+
+  // Determine language from cookie, URL parameter, or headers, default to 'en'
+  let language = req.cookies?.preferredLanguage || req.params.lang || (req.headers['accept-language']?.startsWith('ja') ? 'ja' : 'en');
+  if (language !== 'ja' && language !== 'en') {
+    language = 'en'; // Default to English if the language is not supported
+  }
+
+  // Load translation file
+  const translationPath = resolve(`${process.env.STATIC_DIR}/lang/${language}.json`);
+  let translations = {};
+  try {
+    const translationFile = fs.readFileSync(translationPath, 'utf-8');
+    translations = JSON.parse(translationFile);
+  } catch (error) {
+    console.error('Error loading translations:', error);
+  }
+  
+  // Render the text-to-video page with translations and flag to mark this as the current page
+  res.render(path, { translations, language, isTextToVideoPage: true }, (err, html) => {
+    if (err) {
+      console.error('Error rendering text-to-video template:', err);
+      // Show a simple error page instead of redirecting
+      return res.status(500).send(`<h1>Template Error</h1><pre>${err.message}</pre>`);
+    }
+    res.send(html);
+  });
+});
+
 app.get(['/video-faceswap', '/:lang/video-faceswap'], (req, res) => {
   const path = 'index';
 
@@ -1449,6 +1480,12 @@ wss.on('connection', (ws, req) => {
   if (path === '/image-to-video-ws') {
     // Handle image-to-video WebSocket connection
     imageToVideoRouter.handleWebSocketConnection(ws, req, wss);
+    return;
+  }
+
+  if (path === '/text-to-video-ws') {
+    // Handle text-to-video WebSocket connection
+    imageToVideoRouter.handleTextToVideoWebSocket(ws, req, wss);
     return;
   }
 

@@ -164,123 +164,136 @@
   "error_loading_image": "Error loading image from URL. The image might be restricted or the format is not supported.",
   "load_from_url": "Load from URL",
   
-    "hero": {
-      "headline": "Fast and Secure One-Time Payments",
-      "tagline": "Experience our seamless checkout process that makes paying online easier than ever before. No friction, just smooth transactions.",
-      "cta": "Get Started Now",
-      "imageAlt": "Secure payment processing illustration"
+  "hero": {
+    "headline": "Fast and Secure One-Time Payments",
+    "tagline": "Experience our seamless checkout process that makes paying online easier than ever before. No friction, just smooth transactions.",
+    "cta": "Get Started Now",
+    "imageAlt": "Secure payment processing illustration"
+  },
+  "demo": {
+    "title": "Demo",
+    "heading": "See How It Works",
+    "description": "Our payment system is designed with simplicity in mind. Just a few clicks and you're done - it's that easy!",
+    "imageAlt": "Product demonstration"
+  },
+  "howItWorks": {
+    "title": "How It Works",
+    "heading": "Simple Three-Step Process",
+    "step1": {
+      "description": "Just select your product, enter your payment details, and confirm. We'll take care of the rest! Our system handles everything securely in the background."
+    }
+  },
+  "benefits": {
+    "title": "Benefits",
+    "heading": "Why Choose Our Payment System?",
+    "seamless": {
+      "title": "Seamless Experience",
+      "description": "Enjoy a smooth checkout process without any redirects or complicated steps. Everything happens right where you are."
     },
-    "demo": {
-      "title": "Demo",
-      "heading": "See How It Works",
-      "description": "Our payment system is designed with simplicity in mind. Just a few clicks and you're done - it's that easy!",
-      "imageAlt": "Product demonstration"
+    "secure": {
+      "title": "Bank-Level Security",
+      "description": "Your data is protected with the latest encryption technology. We never store your sensitive card details."
     },
-    "howItWorks": {
-      "title": "How It Works",
-      "heading": "Simple Three-Step Process",
-      "step1": {
-        "description": "Just select your product, enter your payment details, and confirm. We'll take care of the rest! Our system handles everything securely in the background."
-      }
+    "fast": {
+      "title": "Lightning Fast",
+      "description": "Complete your purchase in seconds, not minutes. Our optimized system means you'll never be kept waiting."
     },
-    "benefits": {
-      "title": "Benefits",
-      "heading": "Why Choose Our Payment System?",
-      "seamless": {
-        "title": "Seamless Experience",
-        "description": "Enjoy a smooth checkout process without any redirects or complicated steps. Everything happens right where you are."
-      },
-      "secure": {
-        "title": "Bank-Level Security",
-        "description": "Your data is protected with the latest encryption technology. We never store your sensitive card details."
-      },
-      "fast": {
-        "title": "Lightning Fast",
-        "description": "Complete your purchase in seconds, not minutes. Our optimized system means you'll never be kept waiting."
-      },
-      "quality": {
-        "title": "Premium Support",
-        "description": "Have questions? Our friendly support team is ready to help you 24/7. We're just a message away!"
-      }
+    "quality": {
+      "title": "Premium Support",
+      "description": "Have questions? Our friendly support team is ready to help you 24/7. We're just a message away!"
+    }
+  },
+  "dynamicPricing": {
+    "title": "Pricing",
+    "heading": "Transparent Pricing, No Surprises",
+    "description": "We believe in clear and upfront pricing. What you see is exactly what you pay - no hidden fees or unexpected charges.",
+    "reassurance": "Our secure payment processing ensures your money and data are always protected. Pay with confidence!",
+    "ctaButton": "Make a Payment"
+  },
+  "faq": {
+    "title": "FAQ",
+    "heading": "Got Questions? We've Got Answers",
+    "q1": {
+      "question": "How secure is your payment system?",
+      "answer": "Extremely secure! We use bank-level encryption and comply with all PCI-DSS requirements. Your payment information is never stored on our servers, and all transactions are protected with the latest security protocols."
     },
-    "dynamicPricing": {
-      "title": "Pricing",
-      "heading": "Transparent Pricing, No Surprises",
-      "description": "We believe in clear and upfront pricing. What you see is exactly what you pay - no hidden fees or unexpected charges.",
-      "reassurance": "Our secure payment processing ensures your money and data are always protected. Pay with confidence!",
-      "ctaButton": "Make a Payment"
+    "q2": {
+      "question": "Can I get a refund if something goes wrong?",
+      "answer": "Absolutely! We have a hassle-free refund policy. If you're not satisfied or if there's any issue with your purchase, just reach out to our support team within 30 days and we'll process your refund quickly."
     },
-    "faq": {
-      "title": "FAQ",
-      "heading": "Got Questions? We've Got Answers",
-      "q1": {
-        "question": "How secure is your payment system?",
-        "answer": "Extremely secure! We use bank-level encryption and comply with all PCI-DSS requirements. Your payment information is never stored on our servers, and all transactions are protected with the latest security protocols."
-      },
-      "q2": {
-        "question": "Can I get a refund if something goes wrong?",
-        "answer": "Absolutely! We have a hassle-free refund policy. If you're not satisfied or if there's any issue with your purchase, just reach out to our support team within 30 days and we'll process your refund quickly."
-      },
-      "q3": {
-        "question": "What payment methods do you accept?",
-        "answer": "We accept all major credit cards (Visa, Mastercard, American Express, Discover), PayPal, Apple Pay, Google Pay, and several local payment methods depending on your region. We're constantly adding more payment options to make checkout convenient for everyone!"
-      },
-      "q4": {
-        "question": "How long does the payment process take?",
-        "answer": "Most payments are processed instantly! The entire checkout flow typically takes less than a minute to complete. Once your payment is confirmed, you'll immediately receive a confirmation email with all your purchase details."
-      },
-      "q5": {
-        "question": "Is my personal information protected?",
-        "answer": "Your privacy is our priority! We follow strict data protection guidelines and never share your personal information with third parties without your consent. All your data is encrypted and securely stored according to the highest industry standards."
-      }
+    "q3": {
+      "question": "What payment methods do you accept?",
+      "answer": "We accept all major credit cards (Visa, Mastercard, American Express, Discover), PayPal, Apple Pay, Google Pay, and several local payment methods depending on your region. We're constantly adding more payment options to make checkout convenient for everyone!"
     },
-    "footer": {
-      "ctaHeading": "Ready to Experience Better Payments?",
-      "ctaMessage": "Join thousands of satisfied customers who've already made the switch to our simple, secure payment system.",
-      "ctaButton": "Start Using It Today"
+    "q4": {
+      "question": "How long does the payment process take?",
+      "answer": "Most payments are processed instantly! The entire checkout flow typically takes less than a minute to complete. Once your payment is confirmed, you'll immediately receive a confirmation email with all your purchase details."
     },
-    "compressing_image": "Compressing image...",
-    "compression_complete": "Image compressed successfully!",
-    "compression_error": "Error compressing image:",
-    "reduction": "reduction",
-    "auto_compressed": "Auto-compressed for optimal size",
-    "compress_now": "Compress Now",
-    "howToFaceSwap": {
-      "heading": "How to Face Swap With AI in 3 Easy Steps?",
-      "step1": {
-        "title": "Upload Media",
-        "description": "Upload your image, GIF or video that contains faces",
-        "support": "Supports most common formats like JPG, PNG, GIF and MP4",
-        "tip": "Make sure faces are clearly visible for best results"
-      },
-      "step2": {
-        "title": "Select Faces",
-        "description": "Choose which faces you want to swap",
-        "select": "Select target faces to replace them with. You can select and swap multiple faces at once"
-      },
-      "step3": {
-        "title": "Generate & Download",
-        "description": "Click the 'Swap Faces' button to start the process",
-        "wait": "Wait a few seconds for AI to work its magic",
-        "download": "Download your face-swapped result in original quality"
-      }
+    "q5": {
+      "question": "Is my personal information protected?",
+      "answer": "Your privacy is our priority! We follow strict data protection guidelines and never share your personal information with third parties without your consent. All your data is encrypted and securely stored according to the highest industry standards."
+    }
+  },
+  "footer": {
+    "ctaHeading": "Ready to Experience Better Payments?",
+    "ctaMessage": "Join thousands of satisfied customers who've already made the switch to our simple, secure payment system.",
+    "ctaButton": "Start Using It Today"
+  },
+  "compressing_image": "Compressing image...",
+  "compression_complete": "Image compressed successfully!",
+  "compression_error": "Error compressing image:",
+  "reduction": "reduction",
+  "auto_compressed": "Auto-compressed for optimal size",
+  "compress_now": "Compress Now",
+  "howToFaceSwap": {
+    "heading": "How to Face Swap With AI in 3 Easy Steps?",
+    "step1": {
+      "title": "Upload Media",
+      "description": "Upload your image, GIF or video that contains faces",
+      "support": "Supports most common formats like JPG, PNG, GIF and MP4",
+      "tip": "Make sure faces are clearly visible for best results"
     },
-    "examples": {
-      "heading": "See the Results",
-      "description": "Drag the slider to compare before and after images",
-      "example1": {
-        "title": "Perfect Face Swapping",
-        "description": "Our AI seamlessly integrates facial features while maintaining natural expressions"
-      },
-      "example2": {
-        "title": "Lighting and Color Matching",
-        "description": "Advanced algorithms automatically adjust lighting and skin tones for realistic results"
-      },
-      "example3": {
-        "title": "Detail Preservation",
-        "description": "High-quality output preserves important details for professional-looking swaps"
-      },
-      "tryButton": "Try It Yourself"
+    "step2": {
+      "title": "Select Faces",
+      "description": "Choose which faces you want to swap",
+      "select": "Select target faces to replace them with. You can select and swap multiple faces at once"
     },
-    "or_choose_video_template": "or choose a video template"
+    "step3": {
+      "title": "Generate & Download",
+      "description": "Click the 'Swap Faces' button to start the process",
+      "wait": "Wait a few seconds for AI to work its magic",
+      "download": "Download your face-swapped result in original quality"
+    }
+  },
+  "examples": {
+    "heading": "See the Results",
+    "description": "Drag the slider to compare before and after images",
+    "example1": {
+      "title": "Perfect Face Swapping",
+      "description": "Our AI seamlessly integrates facial features while maintaining natural expressions"
+    },
+    "example2": {
+      "title": "Lighting and Color Matching",
+      "description": "Advanced algorithms automatically adjust lighting and skin tones for realistic results"
+    },
+    "example3": {
+      "title": "Detail Preservation",
+      "description": "High-quality output preserves important details for professional-looking swaps"
+    },
+    "tryButton": "Try It Yourself"
+  },
+  "or_choose_video_template": "or choose a video template",
+  "text-to-video": {
+    "hero_title": "Text to Video Generator",
+    "hero_subtitle": "Transform your text descriptions into stunning videos with AI technology",
+    "examples-title": "Prompt Examples",
+    "examples-subtitle": "Click any example below to use it as your prompt",
+    "use-example": "Use This",
+    "categories": {
+      "nature-landscapes": "Nature & Landscapes",
+      "animals-wildlife": "Animals & Wildlife",
+      "urban-city": "Urban & City",
+      "everyday-life": "Everyday Life"
+    }
+  }
 }

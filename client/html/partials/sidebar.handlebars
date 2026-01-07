@@ -37,6 +37,14 @@
                     </a>
                 </li>
                 <li>
+                    <a href="/text-to-video" 
+                       class="{{#if isTextToVideoPage}}active{{/if}}"
+                       aria-label="Text to Video - Generate videos from text descriptions">
+                        <span class="icon"><i class="bi bi-file-earmark-text"></i></span>
+                        <span class="text">{{t "text_to_video" "Text to Video"}}</span>
+                    </a>
+                </li>
+                <li>
                     <a href="/video-faceswap" 
                        class="{{#if isFaceSwapVideoPage}}active{{/if}}"
                        aria-label="Video Face Swap - Replace faces in videos">
@@ -118,6 +126,7 @@
             <li><a href="/"><span class="icon"><i class="bi bi-house-door"></i></span><span class="text">Home</span></a></li>
             <li><span class="nav-section-title">Video AI</span></li>
             <li><a href="/image-to-video" class="{{#if isImageToVideoPage}}active{{/if}}"><span class="icon"><i class="bi bi-image-alt"></i></span><span class="text">{{t "image_to_video" "Image to Video"}}</span></a></li>
+            <li><a href="/text-to-video" class="{{#if isTextToVideoPage}}active{{/if}}"><span class="icon"><i class="bi bi-file-earmark-text"></i></span><span class="text">{{t "text_to_video" "Text to Video"}}</span></a></li>
             <li><a href="/video-faceswap" class="{{#if isFaceSwapVideoPage}}active{{/if}}"><span class="icon"><i class="bi bi-camera-video"></i></span><span class="text">{{t "video_face_swap" "Video Face Swap"}}</span></a></li>
             <li><span class="nav-section-title">Image AI</span></li>
             <li><a href="/image-faceswap" class="{{#if isFaceSwapImagePage}}active{{/if}}"><span class="icon"><i class="bi bi-image"></i></span><span class="text">{{t "image_face_swap" "Image Face Swap"}}</span></a></li>
